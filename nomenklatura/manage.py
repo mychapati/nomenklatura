@@ -25,14 +25,6 @@ def postproc_20131119():
 
 
 @manager.command
-def flush(dataset):
-    ds = Dataset.by_name(dataset)
-    for alias in Alias.all_unmatched(ds):
-        db.session.delete(alias)
-    db.session.commit()
-
-
-@manager.command
 def cluster(dataset):
     ds = Dataset.by_name(dataset)
     from nomenklatura.model.cluster import generate_clusters
