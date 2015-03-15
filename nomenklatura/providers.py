@@ -29,7 +29,8 @@ class Stub():
 
 PROVIDERS = {
     'twitter': Stub('twitter'),
-    'facebook': Stub('facebook')
+    'facebook': Stub('facebook'),
+    'github': Stub('github')
 }
 
 

@@ -3,12 +3,11 @@ import logging
 from flask import Flask
 from flask import url_for as _url_for
 from flask.ext.sqlalchemy import SQLAlchemy
-from flask.ext.oauth import OAuth
+from flask_oauthlib.client import OAuth
 from flask.ext.login import LoginManager
 from flask.ext.assets import Environment
 from flask.ext.migrate import Migrate
 
-import certifi
 from kombu import Exchange, Queue
 from celery import Celery
 
