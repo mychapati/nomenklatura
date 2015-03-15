@@ -5,7 +5,7 @@ function DatasetsViewCtrl($scope, $routeParams, $location, $http, $modal, $timeo
     $scope.new_entity = {};
     $scope.query = '';
 
-    session.authz($routeParams.name);
+    //session.authz($routeParams.name);
     
     $http.get('/api/2/datasets/' + $routeParams.name).then(function(res) {
         $scope.dataset = res.data;

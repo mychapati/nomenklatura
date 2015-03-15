@@ -1,19 +1,24 @@
 nomenklatura.factory('session', ['$http', function($http) {
-    var _authz = {},
-        dfd = $http.get('/api/2/sessions');
+    var dfd = null;
 
-    var requestAuthz = function(dataset_name) {
-        if (!(dataset_name in _authz)) {
-            _authz[dataset_name] = $http({
-                url: '/api/2/sessions/authz',
-                method: 'GET',
-                params: {dataset: dataset_name}});
+    var get = function(cb) {
+        if (dfd === null) {
+            var dt = new Date();
+            var config = {cache: false, params: {'_': dt.getTime()}};
+            dfd = $http.get('/api/2/sessions', config);
         }
-        return _authz[dataset_name];
+        dfd.success(function(data) {
+          data.cbq = data.logged_in ? data.user.id : 'anon';
+          cb(data);
+        });
+    };
+
+    var reset = function() {
+        dfd = null;
     };
 
     return {
-        get: dfd.success,
-        authz: requestAuthz
+        get: get,
+        reset: reset
     };
 }]);
