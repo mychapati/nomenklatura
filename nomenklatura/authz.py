@@ -1,9 +1,9 @@
-from flask import request
+from flask.ext.login import current_user
 from werkzeug.exceptions import Forbidden
 
 
 def logged_in():
-    return request.user is not None
+    return current_user.is_authenticated()
 
 
 def dataset_create():
@@ -15,7 +15,7 @@ def dataset_edit(dataset):
         return False
     if dataset.public_edit:
         return True
-    if dataset.owner_id == request.user.id:
+    if dataset.owner_id == current_user.id:
         return True
     return False
 
@@ -23,7 +23,7 @@ def dataset_edit(dataset):
 def dataset_manage(dataset):
     if not logged_in():
         return False
-    if dataset.owner_id == request.user.id:
+    if dataset.owner_id == current_user.id:
         return True
     return False
 

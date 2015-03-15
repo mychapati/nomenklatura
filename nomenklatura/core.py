@@ -4,6 +4,7 @@ from flask import Flask
 from flask import url_for as _url_for
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.oauth import OAuth
+from flask.ext.login import LoginManager
 from flask.ext.assets import Environment
 from flask.ext.migrate import Migrate
 
@@ -24,6 +25,9 @@ db = SQLAlchemy(app)
 migrate = Migrate(app, db, directory=app.config.get('ALEMBIC_DIR'))
 
 assets = Environment(app)
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'index'
 
 celery = Celery('nomenklatura', broker=app.config['CELERY_BROKER_URL'])
 
@@ -37,15 +41,6 @@ celery = Celery(app_name, broker=app.config['CELERY_BROKER_URL'])
 celery.config_from_object(app.config)
 
 oauth = OAuth()
-github = oauth.remote_app('github',
-        base_url='https://github.com/login/oauth/',
-        authorize_url='https://github.com/login/oauth/authorize',
-        request_token_url=None,
-        access_token_url='https://github.com/login/oauth/access_token',
-        consumer_key=app.config.get('GITHUB_CLIENT_ID'),
-        consumer_secret=app.config.get('GITHUB_CLIENT_SECRET'))
-
-github._client.ca_certs = certifi.where()
 
 
 def url_for(*a, **kw):

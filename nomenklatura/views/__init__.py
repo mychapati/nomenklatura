@@ -1,36 +1,30 @@
 import os
 
 from flask import render_template, request
-from flask import session
-from werkzeug.exceptions import Unauthorized
 from formencode import Invalid
 from apikit import jsonify
 
-from nomenklatura.core import app
+from nomenklatura.core import app, login_manager
 from nomenklatura.model import User
 from nomenklatura.views.upload import section as upload
-from nomenklatura.views.sessions import section as sessions
+from nomenklatura.views.sessions_api import blueprint as sessions_api
 from nomenklatura.views.datasets import section as datasets
 from nomenklatura.views.entities import section as entities
 from nomenklatura.views.reconcile import section as reconcile
 from nomenklatura.views.matching import section as matching
 
 
-@app.before_request
-def check_auth():
+@login_manager.request_loader
+def load_user_from_request(request):
     api_key = request.headers.get('Authorization') \
         or request.args.get('api_key')
-    if session.get('id'):
-        request.user = User.by_github_id(session.get('id'))
-        if request.user is None:
-            del session['id']
-            raise Unauthorized()
-    elif api_key is not None:
-        request.user = User.by_api_key(api_key)
-        if request.user is None:
-            raise Unauthorized()
-    else:
-        request.user = None
+    if api_key is not None:
+        return User.by_api_key(api_key)
+
+
+@app.before_request
+def before():
+    request.authz_datasets = {}
 
 
 @app.errorhandler(401)
@@ -64,7 +58,7 @@ def handle_invalid(exc):
 
 app.register_blueprint(upload, url_prefix='/api/2')
 app.register_blueprint(reconcile, url_prefix='/api/2')
-app.register_blueprint(sessions, url_prefix='/api/2')
+app.register_blueprint(sessions_api, url_prefix='/api/2')
 app.register_blueprint(datasets, url_prefix='/api/2')
 app.register_blueprint(entities, url_prefix='/api/2')
 app.register_blueprint(matching, url_prefix='/api/2')
