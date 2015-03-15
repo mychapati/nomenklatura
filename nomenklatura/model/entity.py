@@ -72,7 +72,7 @@ class Entity(db.Model):
     canonical_id = db.Column(db.Integer,
                              db.ForeignKey('entity.id'), nullable=True)
     dataset_id = db.Column(db.Integer, db.ForeignKey('dataset.id'))
-    creator_id = db.Column(db.Integer, db.ForeignKey('account.id'))
+    creator_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow,
                            onupdate=datetime.utcnow)
@@ -159,12 +159,12 @@ class Entity(db.Model):
         return q
 
     @classmethod
-    def create(cls, dataset, data, account):
+    def create(cls, dataset, data, user):
         state = EntityState(dataset, None)
         data = EntitySchema().to_python(data, state)
         entity = cls()
         entity.dataset = dataset
-        entity.creator = account
+        entity.creator = user
         entity.name = data['name']
         entity.normalized = normalize(entity.name)
         entity.attributes = data.get('attributes', {})
@@ -175,10 +175,10 @@ class Entity(db.Model):
         db.session.flush()
         return entity
 
-    def update(self, data, account):
+    def update(self, data, user):
         state = EntityState(self.dataset, self)
         data = EntitySchema().to_python(data, state)
-        self.creator = account
+        self.creator = user
         self.name = data['name']
         self.normalized = normalize(self.name)
         self.attributes = data['attributes']

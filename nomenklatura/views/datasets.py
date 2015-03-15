@@ -20,7 +20,7 @@ def index():
 @section.route('/datasets', methods=['POST'])
 def create():
     authz.require(authz.dataset_create())
-    dataset = Dataset.create(request_data(), request.account)
+    dataset = Dataset.create(request_data(), request.user)
     db.session.commit()
     return redirect(url_for('.view', dataset=dataset.name))
 

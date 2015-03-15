@@ -4,8 +4,8 @@ from nomenklatura.core import db
 from nomenklatura.model.common import make_key
 
 
-class Account(db.Model):
-    __tablename__ = 'account'
+class User(db.Model):
+    __tablename__ = 'user'
 
     id = db.Column(db.Integer, primary_key=True)
     github_id = db.Column(db.Integer)
@@ -14,14 +14,14 @@ class Account(db.Model):
     api_key = db.Column(db.Unicode, default=make_key)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow,
-            onupdate=datetime.utcnow)
+                           onupdate=datetime.utcnow)
 
     datasets = db.relationship('Dataset', backref='owner',
                                lazy='dynamic')
     uploads = db.relationship('Upload', backref='creator',
-                               lazy='dynamic')
+                              lazy='dynamic')
     entities_created = db.relationship('Entity', backref='creator',
-                               lazy='dynamic')
+                                       lazy='dynamic')
 
     def to_dict(self):
         return {
@@ -30,7 +30,7 @@ class Account(db.Model):
             'login': self.login,
             'created_at': self.created_at,
             'updated_at': self.updated_at,
-            }
+        }
 
     @classmethod
     def by_id(cls, id):
@@ -46,13 +46,13 @@ class Account(db.Model):
 
     @classmethod
     def create(cls, data):
-        account = cls()
-        account.github_id = data['id']
-        account.login = data['login']
-        account.email = data.get('email')
-        db.session.add(account)
+        user = cls()
+        user.github_id = data['id']
+        user.login = data['login']
+        user.email = data.get('email')
+        db.session.add(user)
         db.session.flush()
-        return account
+        return user
 
     def update(self, data):
         self.login = data['login']

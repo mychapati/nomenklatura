@@ -55,23 +55,23 @@ class Dataset(db.Model):
     public_edit = db.Column(db.Boolean, default=False)
     normalize_text = db.Column(db.Boolean, default=True)
     enable_invalid = db.Column(db.Boolean, default=True)
-    owner_id = db.Column(db.Integer, db.ForeignKey('account.id'))
+    owner_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow,
-            onupdate=datetime.utcnow)
+                           onupdate=datetime.utcnow)
 
     entities = db.relationship('Entity', backref='dataset',
-                             lazy='dynamic')
-    uploads = db.relationship('Upload', backref='dataset',
                                lazy='dynamic')
+    uploads = db.relationship('Upload', backref='dataset',
+                              lazy='dynamic')
 
     def to_dict(self):
         from nomenklatura.model.entity import Entity
-        num_aliases = Entity.all(self).filter(Entity.canonical_id!=None).count()
+        num_aliases = Entity.all(self).filter(Entity.canonical_id != None).count()
         num_review = Entity.all(self).filter_by(reviewed=False).count()
         num_entities = Entity.all(self).count()
         num_invalid = Entity.all(self).filter_by(invalid=True).count()
-    
+
         return {
             'id': self.id,
             'name': self.name,
@@ -127,10 +127,10 @@ class Dataset(db.Model):
         return cls.query
 
     @classmethod
-    def create(cls, data, account):
+    def create(cls, data, user):
         data = DatasetNewSchema().to_python(data)
         dataset = cls()
-        dataset.owner = account
+        dataset.owner = user
         dataset.name = data['name']
         dataset.label = data['label']
         db.session.add(dataset)
@@ -147,4 +147,3 @@ class Dataset(db.Model):
         self.enable_invalid = data['enable_invalid']
         db.session.add(self)
         db.session.flush()
-

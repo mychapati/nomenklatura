@@ -18,7 +18,7 @@ def upload(dataset):
     if not file_ or not file_.filename:
         err = {'file': "You need to upload a file"}
         raise Invalid("No file.", None, None, error_dict=err)
-    upload = Upload.create(dataset, request.account, file_)
+    upload = Upload.create(dataset, request.user, file_)
     db.session.commit()
     return jsonify(upload)
 
@@ -47,5 +47,5 @@ def process(dataset, id):
     if 'name' not in fields and 'id' not in fields:
         raise Invalid("You have not selected a field that definies entity names.", None, None)
 
-    import_upload.delay(upload.id, request.account.id, mapping)
+    import_upload.delay(upload.id, request.user.id, mapping)
     return jsonify({'status': 'Loading data...'})

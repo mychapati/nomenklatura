@@ -1,6 +1,6 @@
 <div class="modal-header">
   <button type="button" class="close" ng-click="cancel()" aria-hidden="true">&times;</button>
-  <h4 class="modal-title">Profile: {{session.account.login}}</h4>
+  <h4 class="modal-title">Profile: {{session.user.login}}</h4>
 </div>
 
 <form class="form-horizontal" role="form" name="newDataset">
@@ -12,7 +12,7 @@
       </tr>
       <tr>
         <th>GitHub ID</th>
-        <td>{{session.account.github_id}}</td>
+        <td>{{session.user.github_id}}</td>
       </tr>
     </table>
   </div>

@@ -7,7 +7,7 @@ from formencode import Invalid
 from apikit import jsonify
 
 from nomenklatura.core import app
-from nomenklatura.model import Account
+from nomenklatura.model import User
 from nomenklatura.views.upload import section as upload
 from nomenklatura.views.sessions import section as sessions
 from nomenklatura.views.datasets import section as datasets
@@ -21,16 +21,16 @@ def check_auth():
     api_key = request.headers.get('Authorization') \
         or request.args.get('api_key')
     if session.get('id'):
-        request.account = Account.by_github_id(session.get('id'))
-        if request.account is None:
+        request.user = User.by_github_id(session.get('id'))
+        if request.user is None:
             del session['id']
             raise Unauthorized()
     elif api_key is not None:
-        request.account = Account.by_api_key(api_key)
-        if request.account is None:
+        request.user = User.by_api_key(api_key)
+        if request.user is None:
             raise Unauthorized()
     else:
-        request.account = None
+        request.user = None
 
 
 @app.errorhandler(401)

@@ -5,7 +5,7 @@ from apikit import jsonify
 
 from nomenklatura import authz
 from nomenklatura.core import db, github
-from nomenklatura.model import Account, Dataset
+from nomenklatura.model import User, Dataset
 
 section = Blueprint('sessions', __name__)
 
@@ -14,8 +14,8 @@ section = Blueprint('sessions', __name__)
 def status():
     return jsonify({
         'logged_in': authz.logged_in(),
-        'api_key': request.account.api_key if authz.logged_in() else None,
-        'account': request.account,
+        'api_key': request.user.api_key if authz.logged_in() else None,
+        'user': request.user,
         'base_url': url_for('index', _external=True)
     })
 
@@ -54,13 +54,13 @@ def authorized(resp):
         return redirect(url_for('index'))
     access_token = resp['access_token']
     session['access_token'] = access_token, ''
-    res = requests.get('https://api.github.com/user?access_token=%s' % access_token,
-                       verify=False)
+    url = 'https://api.github.com/user?access_token=%s' % access_token
+    res = requests.get(url, verify=False)
     data = res.json()
     for k, v in data.items():
         session[k] = v
-    account = Account.by_github_id(data.get('id'))
-    if account is None:
-        account = Account.create(data)
+    user = User.by_github_id(data.get('id'))
+    if user is None:
+        user = User.create(data)
         db.session.commit()
     return redirect('/')

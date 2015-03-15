@@ -3,7 +3,7 @@ from werkzeug.exceptions import Forbidden
 
 
 def logged_in():
-    return request.account is not None
+    return request.user is not None
 
 
 def dataset_create():
@@ -15,7 +15,7 @@ def dataset_edit(dataset):
         return False
     if dataset.public_edit:
         return True
-    if dataset.owner_id == request.account.id:
+    if dataset.owner_id == request.user.id:
         return True
     return False
 
@@ -23,7 +23,7 @@ def dataset_edit(dataset):
 def dataset_manage(dataset):
     if not logged_in():
         return False
-    if dataset.owner_id == request.account.id:
+    if dataset.owner_id == request.user.id:
         return True
     return False
 

@@ -13,11 +13,10 @@ class Upload(db.Model):
     filename = db.Column(db.Unicode)
     data = db.deferred(db.Column(db.LargeBinary))
     dataset_id = db.Column(db.Integer, db.ForeignKey('dataset.id'))
-    creator_id = db.Column(db.Integer, db.ForeignKey('account.id'))
+    creator_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow,
                            onupdate=datetime.utcnow)
-
 
     def to_dict(self):
         data = {

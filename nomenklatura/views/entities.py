@@ -41,7 +41,7 @@ def create():
     data = request_data()
     dataset = Dataset.from_form(data)
     authz.require(authz.dataset_edit(dataset))
-    entity = Entity.create(dataset, data, request.account)
+    entity = Entity.create(dataset, data, request.user)
     db.session.commit()
     return redirect(url_for('.view', id=entity.id))
 
@@ -71,6 +71,6 @@ def aliases(id):
 def update(id):
     entity = Entity.by_id(id)
     authz.require(authz.dataset_edit(entity.dataset))
-    entity.update(request_data(), request.account)
+    entity.update(request_data(), request.user)
     db.session.commit()
     return redirect(url_for('.view', id=entity.id))

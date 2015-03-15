@@ -2,7 +2,7 @@ from formencode import Invalid
 
 from nomenklatura.core import db
 from nomenklatura.core import celery as app
-from nomenklatura.model import Dataset, Entity, Account, Upload
+from nomenklatura.model import Dataset, Entity, User, Upload
 
 
 def apply_mapping(row, mapping):
@@ -20,9 +20,9 @@ def apply_mapping(row, mapping):
 
 
 @app.task
-def import_upload(upload_id, account_id, mapping):
+def import_upload(upload_id, user_id, mapping):
     upload = Upload.all().filter_by(id=upload_id).first()
-    account = Account.by_id(account_id)
+    user = User.by_id(user_id)
     mapped = mapping['columns'].values()
 
     rows = [apply_mapping(r, mapping) for r in upload.tab.dict]
@@ -37,13 +37,13 @@ def import_upload(upload_id, account_id, mapping):
             if entity is None:
                 entity = Entity.by_name(upload.dataset, row.get('name'))
             if entity is None:
-                entity = Entity.create(upload.dataset, row, account)
+                entity = Entity.create(upload.dataset, row, user)
 
-            # restore some defaults: 
+            # restore some defaults:
             if entity.canonical_id and 'canonical' not in mapped:
                 row['canonical'] = entity.canonical_id
             if entity.invalid and 'invalid' not in mapped:
-                row['invalid'] = entity.invalid 
+                row['invalid'] = entity.invalid
 
             if entity.attributes:
                 attributes = entity.attributes.copy()
@@ -52,12 +52,12 @@ def import_upload(upload_id, account_id, mapping):
             attributes.update(row['attributes'])
             row['attributes'] = attributes
 
-            entity.update(row, account)
+            entity.update(row, user)
             print entity
             if i % 100 == 0:
                 print 'COMMIT'
                 db.session.commit()
         except Invalid, inv:
-            # TODO: logging. 
+            # TODO: logging.
             print inv
     db.session.commit()
