@@ -1,5 +1,5 @@
-from flask import Blueprint, request, url_for
-from flask import redirect
+from flask import Blueprint, request, url_for, redirect
+from flask.ext.login import current_user
 from apikit import jsonify, Pager, request_data
 
 from nomenklatura.core import db
@@ -12,15 +12,16 @@ section = Blueprint('datasets', __name__)
 
 @section.route('/datasets', methods=['GET'])
 def index():
-    datasets = Dataset.all()
-    pager = Pager(datasets)
+    q = Dataset.all()
+    q = q.filter(Dataset.name.in_(authz.datasets('read')))
+    pager = Pager(q)
     return jsonify(pager.to_dict())
 
 
 @section.route('/datasets', methods=['POST'])
 def create():
     authz.require(authz.dataset_create())
-    dataset = Dataset.create(request_data(), request.user)
+    dataset = Dataset.create(request_data(), current_user)
     db.session.commit()
     return redirect(url_for('.view', dataset=dataset.name))
 
@@ -39,8 +40,8 @@ def attributes(dataset):
 
 @section.route('/datasets/<dataset>', methods=['POST'])
 def update(dataset):
-    dataset = Dataset.find(dataset)
     authz.require(authz.dataset_manage(dataset))
+    dataset = Dataset.find(dataset)
     dataset.update(request_data())
     db.session.commit()
     return redirect(url_for('.view', dataset=dataset.name))

@@ -12,7 +12,6 @@ function EntitiesViewCtrl($scope, $routeParams, $location, $http, $modal, $timeo
         $http.get('/api/2/datasets/' + res.data.dataset).then(function(res) {
             $scope.dataset = res.data;
         });
-        session.authz(res.data.dataset);
     });
 
     function loadAliases(url) {

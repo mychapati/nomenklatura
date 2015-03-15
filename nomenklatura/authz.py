@@ -1,5 +1,33 @@
+from flask import request
 from flask.ext.login import current_user
 from werkzeug.exceptions import Forbidden
+from sqlalchemy import or_
+
+from nomenklatura.model import Dataset
+
+
+def datasets(action):
+    if action == 'read' and request.authz_datasets.get('read') is None:
+        q = Dataset.find_names()
+        request.authz_datasets['read'] = [d.name for d in q.all()]
+    if action == 'edit' and request.authz_datasets.get('edit') is None:
+        if current_user.is_authenticated():
+            q = Dataset.find_names()
+            q = q.filter(or_(
+                Dataset.owner_id == current_user.id,
+                Dataset.public_edit == True # noqa
+            ))
+            request.authz_datasets['edit'] = [d.name for d in q.all()]
+        else:
+            request.authz_datasets['edit'] = []
+    if action == 'manage' and request.authz_datasets.get('manage') is None:
+        if current_user.is_authenticated():
+            q = Dataset.find_names()
+            q = q.filter(Dataset.owner_id == current_user.id)
+            request.authz_datasets['manage'] = [d.name for d in q.all()]
+        else:
+            request.authz_datasets['manage'] = []
+    return request.authz_datasets[action] or []
 
 
 def logged_in():
@@ -10,22 +38,12 @@ def dataset_create():
     return logged_in()
 
 
-def dataset_edit(dataset):
-    if not logged_in():
-        return False
-    if dataset.public_edit:
-        return True
-    if dataset.owner_id == current_user.id:
-        return True
-    return False
+def dataset_edit(name):
+    return name in datasets('edit')
 
 
-def dataset_manage(dataset):
-    if not logged_in():
-        return False
-    if dataset.owner_id == current_user.id:
-        return True
-    return False
+def dataset_manage(name):
+    return name in datasets('manage')
 
 
 def require(pred):

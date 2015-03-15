@@ -9,12 +9,11 @@ nomenklatura.directive('nkAuthz', ['$timeout', 'session', function ($timeout, se
             element.addClass('hidden');
             scope.$watch('dataset', function(n, o, dataset) {
                 if (scope.dataset && scope.dataset.name) {
-                    // session.authz(scope.dataset.name).then(function(res) {
-                    //     var perms = res.data[scope.dataset.name];
-                    //     if (perms[scope.operation]) {
-                    //         element.removeClass('hidden');
-                    //     }
-                    // });
+                    session.get(function(res) {
+                        if (res.permissions[scope.operation].indexOf(scope.dataset.name) != -1) {
+                            element.removeClass('hidden');
+                        }
+                    });
                 }
             });
         }

@@ -118,6 +118,11 @@ class Dataset(db.Model):
         return dataset
 
     @classmethod
+    def find_names(cls):
+        q = db.session.query(cls.name)
+        return q
+
+    @classmethod
     def from_form(cls, form_data):
         data = FormDatasetSchema().to_python(form_data)
         return data.get('dataset')

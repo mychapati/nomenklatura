@@ -1,4 +1,5 @@
 from flask import Blueprint, request, url_for, redirect
+from flask.ext.login import current_user
 from apikit import jsonify, Pager, arg_bool, request_data, obj_or_404
 
 from nomenklatura.core import db
@@ -40,8 +41,8 @@ def index():
 def create():
     data = request_data()
     dataset = Dataset.from_form(data)
-    authz.require(authz.dataset_edit(dataset))
-    entity = Entity.create(dataset, data, request.user)
+    authz.require(authz.dataset_edit(dataset.name))
+    entity = Entity.create(dataset, data, current_user)
     db.session.commit()
     return redirect(url_for('.view', id=entity.id))
 
@@ -70,7 +71,7 @@ def aliases(id):
 @section.route('/entities/<id>', methods=['POST'])
 def update(id):
     entity = Entity.by_id(id)
-    authz.require(authz.dataset_edit(entity.dataset))
-    entity.update(request_data(), request.user)
+    authz.require(authz.dataset_edit(entity.dataset.name))
+    entity.update(request_data(), current_user)
     db.session.commit()
     return redirect(url_for('.view', id=entity.id))

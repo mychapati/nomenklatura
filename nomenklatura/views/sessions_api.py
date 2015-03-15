@@ -19,11 +19,15 @@ def status():
         if not isinstance(provider, Stub):
             oauth_providers[name] = url_for('.login', provider=name)
 
+    permissions = {}
+    for perm in ['read', 'edit', 'manage']:
+        permissions[perm] = authz.datasets(perm)
+
     return jsonify({
         'logged_in': authz.logged_in(),
         'api_key': current_user.api_key if authz.logged_in() else None,
         'user': current_user if authz.logged_in() else None,
-        'permissions': {},
+        'permissions': permissions,
         'logins': oauth_providers,
         'logout': url_for('.logout')
     })
