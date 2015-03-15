@@ -1,28 +1,23 @@
-from normality import normalize
 from flask.ext.script import Manager
 from flask.ext.assets import ManageAssets
+from flask.ext.migrate import MigrateCommand, upgrade
 
 from nomenklatura.core import db
-from nomenklatura.model import Entity
 from nomenklatura.views import app
 from nomenklatura.assets import assets
 
 manager = Manager(app)
 manager.add_command('assets', ManageAssets(assets))
+manager.add_command('db', MigrateCommand)
 
 
 @manager.command
-def createdb():
-    """ Make the database. """
+def sync():
+    """ Sync or create the database. """
+    db.engine.execute("CREATE EXTENSION IF NOT EXISTS hstore;")
+    db.engine.execute("CREATE EXTENSION IF NOT EXISTS fuzzystrmatch;")
+    upgrade()
     db.create_all()
-
-
-@manager.command
-def flush(dataset):
-    ds = Dataset.by_name(dataset)
-    for alias in Alias.all_unmatched(ds):
-        db.session.delete(alias)
-    db.session.commit()
 
 
 if __name__ == '__main__':
