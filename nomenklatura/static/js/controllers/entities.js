@@ -1,27 +1,27 @@
 
-function EntitiesViewCtrl($scope, $routeParams, $location, $http, $modal, $timeout, session) {
-    $scope.dataset = {};
-    $scope.entity = {};
-    $scope.aliases = {};
-    $scope.has_aliases = false;
-    
-    $http.get('/api/2/entities/' + $routeParams.id).then(function(res) {
-        $scope.entity = res.data;
-        $scope.has_attributes = res.data.attributes && Object.keys(res.data.attributes).length > 0;
+var loadEntity = ['$route', '$http', '$q', function($route, $http, $q) {
+  var dfd = $q.defer();
+  $http.get('/api/2/entities/' + $route.current.params.id).then(function(res) {
+    dfd.resolve(res.data);
+  });
+  return dfd.promise;
+}];
 
-        $http.get('/api/2/datasets/' + res.data.dataset).then(function(res) {
-            $scope.dataset = res.data;
-        });
+nomenklatura.controller('EntitiesViewCtrl', ['$scope', '$routeParams', '$location',
+            '$http', '$modal', '$timeout', 'session', 'dataset', 'entity',
+  function ($scope, $routeParams, $location, $http, $modal, $timeout, session, dataset, entity) {
+  $scope.dataset = dataset;
+  $scope.entity = entity;
+  $scope.has_attributes = entity.attributes && Object.keys(entity.attributes).length > 0;
+  $scope.aliases = {};
+  $scope.has_aliases = false;
+  
+  function loadAliases(url) {
+    $http.get(url).then(function(res) {
+      $scope.aliases = res.data;
+      $scope.has_aliases = res.data.total > 0;
     });
+  }
 
-    function loadAliases(url) {
-        $http.get(url).then(function(res) {
-            $scope.aliases = res.data;
-            $scope.has_aliases = res.data.total > 0;
-        });
-    }
-
-    loadAliases('/api/2/entities/' + $routeParams.id + '/aliases');
-}
-
-EntitiesViewCtrl.$inject = ['$scope', '$routeParams', '$location', '$http', '$modal', '$timeout', 'session'];
+  loadAliases('/api/2/entities/' + $routeParams.id + '/aliases');
+}]);

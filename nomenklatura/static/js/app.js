@@ -4,40 +4,55 @@ nomenklatura.config(['$routeProvider', '$locationProvider', '$sceProvider', 'cfp
     function($routeProvider, $locationProvider, $sceProvider, cfpLoadingBarProvider) {
 
   cfpLoadingBarProvider.includeSpinner = false;
-  
+
   $routeProvider.when('/', {
     templateUrl: '/static/templates/home.html',
-    controller: HomeCtrl
+    controller: 'HomeCtrl'
   });
 
   $routeProvider.when('/docs/:page/:anchor', {
     templateUrl: '/static/templates/pages/template.html',
-    controller: DocsCtrl
+    controller: 'DocsCtrl'
   });
 
   $routeProvider.when('/docs/:page', {
     templateUrl: '/static/templates/docs/template.html',
-    controller: DocsCtrl
+    controller: 'DocsCtrl'
   });
 
-  $routeProvider.when('/datasets/:name', {
+  $routeProvider.when('/datasets/:dataset', {
     templateUrl: '/static/templates/datasets/view.html',
-    controller: DatasetsViewCtrl
+    controller: 'DatasetsViewCtrl',
+    resolve: {
+      'dataset': loadDataset,
+      'entities': loadDatasetEntities
+    }
   });
 
   $routeProvider.when('/datasets/:dataset/uploads/:upload', {
     templateUrl: '/static/templates/mapping.html',
-    controller: MappingCtrl
+    controller: 'MappingCtrl',
+    resolve: {
+      'dataset': loadDataset,
+      'upload': loadUpload
+    }
   });
 
   $routeProvider.when('/datasets/:dataset/review/:what', {
     templateUrl: '/static/templates/review.html',
-    controller: ReviewCtrl
+    controller: 'ReviewCtrl',
+    resolve: {
+      'dataset': loadDataset
+    }
   });
 
   $routeProvider.when('/datasets/:dataset/entities/:id', {
     templateUrl: '/static/templates/entities/view.html',
-    controller: EntitiesViewCtrl
+    controller: 'EntitiesViewCtrl',
+    resolve: {
+      'dataset': loadDataset,
+      'entity': loadEntity
+    }
   });
 
   $routeProvider.otherwise({
