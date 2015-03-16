@@ -34,15 +34,10 @@ class Matches(object):
 
 def find_matches(dataset, text, filter=None, exclude=None):
     entities = Entity.__table__
-    match_text = normalize(text, dataset)[:254]
+    match_text = normalize(text or '')[:254]
 
     # select text column and apply necesary transformations
-    text_field = entities.c.name
-    if dataset.normalize_text:
-        text_field = entities.c.normalized
-    if dataset.ignore_case:
-        text_field = func.lower(text_field)
-    text_field = func.left(text_field, 254)
+    text_field = func.left(entities.c.normalized, 254)
 
     # calculate the difference percentage
     l = func.greatest(1.0, func.least(len(match_text), func.length(text_field)))
@@ -58,7 +53,7 @@ def find_matches(dataset, text, filter=None, exclude=None):
     if not dataset.match_aliases:
         filters.append(entities.c.canonical_id == None) # noqa
     if exclude is not None:
-        filters.append(entities.c.id!=exclude)
+        filters.append(entities.c.id != exclude)
     if filter is not None:
         filters.append(text_field.ilike('%%%s%%' % filter))
 
