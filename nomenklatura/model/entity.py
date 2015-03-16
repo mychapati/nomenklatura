@@ -7,7 +7,7 @@ from sqlalchemy import func
 from sqlalchemy.orm import joinedload_all, backref
 from sqlalchemy.dialects.postgresql import HSTORE
 
-from nomenklatura.core import db
+from nomenklatura.core import db, url_for
 from nomenklatura.exc import NotFound
 
 
@@ -83,6 +83,7 @@ class Entity(db.Model):
     def to_dict(self, shallow=False):
         d = {
             'id': self.id,
+            'api_url': url_for('entities.view', id=self.id),
             'name': self.name,
             'dataset': self.dataset.name,
             'reviewed': self.reviewed,

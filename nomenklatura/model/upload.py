@@ -2,7 +2,7 @@ from datetime import datetime
 from tablib import Dataset as TablibDataset
 
 from nomenklatura.exc import NotFound
-from nomenklatura.core import db
+from nomenklatura.core import db, url_for
 
 
 class Upload(db.Model):
@@ -21,6 +21,8 @@ class Upload(db.Model):
     def to_dict(self):
         data = {
             'id': self.id,
+            'api_url': url_for('uploads.view', dataset=self.dataset.name,
+                               id=self.id),
             'mimetype': self.mimetype,
             'filename': self.filename,
             'created_at': self.created_at,
