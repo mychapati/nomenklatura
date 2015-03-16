@@ -9,6 +9,7 @@
 @border-color: #d7d7d7;
 @boxed-color: #fafafa;
 @brand-primary: @main-color;
+@loading-bar-color: @main-color;
 
 // Style tiles, Fonts
 @font-default: 'Lato', sans-serif;
@@ -58,6 +59,8 @@
 // Utility classes
 @import "../vendor/bootstrap/less/utilities.less";
 @import "../vendor/bootstrap/less/responsive-utilities.less";
+
+@import "loader.less";
 
 // Modal backdrop workaround:
 html { height: 100%; }
