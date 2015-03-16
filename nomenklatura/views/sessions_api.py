@@ -51,6 +51,13 @@ def login(provider):
     return PROVIDERS[provider].authorize(callback=callback)
 
 
+def login_authorized(next_url, data):
+    user = User.load(data)
+    db.session.commit()
+    login_user(user, remember=True)
+    return redirect(next_url)
+
+
 handler = PROVIDERS.get('twitter')
 
 
@@ -64,14 +71,10 @@ def twitter_authorized(resp):
                                 resp['oauth_token_secret'])
     provider = PROVIDERS.get('twitter')
     res = provider.get('users/show.json?user_id=%s' % resp.get('user_id'))
-    data = {
+    return login_authorized(next_url, {
         'display_name': res.data.get('name'),
         'twitter_id': res.data.get('id')
-    }
-    user = User.load(data)
-    db.session.commit()
-    login_user(user, remember=True)
-    return redirect(next_url)
+    })
 
 
 handler = PROVIDERS.get('facebook')
@@ -85,15 +88,11 @@ def facebook_authorized(resp):
         return redirect(next_url)
     session['facebook_token'] = (resp.get('access_token'), '')
     profile = PROVIDERS.get('facebook').get('/me').data
-    data = {
+    return login_authorized(next_url, {
         'display_name': profile.get('name'),
         'email': profile.get('email'),
         'facebook_id': profile.get('id')
-    }
-    user = User.load(data)
-    db.session.commit()
-    login_user(user, remember=True)
-    return redirect(next_url)
+    })
 
 
 handler = PROVIDERS.get('github')
@@ -107,13 +106,9 @@ def github_authorized(resp):
         return redirect(next_url)
     session['github_token'] = (resp['access_token'], '')
     res = PROVIDERS.get('github').get('https://api.github.com/user')
-    data = {
+    return login_authorized(next_url, {
         'display_name': res.data.get('name'),
         'email': res.data.get('email'),
         'login': res.data.get('login'),
         'github_id': res.data.get('id')
-    }
-    user = User.load(data)
-    db.session.commit()
-    login_user(user, remember=True)
-    return redirect(next_url)
+    })
