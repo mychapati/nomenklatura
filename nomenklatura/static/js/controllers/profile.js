@@ -1,14 +1,25 @@
-function ProfileCtrl($scope, $location, $modalInstance, session) {
-    $scope.session = {logged_in: false};
+function ProfileCtrl($scope, $location, $modalInstance, $http, session) {
+  $scope.session = {logged_in: false};
+  $scope.user = {}
 
-    session.get(function(data) {
-        $scope.session = data;
+  session.get(function(data) {
+      $scope.session = data;
+      $scope.user = data.user;
+  });
+
+  $scope.cancel = function() {
+    $modalInstance.dismiss('cancel');
+  };
+
+  $scope.update = function(form) {
+    var res = $http.post($scope.user.api_url, $scope.user);
+    res.success(function(data) {
+      $scope.user = data;
+      $scope.session.user = data;
+      $modalInstance.dismiss('ok');
     });
-
-    $scope.cancel = function() {
-        $modalInstance.dismiss('cancel');
-    };
+  };  
     
 }
 
-ProfileCtrl.$inject = ['$scope', '$location', '$modalInstance', 'session'];
+ProfileCtrl.$inject = ['$scope', '$location', '$modalInstance', '$http', 'session'];

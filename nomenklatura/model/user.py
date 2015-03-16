@@ -1,12 +1,20 @@
 from datetime import datetime
 
-from nomenklatura.core import db, login_manager
+from formencode import Schema, validators
+
+from nomenklatura.core import db, url_for, login_manager
 from nomenklatura.model.common import make_key
 
 
 @login_manager.user_loader
 def load_user(id):
     return User.query.get(int(id))
+
+
+class UserEditSchema(Schema):
+    allow_extra_fields = True
+    display_name = validators.String(min=3, max=512)
+    email = validators.Email()
 
 
 class User(db.Model):
@@ -35,7 +43,10 @@ class User(db.Model):
         return {
             'id': self.id,
             'github_id': self.github_id,
+            'display_name': self.display_name,
+            'email': self.email,
             'login': self.login,
+            'api_url': url_for('users.view', id=self.id),
             'created_at': self.created_at,
             'updated_at': self.updated_at,
         }
@@ -57,6 +68,15 @@ class User(db.Model):
 
     def __unicode__(self):
         return self.display_name
+
+    def update(self, data):
+        data = UserEditSchema().to_python(data)
+        self.display_name = data.get('display_name')
+        self.email = data.get('email')
+
+    @classmethod
+    def all(cls):
+        return cls.query
 
     @classmethod
     def by_id(cls, id):
