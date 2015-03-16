@@ -1,8 +1,10 @@
-var nomenklatura = angular.module('nomenklatura', ['ngRoute', 'ngUpload', 'ui.bootstrap']);
+var nomenklatura = angular.module('nomenklatura', ['ngRoute', 'ngUpload', 'angular-loading-bar', 'ui.bootstrap']);
 
-nomenklatura.config(['$routeProvider', '$locationProvider', '$sceProvider',
-    function($routeProvider, $locationProvider, $sceProvider) {
+nomenklatura.config(['$routeProvider', '$locationProvider', '$sceProvider', 'cfpLoadingBarProvider',
+    function($routeProvider, $locationProvider, $sceProvider, cfpLoadingBarProvider) {
 
+  cfpLoadingBarProvider.includeSpinner = false;
+  
   $routeProvider.when('/', {
     templateUrl: '/static/templates/home.html',
     controller: HomeCtrl

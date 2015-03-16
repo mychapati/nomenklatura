@@ -7,6 +7,7 @@ deps_assets = Bundle(
     'vendor/bootstrap/js/collapse.js',
     'vendor/angular/angular.js',
     'vendor/angular-route/angular-route.js',
+    'vendor/angular-loading-bar/build/loading-bar.js',
     'vendor/angular-bootstrap/ui-bootstrap-tpls.js',
     'vendor/ngUpload/ng-upload.js',
     filters='uglifyjs',
@@ -33,6 +34,7 @@ app_assets = Bundle(
 
 css_assets = Bundle(
     'vendor/font-awesome/less/font-awesome.less',
+    'vendor/angular-loading-bar/build/loading-bar.css',
     'style/style.less',
     filters='less,cssrewrite',
     output='assets/style.css'
