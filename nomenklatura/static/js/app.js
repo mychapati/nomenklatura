@@ -33,7 +33,7 @@ nomenklatura.config(['$routeProvider', '$locationProvider', '$sceProvider',
     controller: ReviewCtrl
   });
 
-  $routeProvider.when('/entities/:id', {
+  $routeProvider.when('/datasets/:dataset/entities/:id', {
     templateUrl: '/static/templates/entities/view.html',
     controller: EntitiesViewCtrl
   });
@@ -43,7 +43,6 @@ nomenklatura.config(['$routeProvider', '$locationProvider', '$sceProvider',
   });
 
   $locationProvider.html5Mode(true);
-  //$sceProvider.enabled(false);
 }]);
 
 nomenklatura.handleFormError = function(form) {

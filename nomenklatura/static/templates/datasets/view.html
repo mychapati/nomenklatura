@@ -73,7 +73,7 @@
         </tr>
         <tr ng-repeat="entity in entities.results">
             <td>
-              <a href="/entities/{{entity.id}}" class="structured">{{entity.name}}</a>
+              <a href="/datasets/{{dataset.name}}/entities/{{entity.id}}" class="structured">{{entity.name}}</a>
             </td>
             <td class="num">
               <span ng-show="entity.canonical" class="label label-info">Alias</span>

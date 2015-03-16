@@ -3,7 +3,7 @@
     <a href="/datasets/{{dataset.name}}">{{dataset.label}}</a>
   </li>
   <li>
-    <a href="/entities/{{entity.id}}">{{entity.name}}</a>
+    <a href="/datasets/{{dataset.name}}/entities/{{entity.id}}">{{entity.name}}</a>
   </li>
 </ul>
 
@@ -24,7 +24,8 @@
 
 <div ng-show="entity.canonical" class="alert alert-info">
     <span class="structured">{{entity.name}}</span> is an alias name for 
-    <a ng-href="/entities/{{entity.canonical.id}}" class="structured">{{entity.canonical.name}}</a>.
+    <a ng-href="/datasets/{{dataset.name}}/entities/{{entity.canonical.id}}"
+      class="structured">{{entity.canonical.name}}</a>.
 </div>
 
 <div ng-show="entity.invalid" class="alert alert-danger">
@@ -67,7 +68,7 @@
         <td>
           <a ng-href="/datasets/{{dataset.name}}/review/{{alias.id}}"
             class="pull-right label label-danger">review</a>
-          <a ng-href="/entities/{{alias.id}}" class="structured">{{alias.name}}</a>
+          <a ng-href="/datasets/{{dataset.name}}/entities/{{alias.id}}" class="structured">{{alias.name}}</a>
         </td>
       </tr>
     </table>
