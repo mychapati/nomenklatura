@@ -47,7 +47,7 @@
         value="{{match.entity.id}}" nk-bind-key="{{49 + $index}}" key-do='click'>
     </td>
     <td>
-      <a href="/entities/{{match.entity.id}}"
+      <a href="/datasets/{{dataset.name}}/entities/{{match.entity.id}}"
         target="_new" class="structured">{{match.entity.name}}</a>
     </td>
     <td class="num" width="10%">{{match.score}} %</td>

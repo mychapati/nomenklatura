@@ -40,8 +40,9 @@ def find_matches(dataset, text, filter=None, exclude=None):
     text_field = func.left(entities.c.normalized, 254)
 
     # calculate the difference percentage
-    l = func.greatest(1.0, func.least(len(match_text), func.length(text_field)))
-    score = func.greatest(0.0, ((l - func.levenshtein(text_field, match_text)) / l) * 100.0)
+    rel = func.greatest(max(len(match_text), 1), func.length(text_field))
+    distance = func.levenshtein(text_field, match_text)
+    score = func.greatest(0.0, ((rel - distance) / rel) * 100.0)
     score = func.max(score).label('score')
 
     # coalesce the canonical identifier
