@@ -32,7 +32,6 @@ app_assets = Bundle(
 )
 
 css_assets = Bundle(
-    'vendor/bootstrap/less/bootstrap.less',
     'vendor/font-awesome/less/font-awesome.less',
     'style/style.less',
     filters='less,cssrewrite',
