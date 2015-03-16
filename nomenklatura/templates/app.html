@@ -93,10 +93,6 @@
     </div>
   </footer>
 
-  {% for path, tmpl in angular_templates %}
-    <script id="{{path}}" type="text/ng-template">{{tmpl|safe}}</script>
-  {% endfor %}
-
   {% assets "deps" %}
     <script src="{{ ASSET_URL }}"></script>
   {% endassets %}
@@ -104,6 +100,11 @@
   {% assets "app" %}
     <script src="{{ ASSET_URL }}"></script>
   {% endassets %}
+
+  {% for path, tmpl in angular_templates %}
+    <script id="{{path}}" type="text/ng-template">{{tmpl|safe}}</script>
+  {% endfor %}
+
 </body>
 </html>
 
