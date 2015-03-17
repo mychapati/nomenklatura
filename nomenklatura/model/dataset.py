@@ -92,20 +92,6 @@ class Dataset(db.Model):
             'updated_at': self.updated_at
         }
 
-    @property
-    def last_modified(self):
-        dates = [self.updated_at]
-        from nomenklatura.model.entity import Entity
-        latest_entity = self.entities.order_by(Entity.updated_at.desc()).first()
-        if latest_entity is not None:
-            dates.append(latest_entity.updated_at)
-
-        from nomenklatura.model.alias import Alias
-        latest_alias = self.aliases.order_by(Alias.updated_at.desc()).first()
-        if latest_alias is not None:
-            dates.append(latest_alias.updated_at)
-        return max(dates)
-
     @classmethod
     def by_name(cls, name):
         return cls.query.filter_by(name=name).first()
@@ -121,11 +107,6 @@ class Dataset(db.Model):
     def find_names(cls):
         q = db.session.query(cls.name)
         return q
-
-    @classmethod
-    def from_form(cls, form_data):
-        data = FormDatasetSchema().to_python(form_data)
-        return data.get('dataset')
 
     @classmethod
     def all(cls):
