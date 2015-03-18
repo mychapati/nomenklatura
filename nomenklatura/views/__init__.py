@@ -8,7 +8,7 @@ from nomenklatura.views.ui import app
 from nomenklatura.views.sessions_api import blueprint as sessions_api
 from nomenklatura.views.users_api import blueprint as users_api
 from nomenklatura.views.upload import section as upload
-from nomenklatura.views.datasets import section as datasets
+from nomenklatura.views.datasets_api import blueprint as datasets_api
 from nomenklatura.views.entities import section as entities
 from nomenklatura.views.reconcile import section as reconcile
 from nomenklatura.views.matching import section as matching
@@ -58,9 +58,9 @@ def handle_invalid(exc):
 
 app.register_blueprint(sessions_api, url_prefix='/api/2')
 app.register_blueprint(users_api, url_prefix='/api/2')
+app.register_blueprint(datasets_api, url_prefix='/api/2')
 
 app.register_blueprint(upload, url_prefix='/api/2')
 app.register_blueprint(reconcile, url_prefix='/api/2')
-app.register_blueprint(datasets, url_prefix='/api/2')
 app.register_blueprint(entities, url_prefix='/api/2')
 app.register_blueprint(matching, url_prefix='/api/2')
