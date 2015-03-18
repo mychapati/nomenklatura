@@ -1,6 +1,6 @@
 <ul class="breadcrumb hidden-xs">
   <li>
-    <a href="/datasets/{{dataset.name}}">{{dataset.label}}</a>
+    <a href="/datasets/{{dataset.slug}}">{{dataset.label}}</a>
   </li>
   <li>
     Overview
@@ -18,13 +18,13 @@
   </div>
   <div class="col-xs-12 col-md-5">
     <div class="btn-group pull-right">
-      <a nk-authz dataset="dataset" op="edit" class="btn btn-default" ng-href="/datasets/{{dataset.name}}/review/random">
+      <a nk-authz dataset="dataset" op="edit" class="btn btn-default" ng-href="/datasets/{{dataset.slug}}/review/random">
         <i class="fa fa-link"></i> Review ({{dataset.stats.num_review}})</a>
       <a nk-authz dataset="dataset" op="manage" class="btn btn-default" ng-click="editDataset()">
         <i class="fa fa-cog"></i> Settings</a>
       <a nk-authz dataset="dataset" op="manage" class="btn btn-default" ng-click="uploadFile()">
         <i class="fa fa-cloud-upload"></i> Import</a>
-      <a class="btn btn-default" ng-href="/api/2/entities?dataset={{dataset.name}}&format=csv&download=true" target="_self">
+      <a class="btn btn-default" ng-href="/api/2/entities?dataset={{dataset.slug}}&format=csv&download=true" target="_self">
           <i class="fa fa-cloud-download"></i> Export
       </a>
     </div>
@@ -46,7 +46,7 @@
         </tr>
         <tr ng-repeat="entity in entities.results">
             <td>
-              <a href="/datasets/{{dataset.name}}/entities/{{entity.id}}" class="structured">{{entity.name}}</a>
+              <a href="/datasets/{{dataset.slug}}/entities/{{entity.id}}" class="structured">{{entity.name}}</a>
             </td>
             <td class="num">
               <span ng-show="entity.canonical" class="label label-info">Alias</span>
@@ -61,11 +61,11 @@
         <tr nk-authz dataset="dataset" op="edit">
           <th>
             <form name="newEntity" role="form">
-              <div class="form-group" ng-class="{'has-error': newEntity.name.$invalid}">
-                <input type="text" class="form-control" ng-model="new_entity.name"
+              <div class="form-group" ng-class="{'has-error': newEntity.slug.$invalid}">
+                <input type="text" class="form-control" ng-model="new_entity.slug"
                   placeholder="Add an entity..." name="name">
-                <p class="help-block" ng-show="newEntity.name.$invalid"
-                  ng-bind="newEntity.name.$message"></p>
+                <p class="help-block" ng-show="newEntity.slug.$invalid"
+                  ng-bind="newEntity.slug.$message"></p>
               </div>
             </form>
           </th>

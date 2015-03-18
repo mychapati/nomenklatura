@@ -15,8 +15,9 @@ def index():
     entities = Entity.all()
     dataset_arg = request.args.get('dataset')
     if dataset_arg is not None:
-        dataset = Dataset.find(dataset_arg)
+        dataset = obj_or_404(Dataset.by_slug(dataset_arg))
         entities = entities.filter_by(dataset=dataset)
+
     filter_name = request.args.get('filter_name', '')
     if len(filter_name):
         query = '%' + filter_name + '%'
@@ -55,7 +56,7 @@ def view(id):
 
 @section.route('/datasets/<dataset>/find', methods=['GET'])
 def by_name(dataset):
-    dataset = Dataset.find(dataset)
+    dataset = obj_or_404(Dataset.by_slug(dataset))
     name = request.args.get('name')
     entity = obj_or_404(Entity.by_name(dataset, name))
     return jsonify(entity)
@@ -63,14 +64,14 @@ def by_name(dataset):
 
 @section.route('/entities/<int:id>/aliases', methods=['GET'])
 def aliases(id):
-    entity = Entity.by_id(id)
+    entity = obj_or_404(Entity.by_id(id))
     pager = Pager(entity.aliases, id=id)
     return jsonify(pager.to_dict())
 
 
 @section.route('/entities/<id>', methods=['POST'])
 def update(id):
-    entity = Entity.by_id(id)
+    entity = obj_or_404(Entity.by_id(id))
     authz.require(authz.dataset_edit(entity.dataset.name))
     entity.update(request_data(), current_user)
     db.session.commit()

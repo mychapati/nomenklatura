@@ -1,9 +1,10 @@
 import json
 
-from flask import Blueprint, request, url_for
+from flask import Blueprint, request
 from apikit import jsonify, get_limit, get_offset
+from werkzeug.exceptions import BadRequest
 
-from nomenklatura.exc import BadRequest
+from nomenklatura.core import url_for
 from nomenklatura.model import Dataset, Entity
 from nomenklatura.model.matching import find_matches
 
@@ -12,7 +13,7 @@ section = Blueprint('reconcile', __name__)
 
 
 def reconcile_index(dataset):
-    domain = url_for('index', _external=True).strip('/')
+    domain = url_for('index').strip('/')
     urlp = domain + '/entities/{{id}}'
     meta = {
         'name': 'nomenklatura: %s' % dataset.label,
@@ -27,10 +28,10 @@ def reconcile_index(dataset):
         'suggest': {
             'entity': {
                 'service_url': domain,
-                'service_path': '/api/2/datasets/' + dataset.name + '/suggest'
+                'service_path': '/api/2/datasets/' + dataset.slug + '/suggest'
             }
         },
-        'defaultTypes': [{'name': dataset.label, 'id': '/' + dataset.name}]
+        'defaultTypes': [{'name': dataset.label, 'id': '/' + dataset.slug}]
     }
     return jsonify(meta)
 
@@ -50,12 +51,12 @@ def reconcile_op(dataset, query):
             'name': match['entity'].name,
             'score': match['score'],
             'type': [{
-                'id': '/' + dataset.name,
+                'id': '/' + dataset.slug,
                 'name': dataset.label
             }],
             'id': match['entity'].id,
-            'uri': url_for('entities.view', id=match['entity'].id, _external=True),
-            'match': match['score']==100
+            'uri': url_for('entities.view', id=match['entity'].id),
+            'match': match['score'] == 100
         })
     return {
         'result': results,
@@ -69,7 +70,7 @@ def reconcile(dataset):
     Reconciliation API, emulates Google Refine API. See:
     http://code.google.com/p/google-refine/wiki/ReconciliationServiceApi
     """
-    dataset = Dataset.by_name(dataset)
+    dataset = Dataset.by_slug(dataset)
 
     # TODO: Add proper support for types and namespacing.
     data = request.args.copy()
@@ -106,7 +107,7 @@ def suggest(dataset):
     Suggest API, emulates Google Refine API. See:
     http://code.google.com/p/google-refine/wiki/SuggestApi
     """
-    dataset = Dataset.by_name(dataset)
+    dataset = Dataset.by_slug(dataset)
     entities = Entity.all().filter(Entity.invalid != True) # noqa
     query = request.args.get('prefix', '').strip()
     entities = entities.filter(Entity.name.ilike('%s%%' % query))
@@ -118,7 +119,7 @@ def suggest(dataset):
         matches.append({
             'name': entity.name,
             'n:type': {
-                'id': '/' + dataset.name,
+                'id': '/' + dataset.slug,
                 'name': dataset.label
             },
             'id': entity.id

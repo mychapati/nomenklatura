@@ -1,7 +1,7 @@
 from random import randint
 
 from flask import Blueprint, request
-from apikit import jsonify, Pager, arg_int
+from apikit import jsonify, Pager, arg_int, obj_or_404
 
 from nomenklatura.model.matching import find_matches
 from nomenklatura.model import Dataset, Entity
@@ -13,7 +13,7 @@ section = Blueprint('matching', __name__)
 @section.route('/match', methods=['GET'])
 def match():
     dataset_arg = request.args.get('dataset')
-    dataset = Dataset.find(dataset_arg)
+    dataset = obj_or_404(Dataset.by_slug(dataset_arg))
     matches = find_matches(dataset,
                            request.args.get('name'),
                            filter=request.args.get('filter'),
@@ -25,7 +25,7 @@ def match():
 @section.route('/datasets/<dataset>/review', methods=['GET'])
 def review(dataset):
     entities = Entity.all()
-    dataset = Dataset.find(dataset)
+    dataset = obj_or_404(Dataset.by_slug(dataset))
     entities = entities.filter_by(dataset=dataset)
     entities = entities.filter(Entity.reviewed == False)  # noqa
     review_count = entities.count()

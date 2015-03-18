@@ -4,13 +4,12 @@ from formencode import Schema, All, Invalid, validators
 
 from nomenklatura.core import db
 from nomenklatura.model.common import Name, FancyValidator
-from nomenklatura.exc import NotFound
 
 
-class AvailableDatasetName(FancyValidator):
+class AvailableDatasetSlug(FancyValidator):
 
     def _to_python(self, value, state):
-        if Dataset.by_name(value) is None:
+        if Dataset.by_slug(value) is None:
             return value
         raise Invalid('Dataset already exists.', value, None)
 
@@ -18,14 +17,14 @@ class AvailableDatasetName(FancyValidator):
 class ValidDataset(FancyValidator):
 
     def _to_python(self, value, state):
-        dataset = Dataset.by_name(value)
+        dataset = Dataset.by_slug(value)
         if dataset is None:
             raise Invalid('Dataset not found.', value, None)
         return dataset
 
 
 class DatasetNewSchema(Schema):
-    name = All(AvailableDatasetName(), Name(not_empty=True))
+    slug = All(AvailableDatasetSlug(), Name(not_empty=True))
     label = validators.String(min=3, max=255)
 
 
@@ -48,7 +47,7 @@ class Dataset(db.Model):
     __tablename__ = 'dataset'
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.Unicode)
+    slug = db.Column(db.Unicode)
     label = db.Column(db.Unicode)
     ignore_case = db.Column(db.Boolean, default=False)
     match_aliases = db.Column(db.Boolean, default=False)
@@ -74,7 +73,7 @@ class Dataset(db.Model):
 
         return {
             'id': self.id,
-            'name': self.name,
+            'slug': self.slug,
             'label': self.label,
             'owner': self.owner.to_dict(),
             'stats': {
@@ -93,19 +92,12 @@ class Dataset(db.Model):
         }
 
     @classmethod
-    def by_name(cls, name):
-        return cls.query.filter_by(name=name).first()
+    def by_slug(cls, slug):
+        return cls.query.filter_by(slug=slug).first()
 
     @classmethod
-    def find(cls, name):
-        dataset = cls.by_name(name)
-        if dataset is None:
-            raise NotFound("No such dataset: %s" % name)
-        return dataset
-
-    @classmethod
-    def find_names(cls):
-        q = db.session.query(cls.name)
+    def find_slugs(cls):
+        q = db.session.query(cls.slug)
         return q
 
     @classmethod
@@ -117,7 +109,7 @@ class Dataset(db.Model):
         data = DatasetNewSchema().to_python(data)
         dataset = cls()
         dataset.owner = user
-        dataset.name = data['name']
+        dataset.slug = data['slug']
         dataset.label = data['label']
         db.session.add(dataset)
         db.session.flush()

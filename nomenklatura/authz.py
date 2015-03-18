@@ -8,23 +8,23 @@ from nomenklatura.model import Dataset
 
 def datasets(action):
     if action == 'read' and request.authz_datasets.get('read') is None:
-        q = Dataset.find_names()
-        request.authz_datasets['read'] = [d.name for d in q.all()]
+        q = Dataset.find_slugs()
+        request.authz_datasets['read'] = [d.slug for d in q.all()]
     if action == 'edit' and request.authz_datasets.get('edit') is None:
         if current_user.is_authenticated():
-            q = Dataset.find_names()
+            q = Dataset.find_slugs()
             q = q.filter(or_(
                 Dataset.owner_id == current_user.id,
                 Dataset.public_edit == True # noqa
             ))
-            request.authz_datasets['edit'] = [d.name for d in q.all()]
+            request.authz_datasets['edit'] = [d.slug for d in q.all()]
         else:
             request.authz_datasets['edit'] = []
     if action == 'manage' and request.authz_datasets.get('manage') is None:
         if current_user.is_authenticated():
-            q = Dataset.find_names()
+            q = Dataset.find_slugs()
             q = q.filter(Dataset.owner_id == current_user.id)
-            request.authz_datasets['manage'] = [d.name for d in q.all()]
+            request.authz_datasets['manage'] = [d.slug for d in q.all()]
         else:
             request.authz_datasets['manage'] = []
     return request.authz_datasets[action] or []

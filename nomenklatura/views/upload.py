@@ -1,6 +1,6 @@
-from flask import Blueprint, request  # , url_for, flash
+from flask import Blueprint, request
 from formencode import Invalid
-from apikit import jsonify, request_data
+from apikit import jsonify, request_data, obj_or_404
 
 from nomenklatura import authz
 from nomenklatura.core import db
@@ -12,7 +12,7 @@ section = Blueprint('upload', __name__)
 
 @section.route('/datasets/<dataset>/uploads', methods=['POST'])
 def upload(dataset):
-    dataset = Dataset.find(dataset)
+    dataset = obj_or_404(Dataset.by_slug(dataset))
     authz.require(authz.dataset_edit(dataset))
     file_ = request.files.get('file')
     if not file_ or not file_.filename:
@@ -25,17 +25,17 @@ def upload(dataset):
 
 @section.route('/datasets/<dataset>/uploads/<id>', methods=['GET'])
 def view(dataset, id):
-    dataset = Dataset.find(dataset)
+    dataset = obj_or_404(Dataset.by_slug(dataset))
     authz.require(authz.dataset_edit(dataset))
-    upload = Upload.find(dataset, id)
+    upload = obj_or_404(Upload.by_id(dataset, id))
     return jsonify(upload)
 
 
 @section.route('/datasets/<dataset>/uploads/<id>', methods=['POST'])
 def process(dataset, id):
-    dataset = Dataset.find(dataset)
+    dataset = obj_or_404(Dataset.by_slug(dataset))
     authz.require(authz.dataset_edit(dataset))
-    upload = Upload.find(dataset, id)
+    upload = obj_or_404(Upload.by_id(dataset, id))
     mapping = request_data()
     mapping['reviewed'] = mapping.get('reviewed') or False
     mapping['columns'] = mapping.get('columns', {})

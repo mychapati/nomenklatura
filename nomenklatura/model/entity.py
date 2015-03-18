@@ -8,7 +8,6 @@ from sqlalchemy.orm import joinedload_all, backref
 from sqlalchemy.dialects.postgresql import HSTORE
 
 from nomenklatura.core import db, url_for
-from nomenklatura.exc import NotFound
 
 
 class EntityState():
@@ -85,7 +84,7 @@ class Entity(db.Model):
             'id': self.id,
             'api_url': url_for('entities.view', id=self.id),
             'name': self.name,
-            'dataset': self.dataset.name,
+            'dataset': self.dataset.slug,
             'reviewed': self.reviewed,
             'invalid': self.invalid,
             'canonical': self.canonical,
@@ -137,13 +136,6 @@ class Entity(db.Model):
         for entity in cls.query.filter(cls.id.in_(ids)):
             entities[entity.id] = entity
         return entities
-
-    @classmethod
-    def find(cls, dataset, id):
-        entity = cls.by_id(id)
-        if entity is None:
-            raise NotFound("No such value ID: %s" % id)
-        return entity
 
     @classmethod
     def all(cls, dataset=None, query=None, eager_aliases=False, eager=False):

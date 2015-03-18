@@ -29,4 +29,4 @@ def csvify(iterable, status=200, headers=None):
 
 def dataset_filename(dataset, format):
     ts = datetime.utcnow().strftime('%Y%m%d')
-    return '%s-%s.%s' % (dataset.name, ts, format)
+    return '%s-%s.%s' % (dataset.slug, ts, format)

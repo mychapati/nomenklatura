@@ -1,7 +1,6 @@
 from datetime import datetime
 from tablib import Dataset as TablibDataset
 
-from nomenklatura.exc import NotFound
 from nomenklatura.core import db, url_for
 
 
@@ -55,13 +54,6 @@ class Upload(db.Model):
         q = cls.query.filter_by(id=id)
         q = q.filter_by(dataset_id=dataset.id)
         return q.first()
-
-    @classmethod
-    def find(cls, dataset, id):
-        upload = cls.by_id(dataset, id)
-        if upload is None:
-            raise NotFound("No such upload: %s" % id)
-        return upload
 
     @classmethod
     def all(cls):
