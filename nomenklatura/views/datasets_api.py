@@ -7,10 +7,10 @@ from nomenklatura import authz
 from nomenklatura.model import Dataset
 from nomenklatura.model.matching import attribute_keys
 
-section = Blueprint('datasets', __name__)
+blueprint = Blueprint('datasets', __name__)
 
 
-@section.route('/datasets', methods=['GET'])
+@blueprint.route('/datasets', methods=['GET'])
 def index():
     q = Dataset.all()
     q = q.filter(Dataset.slug.in_(authz.datasets('read')))
@@ -18,7 +18,7 @@ def index():
     return jsonify(pager.to_dict())
 
 
-@section.route('/datasets', methods=['POST'])
+@blueprint.route('/datasets', methods=['POST'])
 def create():
     authz.require(authz.dataset_create())
     dataset = Dataset.create(request_data(), current_user)
@@ -26,19 +26,19 @@ def create():
     return redirect(url_for('.view', dataset=dataset.name))
 
 
-@section.route('/datasets/<dataset>', methods=['GET'])
+@blueprint.route('/datasets/<dataset>', methods=['GET'])
 def view(dataset):
     dataset = obj_or_404(Dataset.by_slug(dataset))
     return jsonify(dataset)
 
 
-@section.route('/datasets/<dataset>/attributes', methods=['GET'])
+@blueprint.route('/datasets/<dataset>/attributes', methods=['GET'])
 def attributes(dataset):
     dataset = obj_or_404(Dataset.by_slug(dataset))
     return jsonify({'attributes': attribute_keys(dataset)})
 
 
-@section.route('/datasets/<dataset>', methods=['POST'])
+@blueprint.route('/datasets/<dataset>', methods=['POST'])
 def update(dataset):
     authz.require(authz.dataset_manage(dataset))
     dataset = obj_or_404(Dataset.by_slug(dataset))
