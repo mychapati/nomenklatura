@@ -38,6 +38,7 @@ class User(db.Model):
                               lazy='dynamic')
     entities_created = db.relationship('Entity', backref='creator',
                                        lazy='dynamic')
+    roles = db.relationship('Role', backref='user', lazy='dynamic')
 
     def to_dict(self):
         return {

@@ -38,6 +38,10 @@ def dataset_create():
     return logged_in()
 
 
+def dataset_read(name):
+    return name in datasets('read')
+
+
 def dataset_edit(name):
     return name in datasets('edit')
 
