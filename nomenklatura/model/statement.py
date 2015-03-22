@@ -12,9 +12,9 @@ class Statement(db.Model, CommonMixIn):
 
     __tablename__ = 'statement'
 
-    subject = db.Column(db.String(KEY_LENGTH))
-    _attribute = db.Column('attribute', db.String(1024))
-    _value = db.Column('value', db.Unicode)
+    subject = db.Column(db.String(KEY_LENGTH), index=True)
+    _attribute = db.Column('attribute', db.String(1024), index=True)
+    _value = db.Column('value', db.Unicode, index=True)
 
     dataset_id = db.Column(db.String(KEY_LENGTH), db.ForeignKey('dataset.id'))
     dataset = db.relationship('Dataset', backref=db.backref('statements',
