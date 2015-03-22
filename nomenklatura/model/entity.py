@@ -20,7 +20,8 @@ class Entity(object):
     def attributes(self):
         attributes = set()
         for stmt in self.statements:
-            attributes.add(stmt.attribute)
+            if stmt.active:
+                attributes.add(stmt.attribute)
         return attributes
 
     def has(self, attribute):
@@ -38,6 +39,8 @@ class Entity(object):
         attribute = attributes.get(attribute)
         for stmt in self.statements:
             if stmt.attribute != attribute:
+                continue
+            if not stmt.active:
                 continue
             yield stmt
 

@@ -10,6 +10,7 @@ class Attribute(NamedMixIn):
         self.name = name
         self.label = data.get('label')
         self.data_type = data.get('data_type')
+        self.many = data.get('many', False)
         self.key = data.get('key') or name
 
     @property
@@ -25,12 +26,12 @@ class Attribute(NamedMixIn):
             'name': self.name,
             'label': self.label,
             'key': self.key,
+            'many': self.many,
             'data_type': self.data_type
         }
 
     def __repr__(self):
-        return '<Attribute(%r,%r,%r)>' % (self.name, self.label,
-                                          self.data_type)
+        return '<Attribute(%r,%r)>' % (self.name, self.data_type)
 
     def __eq__(self, other):
         if hasattr(other, 'name'):

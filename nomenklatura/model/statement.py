@@ -51,7 +51,9 @@ class Statement(db.Model, CommonMixIn):
 
     @property
     def active(self):
-        return True
+        if self.context is None:
+            return True
+        return self.context.active
 
     def to_dict(self):
         return {
