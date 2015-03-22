@@ -7,7 +7,10 @@ nomenklatura.config(['$routeProvider', '$locationProvider', '$sceProvider', 'cfp
 
   $routeProvider.when('/', {
     templateUrl: '/static/templates/home.html',
-    controller: 'HomeCtrl'
+    controller: 'HomeCtrl',
+    resolve: {
+      'datasets': loadDatasets
+    }
   });
 
   $routeProvider.when('/docs/:page/:anchor', {
