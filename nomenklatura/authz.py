@@ -15,7 +15,7 @@ def datasets(action):
             q = Dataset.find_slugs()
             q = q.filter(or_(
                 Dataset.owner_id == current_user.id,
-                Dataset.public_edit == True # noqa
+                Dataset.public == True # noqa
             ))
             request.authz_datasets['edit'] = [d.slug for d in q.all()]
         else:

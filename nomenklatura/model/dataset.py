@@ -14,7 +14,7 @@ class Dataset(db.Model):
     label = db.Column(db.Unicode)
     ignore_case = db.Column(db.Boolean, default=False)
     match_aliases = db.Column(db.Boolean, default=False)
-    public_edit = db.Column(db.Boolean, default=False)
+    public = db.Column(db.Boolean, default=False)
     normalize_text = db.Column(db.Boolean, default=True)
     enable_invalid = db.Column(db.Boolean, default=True)
     owner_id = db.Column(db.Integer, db.ForeignKey('user.id'))
@@ -50,7 +50,7 @@ class Dataset(db.Model):
             },
             'ignore_case': self.ignore_case,
             'match_aliases': self.match_aliases,
-            'public_edit': self.public_edit,
+            'public': self.public,
             'normalize_text': self.normalize_text,
             'enable_invalid': self.enable_invalid,
             'created_at': self.created_at,
@@ -85,9 +85,9 @@ class Dataset(db.Model):
     def update(self, data):
         data = DatasetEditForm().deserialize(data)
         self.label = data['label']
+        self.public = data['public']
         self.normalize_text = data['normalize_text']
         self.ignore_case = data['ignore_case']
-        self.public_edit = data['public_edit']
         self.match_aliases = data['match_aliases']
         self.enable_invalid = data['enable_invalid']
         db.session.add(self)
