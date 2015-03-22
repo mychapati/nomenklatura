@@ -20,6 +20,7 @@ function ProfileCtrl($scope, $location, $modalInstance, $http, Session) {
       $scope.session.user = data;
       $modalInstance.dismiss('ok');
     });
+    res.error(nomenklatura.handleFormError(form));
   };  
     
 }

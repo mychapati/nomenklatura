@@ -1,5 +1,5 @@
 from flask import Blueprint, request
-from formencode import Invalid
+from colander import Invalid
 from apikit import jsonify, request_data, obj_or_404
 
 from nomenklatura import authz

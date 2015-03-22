@@ -1,5 +1,5 @@
 from flask import request
-from formencode import Invalid
+from colander import Invalid
 from apikit import jsonify
 
 from nomenklatura.core import login_manager
@@ -51,8 +51,7 @@ def handle_invalid(exc):
     body = {
         'status': 400,
         'name': 'Invalid Data',
-        'description': unicode(exc),
-        'errors': exc.unpack_errors()
+        'errors': exc.asdict()
     }
     return jsonify(body, status=400)
 

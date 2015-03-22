@@ -1,4 +1,4 @@
-from formencode import Invalid
+from colander import Invalid
 
 from nomenklatura.core import db
 from nomenklatura.core import celery as app

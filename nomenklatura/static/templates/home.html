@@ -42,7 +42,7 @@
             </tr>
             <tr ng-repeat="dataset in datasets.results">
                 <td>
-                  {{dataset.owner.login}}
+                  {{dataset.owner.display_name}}
                 </td>
                 <td>
                   <a href="/datasets/{{dataset.slug}}">{{dataset.label}}</a>

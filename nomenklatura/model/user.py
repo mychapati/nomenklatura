@@ -1,18 +1,11 @@
-from formencode import Schema, validators
-
 from nomenklatura.core import db, url_for, login_manager
+from nomenklatura.model.forms import UserEditForm
 from nomenklatura.model.common import CommonMixIn, make_key
 
 
 @login_manager.user_loader
 def load_user(id):
     return User.query.get(id)
-
-
-class UserEditSchema(Schema):
-    allow_extra_fields = True
-    display_name = validators.String(min=3, max=512)
-    email = validators.Email()
 
 
 class User(db.Model, CommonMixIn):
@@ -63,7 +56,7 @@ class User(db.Model, CommonMixIn):
         return self.display_name
 
     def update(self, data):
-        data = UserEditSchema().to_python(data)
+        data = UserEditForm().deserialize(data)
         self.display_name = data.get('display_name')
         self.email = data.get('email')
 

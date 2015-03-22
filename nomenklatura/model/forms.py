@@ -57,6 +57,13 @@ class DatasetEditForm(colander.MappingSchema):
     match_aliases = colander.SchemaNode(colander.Boolean())
 
 
+class UserEditForm(colander.MappingSchema):
+    display_name = colander.SchemaNode(colander.String(),
+        validator=colander.Length(min=3, max=500)) # noqa
+    email = colander.SchemaNode(colander.String(),
+        validator=colander.Email()) # noqa
+
+
 class RoleForm(colander.MappingSchema):
     role = colander.SchemaNode(colander.String(),
         validator=colander.OneOf(['none', 'read', 'edit', 'manage'])) # noqa
