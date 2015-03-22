@@ -26,6 +26,9 @@ class Map(object):
     def to_dict(self):
         return self.items
 
+    def __contains__(self, name):
+        return name in self.items
+
     def __getattr__(self, name):
         return self.__getitem__(name)
 

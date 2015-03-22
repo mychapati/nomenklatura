@@ -25,6 +25,6 @@ nomenklatura.controller('EntitiesViewCtrl', ['$scope', '$routeParams', '$locatio
     });
   }
 
-  var url = '/api/2/dataset/' + dataset.slug + '/entities/' + $routeParams.id + '/aliases';
+  var url = '/api/2/datasets/' + dataset.slug + '/entities/' + $routeParams.id + '/aliases';
   loadAliases(url);
 }]);

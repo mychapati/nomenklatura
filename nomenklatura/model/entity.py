@@ -1,4 +1,4 @@
-from nomenklatura.core import db
+from nomenklatura.core import db, url_for
 from nomenklatura.model.common import make_key
 from nomenklatura.model.attribute import Attribute
 from nomenklatura.model.schema import attributes
@@ -65,10 +65,29 @@ class Entity(object):
         self.set(attributes.label, label)
 
     def to_dict(self):
-        data = {}
+        url = url_for('entities.view', dataset=self.dataset.slug, id=self.id)
+        data = {
+            'id': self.id,
+            'api_url': url
+        }
         for attribute in self.attributes:
             data[attribute.key] = self.get(attribute)
         return data
+
+    @classmethod
+    def create(cls, dataset, data, user):
+        # TODO: crutch. Replace with a better thing asap.
+        entity = Entity(dataset)
+        entity.update(data, user)
+        return entity
+
+    def update(self, data, user):
+        # TODO: crutch. Replace with a better thing asap.
+        for key, value in data.items():
+            attribute = attributes.get(key)
+            if attribute is None:
+                continue
+            self.set(attribute, value)
 
     def __repr__(self):
         return u'<Entity(%r, %s, %r)>' % (self.id, self.type, self.label)

@@ -86,11 +86,9 @@ nomenklatura.controller('DatasetsViewCtrl', ['$scope', '$routeParams', '$locatio
         if (filterTimeout) { $timeout.cancel(filterTimeout); }
 
         filterTimeout = $timeout(function() {
-            var fparams = {
-              dataset: dataset.slug,
-              filter_name: $scope.query
-            };
-            $scope.loadEntities('/api/2/entities', fparams);
+            var fparams = {filter_name: $scope.query},
+                url = '/api/2/datasets/' + dataset.slug + '/entities';
+            $scope.loadEntities(url, fparams);
         }, 500);
     };
 
@@ -105,11 +103,9 @@ nomenklatura.controller('DatasetsViewCtrl', ['$scope', '$routeParams', '$locatio
     };
 
     $scope.createEntity = function(form) {
-        $scope.new_entity.dataset = $scope.dataset.name;
-        $scope.new_entity.attributes = {};
-        var res = $http.post('/api/2/entities', $scope.new_entity);
+        var res = $http.post('/api/2/datasets/' + dataset.slug + '/entities', $scope.new_entity);
         res.success(function(data) {
-            $location.path('/entities/' + data.id);
+            $location.path('/datasets/' + dataset.slug + '/entities/' + data.id);
         });
         res.error(nomenklatura.handleFormError(form));
     };

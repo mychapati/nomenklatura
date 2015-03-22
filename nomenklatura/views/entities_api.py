@@ -6,7 +6,6 @@ from nomenklatura.core import db
 from nomenklatura.views.common import csvify, dataset_filename
 from nomenklatura import authz
 from nomenklatura.model import Entity, Dataset
-from nomenklatura.model.query import EntityQuery
 
 section = Blueprint('entities', __name__)
 
@@ -15,7 +14,7 @@ section = Blueprint('entities', __name__)
 def index(dataset):
     authz.require(authz.dataset_read(dataset))
     dataset = obj_or_404(Dataset.by_slug(dataset))
-    q = EntityQuery(dataset)
+    q = dataset.entities
     # filter_name = request.args.get('filter_name', '')
     # if len(filter_name):
     #    query = '%' + filter_name + '%'
@@ -45,31 +44,33 @@ def create(dataset):
     authz.require(authz.dataset_edit(dataset.slug))
     entity = Entity.create(dataset, data, current_user)
     db.session.commit()
-    return redirect(url_for('.view', id=entity.id))
+    return redirect(url_for('.view', dataset=dataset.slug, id=entity.id))
 
 
-@section.route('/datasets/<dataset>/entities/<int:id>', methods=['GET'])
+@section.route('/datasets/<dataset>/entities/<id>', methods=['GET'])
 def view(dataset, id):
     authz.require(authz.dataset_read(dataset))
     dataset = obj_or_404(Dataset.by_slug(dataset))
-    entity = obj_or_404(dataset.entities().by_id(id))
+    entity = obj_or_404(dataset.entities.by_id(id))
     return jsonify(entity)
 
 
-@section.route('/datasets/<dataset>/entities/<int:id>/aliases', methods=['GET'])
+@section.route('/datasets/<dataset>/entities/<id>/aliases', methods=['GET'])
 def aliases(dataset, id):
     authz.require(authz.dataset_read(dataset))
     dataset = obj_or_404(Dataset.by_slug(dataset))
-    entity = obj_or_404(dataset.entities().by_id(id))
-    pager = Pager(entity.aliases, dataset=dataset.slug, id=id)
-    return jsonify(pager.to_dict())
+    entity = obj_or_404(dataset.entities.by_id(id))
+    print "XXXXX"
+    # pager = Pager(entity.aliases, dataset=dataset.slug, id=id)
+    # return jsonify(pager.to_dict())
+    return jsonify({})
 
 
 @section.route('/datasets/<dataset>/entities/<id>', methods=['POST'])
 def update(dataset, id):
     authz.require(authz.dataset_edit(dataset))
     dataset = obj_or_404(Dataset.by_slug(dataset))
-    entity = obj_or_404(dataset.entities().by_id(id))
+    entity = obj_or_404(dataset.entities.by_id(id))
     entity.update(request_data(), current_user)
     db.session.commit()
-    return redirect(url_for('.view', id=entity.id))
+    return redirect(url_for('.view', dataset=dataset.slug, id=entity.id))

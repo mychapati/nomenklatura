@@ -61,7 +61,7 @@ class EntityQuery(object):
             sq = sq.subquery()
             q = q.outerjoin(sq, stmt.subject == sq.c.subject)
         else:
-            q = q.filter(stmt.subject == id)
+            q = q.filter(stmt.subject == unicode(id))
 
         q = q.order_by(stmt.subject.asc())
         return q
@@ -77,6 +77,10 @@ class EntityQuery(object):
                 statements = []
             subject = stmt.subject
             statements.append(stmt)
+        if len(statements) and subject is not None:
+            yield Entity(self._dataset,
+                         id=subject,
+                         statements=statements)
 
     def by_id(self, id):
         for entity in self._collect(self._query(id=id)):

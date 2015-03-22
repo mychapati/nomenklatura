@@ -12,7 +12,7 @@ class Context(db.Model, CommonMixIn):
     source_url = db.Column(db.Unicode)
     publisher = db.Column(db.Unicode)
     publisher_url = db.Column(db.Unicode)
-    active = db.Column(db.Boolean)
+    active = db.Column(db.Boolean, default=True)
 
     dataset_id = db.Column(db.String(KEY_LENGTH), db.ForeignKey('dataset.id'))
     dataset = db.relationship('Dataset', backref=db.backref('contexts',

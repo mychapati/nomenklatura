@@ -3,7 +3,7 @@
     <a href="/datasets/{{dataset.slug}}">{{dataset.label}}</a>
   </li>
   <li>
-    <a href="/datasets/{{dataset.slug}}/entities/{{entity.id}}">{{entity.name}}</a>
+    <a href="/datasets/{{dataset.slug}}/entities/{{entity.id}}">{{entity.label}}</a>
   </li>
 </ul>
 
@@ -14,7 +14,7 @@
 </ul>
 
 <h2 class="page-header">
-  {{entity.name}}
+  {{entity.label}}
   <div class="btn-group pull-right">
     <a nk-authz dataset="dataset" op="edit" class="btn btn-default" ng-href="/datasets/{{dataset.slug}}/review/{{entity.id}}">
       <i class="fa fa-link"></i> Review</a>
@@ -22,9 +22,9 @@
 </h2>
 
 <div ng-show="entity.canonical" class="alert alert-info">
-    <span class="structured">{{entity.name}}</span> is an alias name for 
+    <span class="structured">{{entity.label}}</span> is an alias name for 
     <a ng-href="/datasets/{{dataset.slug}}/entities/{{entity.canonical.id}}"
-      class="structured">{{entity.canonical.name}}</a>.
+      class="structured">{{entity.canonical.label}}</a>.
 </div>
 
 <div ng-show="entity.invalid" class="alert alert-danger">
@@ -67,7 +67,7 @@
         <td>
           <a ng-href="/datasets/{{dataset.slug}}/review/{{alias.id}}"
             class="pull-right label label-danger">review</a>
-          <a ng-href="/datasets/{{dataset.slug}}/entities/{{alias.id}}" class="structured">{{alias.name}}</a>
+          <a ng-href="/datasets/{{dataset.slug}}/entities/{{alias.id}}" class="structured">{{alias.label}}</a>
         </td>
       </tr>
     </table>

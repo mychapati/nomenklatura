@@ -46,7 +46,7 @@
         </tr>
         <tr ng-repeat="entity in entities.results">
             <td>
-              <a href="/datasets/{{dataset.slug}}/entities/{{entity.id}}" class="structured">{{entity.name}}</a>
+              <a href="/datasets/{{dataset.slug}}/entities/{{entity.id}}" class="structured">{{entity.label}}</a>
             </td>
             <td class="num">
               <span ng-show="entity.canonical" class="label label-info">Alias</span>
@@ -61,11 +61,11 @@
         <tr nk-authz dataset="dataset" op="edit">
           <th>
             <form name="newEntity" role="form">
-              <div class="form-group" ng-class="{'has-error': newEntity.slug.$invalid}">
-                <input type="text" class="form-control" ng-model="new_entity.slug"
+              <div class="form-group" ng-class="{'has-error': newEntity.label.$invalid}">
+                <input type="text" class="form-control" ng-model="new_entity.label"
                   placeholder="Add an entity..." name="name">
-                <p class="help-block" ng-show="newEntity.slug.$invalid"
-                  ng-bind="newEntity.slug.$message"></p>
+                <p class="help-block" ng-show="newEntity.label.$invalid"
+                  ng-bind="newEntity.label.$message"></p>
               </div>
             </form>
           </th>
