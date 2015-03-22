@@ -35,6 +35,14 @@ class Context(db.Model, CommonMixIn):
             'publisher_url': self.publisher_url
         }
 
+    @classmethod
+    def create_generic(cls, dataset, user):
+        ctx = cls()
+        ctx.user = user
+        ctx.dataset = dataset
+        db.session.add(ctx)
+        return ctx
+
     def __repr__(self):
         return u'<Context(%r, %r)>' % (self.id, self.source_url)
 

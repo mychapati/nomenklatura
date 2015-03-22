@@ -27,11 +27,11 @@ class Entity(object):
     def has(self, attribute):
         return attribute in self.attributes
 
-    def set(self, attribute, value, context=None):
+    def set(self, attribute, value, context):
         if not isinstance(attribute, Attribute):
             attribute = attributes.get(attribute)
         stmt = Statement(self.dataset, self.id, attribute, value,
-                         context=context)
+                         context)
         db.session.add(stmt)
         self.statements.append(stmt)
         return stmt
@@ -75,19 +75,19 @@ class Entity(object):
         return data
 
     @classmethod
-    def create(cls, dataset, data, user):
+    def create(cls, dataset, data, context):
         # TODO: crutch. Replace with a better thing asap.
         entity = Entity(dataset)
-        entity.update(data, user)
+        entity.update(data, context)
         return entity
 
-    def update(self, data, user):
+    def update(self, data, context):
         # TODO: crutch. Replace with a better thing asap.
         for key, value in data.items():
             attribute = attributes.get(key)
             if attribute is None:
                 continue
-            self.set(attribute, value)
+            self.set(attribute, value, context)
 
     def __repr__(self):
         return u'<Entity(%r, %s, %r)>' % (self.id, self.type, self.label)

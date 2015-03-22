@@ -5,7 +5,7 @@ from apikit import jsonify, Pager, arg_bool, request_data, obj_or_404
 from nomenklatura.core import db
 from nomenklatura.views.common import csvify, dataset_filename
 from nomenklatura import authz
-from nomenklatura.model import Entity, Dataset
+from nomenklatura.model import Entity, Dataset, Context
 
 section = Blueprint('entities', __name__)
 
@@ -21,9 +21,6 @@ def index(dataset):
     #    entities = entities.filter(Entity.name.ilike(query))
 
     # TODO, other filters.
-
-    print 'XXXX', list(q)
-
     format = request.args.get('format', 'json').lower().strip()
     if format == 'csv':
         res = csvify(q)
@@ -42,7 +39,8 @@ def create(dataset):
     authz.require(authz.dataset_read(dataset))
     dataset = obj_or_404(Dataset.by_slug(dataset))
     authz.require(authz.dataset_edit(dataset.slug))
-    entity = Entity.create(dataset, data, current_user)
+    context = Context.create_generic(dataset, current_user)
+    entity = Entity.create(dataset, data, context)
     db.session.commit()
     return redirect(url_for('.view', dataset=dataset.slug, id=entity.id))
 
@@ -71,6 +69,7 @@ def update(dataset, id):
     authz.require(authz.dataset_edit(dataset))
     dataset = obj_or_404(Dataset.by_slug(dataset))
     entity = obj_or_404(dataset.entities.by_id(id))
-    entity.update(request_data(), current_user)
+    context = Context.create_generic(dataset, current_user)
+    entity.update(request_data(), context)
     db.session.commit()
     return redirect(url_for('.view', dataset=dataset.slug, id=entity.id))

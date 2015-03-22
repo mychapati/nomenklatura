@@ -24,7 +24,7 @@ class Statement(db.Model, CommonMixIn):
     context = db.relationship('Context', backref=db.backref('statements',
                          lazy='dynamic', cascade='all, delete-orphan')) # noqa
 
-    def __init__(self, dataset, subject, attribute, value, context=None):
+    def __init__(self, dataset, subject, attribute, value, context):
         self.dataset = dataset
         self.subject = subject
         self.attribute = attribute
