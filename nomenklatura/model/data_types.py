@@ -71,6 +71,16 @@ class Type(DataType):
         return type
 
 
+class Entity(DataType):
+
+    def serialize(self, entity):
+        return entity.id
+
+    def deserialize(self, value):
+        # from nomenklatura.model.entity import Entity
+        raise NotImplemented()
+
+
 DATA_TYPES = {
     'string': String,
     'text': String,
@@ -78,5 +88,6 @@ DATA_TYPES = {
     'int': Integer,
     'float': Float,
     'datetime': DateTime,
-    'type': Type
+    'type': Type,
+    'entity': Entity
 }
