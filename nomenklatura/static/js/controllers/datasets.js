@@ -15,11 +15,9 @@ var loadDatasetEntities = ['$route', '$http', '$q', 'Session', function($route, 
   var dfd = $q.defer();
       
   Session.get(function(s) {
-    var params = {params: {
-        dataset: $route.current.params.dataset,
-        _uid: s.cbq
-    }};
-    $http.get('/api/2/entities', params).then(function(res) {
+    var url = '/api/2/datasets/' + $route.current.params.dataset + '/entities';
+    var params = {params: {_uid: s.cbq}};
+    $http.get(url, params).then(function(res) {
       dfd.resolve(res.data);
     });
   });

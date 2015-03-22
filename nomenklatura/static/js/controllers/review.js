@@ -38,8 +38,8 @@ nomenklatura.controller('ReviewCtrl', ['$scope', '$routeParams', '$location', '$
 
   $scope.loadEntity = function() {
     //$scope.matches = {};
-    var randomUrl = '/api/2/datasets/' +  $routeParams.dataset + '/review',
-      entityUrl = '/api/2/entities/' +  $routeParams.what,
+    var randomUrl = '/api/2/datasets/' +  dataset.slug + '/review',
+      entityUrl = '/api/2/datasets/' + dataset.slug + '/entities/' +  $routeParams.what,
       url = $scope.random ? randomUrl : entityUrl;
     $http.get(url).then(function(res) {
       if (res.data == "null") {
@@ -73,12 +73,12 @@ nomenklatura.controller('ReviewCtrl', ['$scope', '$routeParams', '$location', '$
       $scope.entity.canonical = parseInt($scope.entity.selection, 10);
     }
     $scope.filter = '';
-    $http.post('/api/2/entities/' + $scope.entity.id, $scope.entity).then(function(res) {
+    $http.post('/api/2/datasets/' + dataset.slug + '/entities/' + $scope.entity.id, $scope.entity).then(function(res) {
       //console.log(res);
       if ($scope.random) {
         $scope.loadEntity();
       } else {
-        $location.path('/entities/' + res.data.id);
+        $location.path('/datasets/' + dataset.slug + '/entities/' + res.data.id);
       }
       // TODO: figure out a nice flashing thingie!
     });

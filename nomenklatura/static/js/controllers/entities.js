@@ -1,7 +1,9 @@
 
 var loadEntity = ['$route', '$http', '$q', function($route, $http, $q) {
-  var dfd = $q.defer();
-  $http.get('/api/2/entities/' + $route.current.params.id).then(function(res) {
+  var dfd = $q.defer(),
+      pa = $route.current.params,
+      url = '/api/2/datasets/' + pa.dataset + '/entities/' + pa.id;
+  $http.get(url).then(function(res) {
     dfd.resolve(res.data);
   });
   return dfd.promise;
@@ -23,5 +25,6 @@ nomenklatura.controller('EntitiesViewCtrl', ['$scope', '$routeParams', '$locatio
     });
   }
 
-  loadAliases('/api/2/entities/' + $routeParams.id + '/aliases');
+  var url = '/api/2/dataset/' + dataset.slug + '/entities/' + $routeParams.id + '/aliases';
+  loadAliases(url);
 }]);
