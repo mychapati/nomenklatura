@@ -28,3 +28,7 @@ attributes:
         label: "Alias"
         list: true
         data_type: string
+
+    sameAs:
+        label: "Same as"
+        data_type: string
