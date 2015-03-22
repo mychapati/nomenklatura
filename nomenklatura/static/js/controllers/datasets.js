@@ -69,12 +69,12 @@ nomenklatura.controller('DatasetsViewCtrl', ['$scope', '$routeParams', '$locatio
     $scope.new_entity = {};
     $scope.query = '';
 
-    $scope.aliases_percent = Math.ceil((dataset.stats.num_aliases / dataset.stats.num_entities)*100);
-    $scope.invalid_percent = Math.ceil((dataset.stats.num_invalid / dataset.stats.num_entities)*100);
-    $scope.review_percent = Math.ceil((dataset.stats.num_review / dataset.stats.num_entities)*100);
-    $scope.normal_percent = 100 - $scope.aliases_percent - $scope.invalid_percent - $scope.review_percent;
-    $scope.normal_num = dataset.stats.num_entities - dataset.stats.num_aliases -
-        dataset.stats.num_invalid - dataset.stats.num_review;
+    // $scope.aliases_percent = Math.ceil((dataset.stats.num_aliases / dataset.stats.num_entities)*100);
+    // $scope.invalid_percent = Math.ceil((dataset.stats.num_invalid / dataset.stats.num_entities)*100);
+    // $scope.review_percent = Math.ceil((dataset.stats.num_review / dataset.stats.num_entities)*100);
+    // $scope.normal_percent = 100 - $scope.aliases_percent - $scope.invalid_percent - $scope.review_percent;
+    // $scope.normal_num = dataset.stats.num_entities - dataset.stats.num_aliases -
+    //     dataset.stats.num_invalid - dataset.stats.num_review;
 
     $scope.loadEntities = function(url, params) {
         $http.get(url, {params: params}).then(function(res) {

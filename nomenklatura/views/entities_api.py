@@ -6,34 +6,34 @@ from nomenklatura.core import db
 from nomenklatura.views.common import csvify, dataset_filename
 from nomenklatura import authz
 from nomenklatura.model import Entity, Dataset
+from nomenklatura.model.query import EntityQuery
 
 section = Blueprint('entities', __name__)
 
 
 @section.route('/entities', methods=['GET'])
 def index():
-    entities = Entity.all()
-    dataset_arg = request.args.get('dataset')
-    if dataset_arg is not None:
-        dataset = obj_or_404(Dataset.by_slug(dataset_arg))
-        entities = entities.filter_by(dataset=dataset)
+    q = EntityQuery()
+    dataset = request.args.get('dataset')
+    if dataset is not None:
+        dataset = obj_or_404(Dataset.by_slug(dataset))
+        q = q.filter_dataset(dataset)
 
-    filter_name = request.args.get('filter_name', '')
-    if len(filter_name):
-        query = '%' + filter_name + '%'
-        entities = entities.filter(Entity.name.ilike(query))
+    # filter_name = request.args.get('filter_name', '')
+    # if len(filter_name):
+    #    query = '%' + filter_name + '%'
+    #    entities = entities.filter(Entity.name.ilike(query))
 
     # TODO, other filters.
 
     format = request.args.get('format', 'json').lower().strip()
     if format == 'csv':
-        res = csvify(entities)
+        res = csvify(q)
     else:
-        pager = Pager(entities)
-        res = jsonify(pager.to_dict())
+        res = jsonify(Pager(q))
 
     if arg_bool('download'):
-        fn = dataset_filename(dataset, format)
+        fn = dataset_filename(dataset or 'all', format)
         res.headers['Content-Disposition'] = 'attachment; filename=' + fn
     return res
 
