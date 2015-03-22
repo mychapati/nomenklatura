@@ -1,32 +1,34 @@
 from flask import request
 from flask.ext.login import current_user
 from werkzeug.exceptions import Forbidden
-from sqlalchemy import or_
 
-from nomenklatura.model import Dataset
+from nomenklatura.core import db
+from nomenklatura.model import Dataset, Role
 
 
 def datasets(action):
-    if action == 'read' and request.authz_datasets.get('read') is None:
-        q = Dataset.find_slugs()
-        request.authz_datasets['read'] = [d.slug for d in q.all()]
-    if action == 'edit' and request.authz_datasets.get('edit') is None:
+    if 'read' not in request.authz_datasets:
+        request.authz_datasets['read'] = []
+        request.authz_datasets['edit'] = []
+        request.authz_datasets['manage'] = []
+
+        q = db.session.query(Dataset.slug)
+        q = q.filter(Dataset.public == True) # noqa
+        request.authz_datasets['read'] = [r.slug for r in q]
+
         if current_user.is_authenticated():
-            q = Dataset.find_slugs()
-            q = q.filter(or_(
-                Dataset.owner_id == current_user.id,
-                Dataset.public == True # noqa
-            ))
-            request.authz_datasets['edit'] = [d.slug for d in q.all()]
-        else:
-            request.authz_datasets['edit'] = []
-    if action == 'manage' and request.authz_datasets.get('manage') is None:
-        if current_user.is_authenticated():
-            q = Dataset.find_slugs()
-            q = q.filter(Dataset.owner_id == current_user.id)
-            request.authz_datasets['manage'] = [d.slug for d in q.all()]
-        else:
-            request.authz_datasets['manage'] = []
+            q = db.session.query(Dataset.slug, Role.role)
+            q = q.join(Role)
+            q = q.filter(Role.user_id == current_user.id)
+
+            for row in q:
+                if row.slug not in request.authz_datasets['read']:
+                    request.authz_datasets['read'].append(row.slug)
+                if row.role == Role.EDIT or row.role == Role.MANAGE:
+                    request.authz_datasets['edit'].append(row.slug)
+                if row.role == Role.MANAGE:
+                    request.authz_datasets['manage'].append(row.slug)
+
     return request.authz_datasets[action] or []
 
 

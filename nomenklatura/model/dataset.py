@@ -62,11 +62,6 @@ class Dataset(db.Model):
         return cls.query.filter_by(slug=slug).first()
 
     @classmethod
-    def find_slugs(cls):
-        q = db.session.query(cls.slug)
-        return q
-
-    @classmethod
     def all(cls):
         return cls.query
 

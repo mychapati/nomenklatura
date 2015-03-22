@@ -8,10 +8,10 @@ class Role(db.Model):
     __tablename__ = 'role'
 
     READ = 'read'
-    WRITE = 'write'
+    EDIT = 'edit'
     MANAGE = 'manage'
     NONE = 'none'
-    ROLES = [READ, WRITE, MANAGE]
+    ROLES = [READ, EDIT, MANAGE]
 
     id = db.Column(db.Integer, primary_key=True)
     role = db.Column(db.Enum(*ROLES, name='roles'), nullable=False)

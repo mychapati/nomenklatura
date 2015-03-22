@@ -22,7 +22,7 @@ class UserRef(Ref):
     def decode(self, cstruct):
         from nomenklatura.model.user import User
 
-        if isinstance(cstruct, User):
+        if hasattr(cstruct, 'api_key'):
             return cstruct
         if isinstance(cstruct, (basestring, int)):
             return User.by_id(cstruct)
@@ -59,5 +59,5 @@ class DatasetEditForm(colander.MappingSchema):
 
 class RoleForm(colander.MappingSchema):
     role = colander.SchemaNode(colander.String(),
-        validator=colander.OneOf(['none', 'read', 'write', 'manage'])) # noqa
+        validator=colander.OneOf(['none', 'read', 'edit', 'manage'])) # noqa
     user = colander.SchemaNode(UserRef())
