@@ -11,17 +11,20 @@ class Map(object):
     """ A simple proxy object so you can request
     ``types.Company`` or ``attributes.label``. """
 
-    def __init__(self, items=None):
+    def __init__(self, cls, items=None):
+        self.cls = cls
         self.items = items or {}
 
     def __getitem__(self, name):
         return self.items.get(name)
 
-    def get(self, name):
+    def get(self, cls, name):
+        if isinstance(name, cls):
+            return name
         return self[name]
 
-    def all(self):
-        return self.items
+    def __iter__(self):
+        return self.items.values()
 
     def to_dict(self):
         return self.items

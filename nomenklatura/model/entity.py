@@ -1,6 +1,5 @@
 from nomenklatura.core import db, url_for
 from nomenklatura.model.common import make_key
-from nomenklatura.model.attribute import Attribute
 from nomenklatura.model.schema import attributes
 from nomenklatura.model.statement import Statement
 
@@ -28,8 +27,7 @@ class Entity(object):
         return attribute in self.attributes
 
     def set(self, attribute, value, context):
-        if not isinstance(attribute, Attribute):
-            attribute = attributes.get(attribute)
+        attribute = attributes.get(attribute)
         stmt = Statement(self.dataset, self.id, attribute, value,
                          context)
         db.session.add(stmt)
@@ -37,14 +35,14 @@ class Entity(object):
         return stmt
 
     def match(self, attribute):
-        if not isinstance(attribute, Attribute):
-            attribute = attributes.get(attribute)
+        attribute = attributes.get(attribute)
         for stmt in self.statements:
             if stmt.attribute != attribute:
                 continue
             yield stmt
 
     def get(self, attribute):
+        attribute = attributes.get(attribute)
         for stmt in self.match(attribute):
             return stmt.value
 
@@ -83,11 +81,11 @@ class Entity(object):
 
     def update(self, data, context):
         # TODO: crutch. Replace with a better thing asap.
-        for key, value in data.items():
-            attribute = attributes.get(key)
-            if attribute is None:
-                continue
-            self.set(attribute, value, context)
+        for attribute in attributes:
+            if attribute.name in data:
+                self.set(attribute, data.get(attribute.name), context)
+            elif attribute.key in data:
+                self.set(attribute, data.get(attribute.key), context)
 
     def __repr__(self):
         return u'<Entity(%r, %s, %r)>' % (self.id, self.type, self.label)
