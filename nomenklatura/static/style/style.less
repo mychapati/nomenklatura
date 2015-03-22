@@ -88,11 +88,6 @@ h1, h2, h3, h4, h5, h6 {
   //padding: 0 0 2em 0;
 }
 
-#airlock {
-  //padding-top: 1em;
-  //position: relative;
-}
-
 .hidden {
   display: none;
 }
@@ -122,7 +117,7 @@ th {
 
 .structured {
   color: lighten(black, 20%);
-  font-family: 'Droid Sans Mono', monospace;
+  font-family: monospace;
   font-size: 0.8em;
   background-color: darken(white, 3%);
   padding: 0 2px 0 2px;
@@ -231,22 +226,20 @@ code {
 
 .docs {
   font-size: 1.2em;
+
+  pre {
+    background-color: #555;
+    color: #ddd;
+  }
+
+  code {
+    font-size: 0.8em;
+    color: #555;
+  }
+
+  h1, h2, h3, h4 {
+    font-weight: 700;
+  }
 }
 
-.docs h1, .docs h2, .docs h3, .docs h4 {
-  font-weight: 700;
-}
 
-.docs pre {
-  background-color: #555;
-  color: #ddd;
-}
-
-.docs code {
-  font-size: 0.8em;
-  color: #555;
-}
-
-.docs pre.call {
-  m-argin-top: 2em;
-}
