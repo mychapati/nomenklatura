@@ -11,14 +11,10 @@ from nomenklatura.model.query import EntityQuery
 section = Blueprint('entities', __name__)
 
 
-@section.route('/entities', methods=['GET'])
-def index():
-    q = EntityQuery()
-    dataset = request.args.get('dataset')
-    if dataset is not None:
-        dataset = obj_or_404(Dataset.by_slug(dataset))
-        q = q.filter_dataset(dataset)
-
+@section.route('/datasets/<dataset>/entities', methods=['GET'])
+def index(dataset):
+    dataset = obj_or_404(Dataset.by_slug(dataset))
+    q = EntityQuery(dataset)
     # filter_name = request.args.get('filter_name', '')
     # if len(filter_name):
     #    query = '%' + filter_name + '%'
@@ -26,11 +22,13 @@ def index():
 
     # TODO, other filters.
 
+    print 'XXXX', list(q)
+
     format = request.args.get('format', 'json').lower().strip()
     if format == 'csv':
         res = csvify(q)
     else:
-        res = jsonify(Pager(q))
+        res = jsonify(Pager(q, dataset=dataset.slug))
 
     if arg_bool('download'):
         fn = dataset_filename(dataset or 'all', format)
@@ -38,39 +36,37 @@ def index():
     return res
 
 
-@section.route('/entities', methods=['POST'])
-def create():
+@section.route('/datasets/<dataset>/entities', methods=['POST'])
+def create(dataset):
     data = request_data()
-    dataset = Dataset.from_form(data)
-    authz.require(authz.dataset_edit(dataset.name))
+    dataset = obj_or_404(Dataset.by_slug(dataset))
+    authz.require(authz.dataset_edit(dataset.slug))
     entity = Entity.create(dataset, data, current_user)
     db.session.commit()
     return redirect(url_for('.view', id=entity.id))
 
 
-@section.route('/entities/<int:id>', methods=['GET'])
-def view(id):
-    entity = obj_or_404(Entity.by_id(id))
-    return jsonify(entity)
-
-
-@section.route('/datasets/<dataset>/find', methods=['GET'])
-def by_name(dataset):
+@section.route('/datasets/<dataset>/entities/<int:id>', methods=['GET'])
+def view(dataset, id):
     dataset = obj_or_404(Dataset.by_slug(dataset))
-    name = request.args.get('name')
-    entity = obj_or_404(Entity.by_name(dataset, name))
+
+    entity = obj_or_404(Entity.by_id(id))
     return jsonify(entity)
 
 
-@section.route('/entities/<int:id>/aliases', methods=['GET'])
-def aliases(id):
+@section.route('/datasets/<dataset>/entities/<int:id>/aliases', methods=['GET'])
+def aliases(dataset, id):
+    dataset = obj_or_404(Dataset.by_slug(dataset))
+    
     entity = obj_or_404(Entity.by_id(id))
-    pager = Pager(entity.aliases, id=id)
+    pager = Pager(entity.aliases, dataset=dataset.slug, id=id)
     return jsonify(pager.to_dict())
 
 
-@section.route('/entities/<id>', methods=['POST'])
-def update(id):
+@section.route('/datasets/<dataset>/entities/<id>', methods=['POST'])
+def update(dataset, id):
+    dataset = obj_or_404(Dataset.by_slug(dataset))
+    
     entity = obj_or_404(Entity.by_id(id))
     authz.require(authz.dataset_edit(entity.dataset.name))
     entity.update(request_data(), current_user)

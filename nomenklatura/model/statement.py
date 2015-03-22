@@ -20,8 +20,7 @@ class Statement(db.Model, CommonMixIn):
     dataset = db.relationship('Dataset', backref=db.backref('statements',
                               lazy='dynamic', cascade='all, delete-orphan')) # noqa
 
-    context_id = db.Column(db.String(KEY_LENGTH), db.ForeignKey('context.id'),
-                           nullable=True)
+    context_id = db.Column(db.String(KEY_LENGTH), db.ForeignKey('context.id'))
     context = db.relationship('Context', backref=db.backref('statements',
                          lazy='dynamic', cascade='all, delete-orphan')) # noqa
 
