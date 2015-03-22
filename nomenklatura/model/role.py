@@ -10,6 +10,7 @@ class Role(db.Model):
     READ = 'read'
     WRITE = 'write'
     MANAGE = 'manage'
+    NONE = 'none'
     ROLES = [READ, WRITE, MANAGE]
 
     id = db.Column(db.Integer, primary_key=True)
@@ -27,13 +28,18 @@ class Role(db.Model):
         q = q.filter(cls.user == data.get('user'))
         q = q.filter(cls.dataset == dataset)
         role = q.first()
-        if role is None:
-            role = cls()
-            role.user = data.get('user')
-            role.dataset = dataset
-        role.role = data.get('role')
-        db.session.add(role)
-        return role
+        if data.get('role') == 'none':
+            if role is None:
+                return
+            db.session.delete(role)
+        else:
+            if role is None:
+                role = cls()
+                role.user = data.get('user')
+                role.dataset = dataset
+            role.role = data.get('role')
+            db.session.add(role)
+            return role
 
     def to_dict(self):
         return {

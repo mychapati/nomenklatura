@@ -34,7 +34,7 @@ nomenklatura.config(['$routeProvider', '$locationProvider', '$sceProvider', 'cfp
     controller: 'DatasetsSettingsCtrl',
     resolve: {
       'dataset': loadDataset,
-      'users': loadUsers
+      'users': loadRoleUsers
     }
   });
 

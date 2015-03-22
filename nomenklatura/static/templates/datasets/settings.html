@@ -3,7 +3,7 @@
     <a href="/datasets/{{dataset.slug}}">{{dataset.label}}</a>
   </li>
   <li>
-    Overview
+    Settings
   </li>
 </ul>
 
@@ -83,14 +83,30 @@
   <div class="col-xs-12 col-md-6">
     <table class="table table-condensed">
       <tr>
-        <th colspan="2">Users who have access</th>
+        <th>Users who have access</th>
+        <th>Read</th>
+        <th>Write</th>
+        <th>Admin</th>
+        <th>No&nbsp;access</th>
       </tr>
       <tr ng-repeat="user in users.results">
-        <td width='1%'>
-          <input type="checkbox" ng-checked="hasUser(user.id)"
-            ng-click="toggleUser(user.id)">
-        </td>
         <td>{{user.display_name}}</td>
+        <td>
+          <input type="radio" name="role" ng-model="user.role" value="read"
+            ng-change="roleChange(user)" ng-hide="readonlyRole(user)">
+        </td>
+        <td>
+          <input type="radio" name="role" ng-model="user.role" value="write"
+            ng-change="roleChange(user)" ng-hide="readonlyRole(user)">
+        </td>
+        <td>
+          <input type="radio" name="role" ng-model="user.role" value="manage"
+            ng-change="roleChange(user)" ng-hide="readonlyRole(user)">
+        </td>
+        <td>
+          <input type="radio" name="role" ng-model="user.role" value="none"
+            ng-change="roleChange(user)" ng-hide="readonlyRole(user)">
+        </td>
       </tr>
     </table>
   </div>

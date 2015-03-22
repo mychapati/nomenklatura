@@ -2,6 +2,7 @@ from flask import Blueprint
 from apikit import jsonify, request_data, obj_or_404
 
 from nomenklatura import authz
+from nomenklatura.core import db
 from nomenklatura.model import Role, Dataset
 
 blueprint = Blueprint('roles', __name__)
@@ -21,4 +22,5 @@ def update(dataset):
     authz.require(authz.dataset_manage(dataset))
     dataset = obj_or_404(Dataset.by_slug(dataset))
     role = Role.update(request_data(), dataset)
+    db.session.commit()
     return jsonify(role)

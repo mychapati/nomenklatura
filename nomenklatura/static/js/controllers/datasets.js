@@ -27,15 +27,36 @@ var loadDatasetEntities = ['$route', '$http', '$q', 'Session', function($route, 
 }];
 
 
-var loadUsers = ['$route', '$http', '$q', 'Session', function($route, $http, $q, Session) {
-  var dfd = $q.defer();
+var loadRoleUsers = ['$route', '$http', '$q', 'Session', function($route, $http, $q, Session) {
+  var dfd = $q.defer(),
+      url = '/api/2/datasets/' + $route.current.params.dataset + '/roles';
+
   Session.get(function(s) {
     var params = {params: {_uid: s.cbq}};
-    $http.get('/api/2/users', params).then(function(res) {
-      dfd.resolve(res.data);
+    $q.all([
+      $http.get('/api/2/users', params),
+      $http.get(url, params)
+    ]).then(function(res) {
+      var users = res[0].data;
+
+      angular.forEach(users.results, function(u) {
+        u.role = 'none';
+      });
+
+      angular.forEach(res[1].data.results, function(r) {
+        angular.forEach(users.results, function(u) {
+          if (r.user_id == u.id) {
+            u.role = r.role;
+          }
+        });
+      });
+
+      dfd.resolve(users);
     });
   });
+
   return dfd.promise;
+
 }];
 
 
@@ -121,11 +142,19 @@ nomenklatura.controller('DatasetsSettingsCtrl', ['$scope', '$route', '$routePara
   $scope.dataset = dataset;
   $scope.users = users;
 
+  $scope.roleChange = function(user) {
+    var data = {'user': user.id, 'role': user.role};
+    $http.post(dataset.api_url + '/roles', data);
+  };
+
+  $scope.readonlyRole = function(user) {
+    return user.id == $scope.session.user.id;
+  };
+
   $scope.update = function(form) {
     var res = $http.post('/api/2/datasets/' + $scope.dataset.slug, $scope.dataset);
     res.success(function(data) {
-      $route.reload();
-      //$modalInstance.dismiss('ok');
+      $location.path('/datasets/' + $scope.dataset.slug);
     });
     res.error(nomenklatura.handleFormError(form));
   };

@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from nomenklatura.core import db
+from nomenklatura.core import db, url_for
 from nomenklatura.model.role import Role
 from nomenklatura.model.forms import DatasetCreateForm
 from nomenklatura.model.forms import DatasetEditForm
@@ -39,6 +39,7 @@ class Dataset(db.Model):
         return {
             'id': self.id,
             'slug': self.slug,
+            'api_url': url_for('datasets.view', dataset=self.slug),
             'label': self.label,
             'owner': self.owner.to_dict(),
             'stats': {
