@@ -1,4 +1,4 @@
-nomenklatura.factory('session', ['$http', function($http) {
+nomenklatura.factory('Session', ['$http', function($http) {
     var dfd = null;
 
     var get = function(cb) {

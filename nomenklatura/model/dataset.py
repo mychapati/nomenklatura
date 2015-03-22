@@ -1,8 +1,9 @@
 from datetime import datetime
 
 from nomenklatura.core import db
-from nomenklatura.model.forms import DatasetNewSchema
-from nomenklatura.model.forms import DatasetEditSchema
+from nomenklatura.model.role import Role
+from nomenklatura.model.forms import DatasetCreateForm
+from nomenklatura.model.forms import DatasetEditForm
 
 
 class Dataset(db.Model):
@@ -70,17 +71,18 @@ class Dataset(db.Model):
 
     @classmethod
     def create(cls, data, user):
-        data = DatasetNewSchema().to_python(data)
+        data = DatasetCreateForm().deserialize(data)
         dataset = cls()
         dataset.owner = user
         dataset.slug = data['slug']
         dataset.label = data['label']
         db.session.add(dataset)
         db.session.flush()
+        Role.update({'role': Role.MANAGE, 'user': user}, dataset)
         return dataset
 
     def update(self, data):
-        data = DatasetEditSchema().to_python(data)
+        data = DatasetEditForm().deserialize(data)
         self.label = data['label']
         self.normalize_text = data['normalize_text']
         self.ignore_case = data['ignore_case']

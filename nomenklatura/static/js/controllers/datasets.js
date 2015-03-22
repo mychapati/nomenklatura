@@ -1,28 +1,47 @@
 
-var loadDataset = ['$route', '$http', '$q', function($route, $http, $q) {
+var loadDataset = ['$route', '$http', '$q', 'Session', function($route, $http, $q, Session) {
   var dfd = $q.defer();
-  $http.get('/api/2/datasets/' + $route.current.params.dataset).then(function(res) {
-    dfd.resolve(res.data);
+  Session.get(function(s) {
+    var params = {params: {_uid: s.cbq}};
+    $http.get('/api/2/datasets/' + $route.current.params.dataset, params).then(function(res) {
+      dfd.resolve(res.data);
+    });
   });
   return dfd.promise;
 }];
 
 
-var loadDatasetEntities = ['$route', '$http', '$q', function($route, $http, $q) {
-  var dfd = $q.defer(),
-      params = {
-        dataset: $route.current.params.dataset
-      };
-  $http.get('/api/2/entities', {params: params}).then(function(res) {
-    dfd.resolve(res.data);
+var loadDatasetEntities = ['$route', '$http', '$q', 'Session', function($route, $http, $q, Session) {
+  var dfd = $q.defer();
+      
+  Session.get(function(s) {
+    var params = {params: {
+        dataset: $route.current.params.dataset,
+        _uid: s.cbq
+    }};
+    $http.get('/api/2/entities', params).then(function(res) {
+      dfd.resolve(res.data);
+    });
+  });
+  return dfd.promise;
+}];
+
+
+var loadUsers = ['$route', '$http', '$q', 'Session', function($route, $http, $q, Session) {
+  var dfd = $q.defer();
+  Session.get(function(s) {
+    var params = {params: {_uid: s.cbq}};
+    $http.get('/api/2/users', params).then(function(res) {
+      dfd.resolve(res.data);
+    });
   });
   return dfd.promise;
 }];
 
 
 nomenklatura.controller('DatasetsViewCtrl', ['$scope', '$routeParams', '$location', '$http', '$modal',
-                                             '$timeout', 'session', 'dataset', 'entities',
-    function ($scope, $routeParams, $location, $http, $modal, $timeout, session, dataset, entities) {
+                                             '$timeout', 'dataset', 'entities',
+    function ($scope, $routeParams, $location, $http, $modal, $timeout, dataset, entities) {
 
     $scope.dataset = dataset;
     $scope.entities = entities;
@@ -49,21 +68,11 @@ nomenklatura.controller('DatasetsViewCtrl', ['$scope', '$routeParams', '$locatio
 
         filterTimeout = $timeout(function() {
             var fparams = {
-              dataset: dataset.name,
+              dataset: dataset.slug,
               filter_name: $scope.query
             };
             $scope.loadEntities('/api/2/entities', fparams);
         }, 500);
-    };
-
-    $scope.editDataset = function() {
-        var d = $modal.open({
-            templateUrl: '/static/templates/datasets/edit.html',
-            controller: 'DatasetsEditCtrl',
-            resolve: {
-                dataset: function () { return $scope.dataset; }
-            }
-        });
     };
 
     $scope.uploadFile = function(){
@@ -88,8 +97,8 @@ nomenklatura.controller('DatasetsViewCtrl', ['$scope', '$routeParams', '$locatio
 }]);
 
 
-nomenklatura.controller('DatasetsNewCtrl', ['$scope', '$routeParams', '$modalInstance', '$location', '$http', 'session',
-  function ($scope, $routeParams, $modalInstance, $location, $http, session) {
+nomenklatura.controller('DatasetsNewCtrl', ['$scope', '$routeParams', '$modalInstance', '$location', '$http',
+  function ($scope, $routeParams, $modalInstance, $location, $http) {
   $scope.dataset = {};
 
   $scope.cancel = function() {
@@ -99,7 +108,7 @@ nomenklatura.controller('DatasetsNewCtrl', ['$scope', '$routeParams', '$modalIns
   $scope.create = function(form) {
     var res = $http.post('/api/2/datasets', $scope.dataset);
     res.success(function(data) {
-      $location.path('/datasets/' + data.name);
+      $location.path('/datasets/' + data.slug);
       $modalInstance.dismiss('ok');
     });
     res.error(nomenklatura.handleFormError(form));
@@ -107,19 +116,16 @@ nomenklatura.controller('DatasetsNewCtrl', ['$scope', '$routeParams', '$modalIns
 }]);
 
 
-nomenklatura.controller('DatasetsEditCtrl', ['$scope', '$route', '$routeParams', '$modalInstance', '$location', '$http', 'dataset',
-  function ($scope, $route, $routeParams, $modalInstance, $location, $http, dataset) {
-  $scope.dataset = angular.copy(dataset);
-
-  $scope.cancel = function() {
-    $modalInstance.dismiss('cancel');
-  };
+nomenklatura.controller('DatasetsSettingsCtrl', ['$scope', '$route', '$routeParams', '$location', '$http', 'dataset', 'users',
+  function ($scope, $route, $routeParams, $location, $http, dataset, users) {
+  $scope.dataset = dataset;
+  $scope.users = users;
 
   $scope.update = function(form) {
-    var res = $http.post('/api/2/datasets/' + $scope.dataset.name, $scope.dataset);
+    var res = $http.post('/api/2/datasets/' + $scope.dataset.slug, $scope.dataset);
     res.success(function(data) {
       $route.reload();
-      $modalInstance.dismiss('ok');
+      //$modalInstance.dismiss('ok');
     });
     res.error(nomenklatura.handleFormError(form));
   };

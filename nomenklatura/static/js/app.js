@@ -29,6 +29,15 @@ nomenklatura.config(['$routeProvider', '$locationProvider', '$sceProvider', 'cfp
     }
   });
 
+  $routeProvider.when('/datasets/:dataset/settings', {
+    templateUrl: '/static/templates/datasets/settings.html',
+    controller: 'DatasetsSettingsCtrl',
+    resolve: {
+      'dataset': loadDataset,
+      'users': loadUsers
+    }
+  });
+
   $routeProvider.when('/datasets/:dataset/uploads/:upload', {
     templateUrl: '/static/templates/mapping.html',
     controller: 'MappingCtrl',

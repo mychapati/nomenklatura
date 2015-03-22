@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from nomenklatura.core import db
+from nomenklatura.model.forms import RoleForm
 
 
 class Role(db.Model):
@@ -18,6 +19,21 @@ class Role(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow,
                            onupdate=datetime.utcnow)
+
+    @classmethod
+    def update(cls, data, dataset):
+        data = RoleForm().deserialize(data)
+        q = db.session.query(cls)
+        q = q.filter(cls.user == data.get('user'))
+        q = q.filter(cls.dataset == dataset)
+        role = q.first()
+        if role is None:
+            role = cls()
+            role.user = data.get('user')
+            role.dataset = dataset
+        role.role = data.get('role')
+        db.session.add(role)
+        return role
 
     def to_dict(self):
         return {

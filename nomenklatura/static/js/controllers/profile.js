@@ -1,8 +1,10 @@
-function ProfileCtrl($scope, $location, $modalInstance, $http, session) {
+
+
+function ProfileCtrl($scope, $location, $modalInstance, $http, Session) {
   $scope.session = {logged_in: false};
   $scope.user = {}
 
-  session.get(function(data) {
+  Session.get(function(data) {
       $scope.session = data;
       $scope.user = data.user;
   });
@@ -22,4 +24,4 @@ function ProfileCtrl($scope, $location, $modalInstance, $http, session) {
     
 }
 
-ProfileCtrl.$inject = ['$scope', '$location', '$modalInstance', '$http', 'session'];
+ProfileCtrl.$inject = ['$scope', '$location', '$modalInstance', '$http', 'Session'];

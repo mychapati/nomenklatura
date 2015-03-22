@@ -1,0 +1,98 @@
+<ul class="breadcrumb hidden-xs">
+  <li>
+    <a href="/datasets/{{dataset.slug}}">{{dataset.label}}</a>
+  </li>
+  <li>
+    Overview
+  </li>
+</ul>
+
+<h2 class="page-header">{{dataset.label}}</h2>
+
+
+<div class="row">
+  <div class="col-xs-12 col-md-6">
+    <form class="form-horizontal" role="form" name="editDataset">
+      <div class="form-group" ng-class="{'has-error': editDataset.label.$invalid}">
+        <label class="col-sm-2 control-label" for="label">Title</label>
+        <div class="col-sm-10">
+          <input type="text" class="form-control" id="label" name="label" ng-model="dataset.label" placeholder="Dataset label">
+          <p class="help-block" ng-show="editDataset.label.$invalid" ng-bind="editDataset.label.$message"></p>
+        </div>
+      </div>
+      <div class="form-group" ng-class="{'has-error': editDataset.ignore_case.$invalid}">
+        <div class="col-sm-offset-2 col-sm-10">
+          <div class="checkbox">
+            <label>
+              <input type="checkbox" ng-model="dataset.ignore_case" value="True">
+              Ignore lowercase/uppercase spelling.
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="form-group" ng-class="{'has-error': editDataset.public_edit.$invalid}">
+        <div class="col-sm-offset-2 col-sm-10">
+          <div class="checkbox">
+            <label>
+              <input type="checkbox" ng-model="dataset.public_edit" value="True">
+              Any user can make matches and create values.
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="form-group" ng-class="{'has-error': editDataset.match_aliases.$invalid}">
+        <div class="col-sm-offset-2 col-sm-10">
+          <div class="checkbox">
+            <label>
+              <input type="checkbox" ng-model="dataset.match_aliases" value="True">
+              Use existing aliases as matching candidates.
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="form-group" ng-class="{'has-error': editDataset.normalize_text.$invalid}">
+        <div class="col-sm-offset-2 col-sm-10">
+          <div class="checkbox">
+            <label>
+              <input type="checkbox" ng-model="dataset.normalize_text" value="True">
+              Clean up text before matching.
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="form-group" ng-class="{'has-error': editDataset.enable_invalid.$invalid}">
+        <div class="col-sm-offset-2 col-sm-10">
+          <div class="checkbox">
+            <label>
+              <input type="checkbox" ng-model="dataset.enable_invalid" value="True">
+              Incoming aliases can be marked as invalid.
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+          <button type="submit" class="btn btn-primary" ng-click="update(editDataset)">Save</button>
+        </div>
+      </div>
+
+    </form>
+  </div>
+
+  <div class="col-xs-12 col-md-6">
+    <table class="table table-condensed">
+      <tr>
+        <th colspan="2">Users who have access</th>
+      </tr>
+      <tr ng-repeat="user in users.results">
+        <td width='1%'>
+          <input type="checkbox" ng-checked="hasUser(user.id)"
+            ng-click="toggleUser(user.id)">
+        </td>
+        <td>{{user.display_name}}</td>
+      </tr>
+    </table>
+  </div>
+</div>
+

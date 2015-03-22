@@ -1,6 +1,6 @@
 
-nomenklatura.controller('ReviewCtrl', ['$scope', '$routeParams', '$location', '$timeout', '$http', 'session', 'dataset',
-  function ($scope, $routeParams, $location, $timeout, $http, session, dataset) {
+nomenklatura.controller('ReviewCtrl', ['$scope', '$routeParams', '$location', '$timeout', '$http', 'dataset',
+  function ($scope, $routeParams, $location, $timeout, $http, dataset) {
   $scope.dataset = dataset;
   $scope.entity = {};
   $scope.matches = {};

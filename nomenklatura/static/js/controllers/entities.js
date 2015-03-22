@@ -8,8 +8,8 @@ var loadEntity = ['$route', '$http', '$q', function($route, $http, $q) {
 }];
 
 nomenklatura.controller('EntitiesViewCtrl', ['$scope', '$routeParams', '$location',
-            '$http', '$modal', '$timeout', 'session', 'dataset', 'entity',
-  function ($scope, $routeParams, $location, $http, $modal, $timeout, session, dataset, entity) {
+            '$http', '$modal', '$timeout', 'dataset', 'entity',
+  function ($scope, $routeParams, $location, $http, $modal, $timeout, dataset, entity) {
   $scope.dataset = dataset;
   $scope.entity = entity;
   $scope.has_attributes = entity.attributes && Object.keys(entity.attributes).length > 0;

@@ -1,5 +1,5 @@
-nomenklatura.controller('UploadCtrl', ['$scope', '$routeParams', '$modalInstance', '$location', '$http', '$sce', 'session', 'dataset',
-  function ($scope, $routeParams, $modalInstance, $location, $http, $sce, session, dataset) {
+nomenklatura.controller('UploadCtrl', ['$scope', '$routeParams', '$modalInstance', '$location', '$http', '$sce', 'dataset',
+  function ($scope, $routeParams, $modalInstance, $location, $http, $sce, dataset) {
   $scope.dataset = angular.copy(dataset);
   $scope.form_action = '/api/2';
   $scope.upload = {};
@@ -34,8 +34,8 @@ var loadUpload = ['$route', '$http', '$q', function($route, $http, $q) {
 }];
 
 
-nomenklatura.controller('MappingCtrl', ['$scope', '$routeParams', '$location', '$http', 'session', 'dataset', 'upload',
-  function ($scope, $routeParams, $location, $http, session, dataset, upload) {
+nomenklatura.controller('MappingCtrl', ['$scope', '$routeParams', '$location', '$http', 'dataset', 'upload',
+  function ($scope, $routeParams, $location, $http, dataset, upload) {
 
   $scope.errors = {};
   $scope.dataset = dataset;

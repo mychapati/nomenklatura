@@ -23,7 +23,7 @@ def create():
     authz.require(authz.dataset_create())
     dataset = Dataset.create(request_data(), current_user)
     db.session.commit()
-    return redirect(url_for('.view', dataset=dataset.name))
+    return redirect(url_for('.view', dataset=dataset.slug))
 
 
 @blueprint.route('/datasets/<dataset>', methods=['GET'])
@@ -44,4 +44,4 @@ def update(dataset):
     dataset = obj_or_404(Dataset.by_slug(dataset))
     dataset.update(request_data())
     db.session.commit()
-    return redirect(url_for('.view', dataset=dataset.name))
+    return redirect(url_for('.view', dataset=dataset.slug))

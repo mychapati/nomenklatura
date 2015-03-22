@@ -1,4 +1,4 @@
-nomenklatura.directive('nkBindKey', ['$timeout', 'session', function ($timeout, session) {
+nomenklatura.directive('nkBindKey', ['$timeout', function ($timeout) {
     return {
         restrict: 'A',
         scope: {

@@ -1,8 +1,6 @@
-from flask import Blueprint, url_for, redirect
-from flask.ext.login import current_user
-from apikit import jsonify, Pager, request_data, obj_or_404
+from flask import Blueprint
+from apikit import jsonify, request_data, obj_or_404
 
-from nomenklatura.core import db
 from nomenklatura import authz
 from nomenklatura.model import Role, Dataset
 
@@ -15,14 +13,12 @@ def index(dataset):
     dataset = obj_or_404(Dataset.by_slug(dataset))
     q = Role.all()
     q = q.filter(Role.dataset == dataset)
-    pager = Pager(q, dataset=dataset.slug)
-    return jsonify(pager.to_dict())
+    return jsonify({'results': q.all(), 'total': q.count()})
 
 
 @blueprint.route('/datasets/<dataset>/roles', methods=['POST'])
 def update(dataset):
     authz.require(authz.dataset_manage(dataset))
     dataset = obj_or_404(Dataset.by_slug(dataset))
-
-    role = None
+    role = Role.update(request_data(), dataset)
     return jsonify(role)
