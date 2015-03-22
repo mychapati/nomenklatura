@@ -1,8 +1,8 @@
 import os
 import yaml
 
-from graphkit.attribute import Attribute
-from graphkit.type import Type
+from nomenklatura.model.attribute import Attribute
+from nomenklatura.model.type import Type
 
 DEFAULT_SCHEMA = os.path.join(os.path.dirname(__file__), 'schema.yaml')
 

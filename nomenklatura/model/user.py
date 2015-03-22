@@ -30,8 +30,6 @@ class User(db.Model, CommonMixIn):
                                lazy='dynamic')
     uploads = db.relationship('Upload', backref='creator',
                               lazy='dynamic')
-    entities_created = db.relationship('Entity', backref='creator',
-                                       lazy='dynamic')
     roles = db.relationship('Role', backref='user', lazy='dynamic')
 
     def to_dict(self):
@@ -83,15 +81,15 @@ class User(db.Model, CommonMixIn):
 
     @classmethod
     def by_github_id(cls, github_id):
-        return cls.query.filter_by(github_id=github_id).first()
+        return cls.query.filter_by(github_id=unicode(github_id)).first()
 
     @classmethod
     def by_twitter_id(cls, twitter_id):
-        return cls.query.filter_by(twitter_id=twitter_id).first()
+        return cls.query.filter_by(twitter_id=unicode(twitter_id)).first()
 
     @classmethod
     def by_facebook_id(cls, facebook_id):
-        return cls.query.filter_by(facebook_id=facebook_id).first()
+        return cls.query.filter_by(facebook_id=unicode(facebook_id)).first()
 
     @classmethod
     def load(cls, data):

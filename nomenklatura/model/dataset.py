@@ -17,19 +17,17 @@ class Dataset(db.Model, CommonMixIn):
     enable_invalid = db.Column(db.Boolean, default=True)
     owner_id = db.Column(db.String(KEY_LENGTH), db.ForeignKey('user.id'))
 
-    entities = db.relationship('Entity', backref='dataset',
-                               lazy='dynamic')
     uploads = db.relationship('Upload', backref='dataset',
                               lazy='dynamic')
     roles = db.relationship('Role', backref='dataset',
                             lazy='dynamic')
 
     def to_dict(self):
-        from nomenklatura.model.entity import Entity
-        num_aliases = Entity.all(self).filter(Entity.canonical_id != None).count()
-        num_review = Entity.all(self).filter_by(reviewed=False).count()
-        num_entities = Entity.all(self).count()
-        num_invalid = Entity.all(self).filter_by(invalid=True).count()
+        # from nomenklatura.model.entity import Entity
+        # num_aliases = Entity.all(self).filter(Entity.canonical_id != None).count()
+        # num_review = Entity.all(self).filter_by(reviewed=False).count()
+        # num_entities = Entity.all(self).count()
+        # num_invalid = Entity.all(self).filter_by(invalid=True).count()
 
         return {
             'id': self.id,
@@ -37,12 +35,12 @@ class Dataset(db.Model, CommonMixIn):
             'api_url': url_for('datasets.view', dataset=self.slug),
             'label': self.label,
             'owner': self.owner.to_dict(),
-            'stats': {
-                'num_aliases': num_aliases,
-                'num_entities': num_entities,
-                'num_review': num_review,
-                'num_invalid': num_invalid
-            },
+            # 'stats': {
+            #     'num_aliases': num_aliases,
+            #     'num_entities': num_entities,
+            #     'num_review': num_review,
+            #     'num_invalid': num_invalid
+            # },
             'ignore_case': self.ignore_case,
             'match_aliases': self.match_aliases,
             'public': self.public,
