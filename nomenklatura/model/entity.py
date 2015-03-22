@@ -29,11 +29,12 @@ class Entity(object):
 
     def set(self, attribute, value, context):
         attribute = attributes.get(attribute)
-        stmt = Statement(self.dataset, self.id, attribute, value,
-                         context)
-        db.session.add(stmt)
-        self.statements.append(stmt)
-        return stmt
+        values = value if attribute.many else [value]
+        for value in values:
+            stmt = Statement(self.dataset, self.id, attribute,
+                             value, context)
+            db.session.add(stmt)
+            self.statements.append(stmt)
 
     def match(self, attribute):
         attribute = attributes.get(attribute)
@@ -46,8 +47,12 @@ class Entity(object):
 
     def get(self, attribute):
         attribute = attributes.get(attribute)
+        values = []
         for stmt in self.match(attribute):
-            return stmt.value
+            if not attribute.many:
+                return stmt.value
+            values.append(stmt.value)
+        return values if attribute.many else None
 
     @property
     def type(self):
@@ -97,7 +102,7 @@ class Entity(object):
         return len(self.statements)
 
     def __iter__(self):
-        return self.statements
+        return iter(self.statements)
 
     def __unicode__(self):
         return self.label or self.id

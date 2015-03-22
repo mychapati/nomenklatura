@@ -18,13 +18,13 @@ class Map(object):
     def __getitem__(self, name):
         return self.items.get(name)
 
-    def get(self, cls, name):
-        if isinstance(name, cls):
+    def get(self, name):
+        if isinstance(name, self.cls):
             return name
         return self[name]
 
     def __iter__(self):
-        return self.items.values()
+        return iter(self.items.values())
 
     def to_dict(self):
         return self.items
@@ -40,7 +40,7 @@ def load_schema():
     """ Load types and attributes from a ``.yaml`` file specified into
     the given dataset. """
 
-    types, attributes = Map(), Map()
+    types, attributes = Map(Type), Map(Attribute)
 
     with open(DEFAULT_SCHEMA, 'rb') as fh:
         data = yaml.load(fh)

@@ -61,7 +61,9 @@ class DateTime(DataType):
 class Type(DataType):
 
     def serialize(self, value):
-        return value.name
+        if hasattr(value, 'name'):
+            return value.name
+        return value
 
     def deserialize(self, value):
         from nomenklatura.model.schema import types

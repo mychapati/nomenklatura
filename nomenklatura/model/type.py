@@ -10,10 +10,7 @@ class Type(NamedMixIn):
         self.label = data.get('label')
 
     def to_dict(self):
-        return {
-            'name': self.name,
-            'label': self.label
-        }
+        return self.name
 
     def __repr__(self):
         return '<Type(%r,%r)>' % (self.name, self.label)
