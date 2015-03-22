@@ -1,15 +1,13 @@
-from datetime import datetime
-
 from nomenklatura.core import db, url_for
+from nomenklatura.model.common import CommonMixIn, KEY_LENGTH
 from nomenklatura.model.role import Role
 from nomenklatura.model.forms import DatasetCreateForm
 from nomenklatura.model.forms import DatasetEditForm
 
 
-class Dataset(db.Model):
+class Dataset(db.Model, CommonMixIn):
     __tablename__ = 'dataset'
 
-    id = db.Column(db.Integer, primary_key=True)
     slug = db.Column(db.Unicode)
     label = db.Column(db.Unicode)
     ignore_case = db.Column(db.Boolean, default=False)
@@ -17,10 +15,7 @@ class Dataset(db.Model):
     public = db.Column(db.Boolean, default=False)
     normalize_text = db.Column(db.Boolean, default=True)
     enable_invalid = db.Column(db.Boolean, default=True)
-    owner_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow,
-                           onupdate=datetime.utcnow)
+    owner_id = db.Column(db.String(KEY_LENGTH), db.ForeignKey('user.id'))
 
     entities = db.relationship('Entity', backref='dataset',
                                lazy='dynamic')

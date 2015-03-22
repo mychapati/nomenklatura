@@ -1,0 +1,30 @@
+types:
+    Company:
+        label: "Company"
+
+    Organization:
+        label: "Organization"
+
+    Person:
+        label: "Person"
+
+attributes:
+    label:
+        label: "Label"
+        data_type: string
+
+    type:
+        label: "Type"
+        data_type: type
+        key: "@type"
+
+    id:
+        label: "Identifier"
+        list: true
+        data_type: string
+        key: "@id"
+
+    alias:
+        label: "Alias"
+        list: true
+        data_type: string

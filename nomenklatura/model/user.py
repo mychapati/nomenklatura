@@ -1,14 +1,12 @@
-from datetime import datetime
-
 from formencode import Schema, validators
 
 from nomenklatura.core import db, url_for, login_manager
-from nomenklatura.model.common import make_key
+from nomenklatura.model.common import CommonMixIn, make_key
 
 
 @login_manager.user_loader
 def load_user(id):
-    return User.query.get(int(id))
+    return User.query.get(id)
 
 
 class UserEditSchema(Schema):
@@ -17,10 +15,9 @@ class UserEditSchema(Schema):
     email = validators.Email()
 
 
-class User(db.Model):
+class User(db.Model, CommonMixIn):
     __tablename__ = 'user'
 
-    id = db.Column(db.Integer, primary_key=True)
     github_id = db.Column(db.Unicode)
     twitter_id = db.Column(db.Unicode)
     facebook_id = db.Column(db.Unicode)
@@ -28,9 +25,6 @@ class User(db.Model):
     display_name = db.Column(db.Unicode)
     email = db.Column(db.Unicode)
     api_key = db.Column(db.Unicode, default=make_key)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow,
-                           onupdate=datetime.utcnow)
 
     datasets = db.relationship('Dataset', backref='owner',
                                lazy='dynamic')

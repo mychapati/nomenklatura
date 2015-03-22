@@ -23,3 +23,5 @@ tablib==0.10.0
 webassets==0.10.1
 wsgiref==0.1.2
 Flask-Login>=0.2.11
+PyYAML>=3.10
+python-dateutil>=2.2

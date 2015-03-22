@@ -1,21 +1,17 @@
-from datetime import datetime
 from tablib import Dataset as TablibDataset
 
 from nomenklatura.core import db, url_for
+from nomenklatura.model.common import CommonMixIn, KEY_LENGTH
 
 
-class Upload(db.Model):
+class Upload(db.Model, CommonMixIn):
     __tablename__ = 'upload'
 
-    id = db.Column(db.Integer, primary_key=True)
     mimetype = db.Column(db.Unicode)
     filename = db.Column(db.Unicode)
     data = db.deferred(db.Column(db.LargeBinary))
-    dataset_id = db.Column(db.Integer, db.ForeignKey('dataset.id'))
-    creator_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow,
-                           onupdate=datetime.utcnow)
+    dataset_id = db.Column(db.String(KEY_LENGTH), db.ForeignKey('dataset.id'))
+    creator_id = db.Column(db.String(KEY_LENGTH), db.ForeignKey('user.id'))
 
     def to_dict(self):
         data = {

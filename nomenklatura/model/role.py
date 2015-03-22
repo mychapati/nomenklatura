@@ -1,10 +1,9 @@
-from datetime import datetime
-
 from nomenklatura.core import db
 from nomenklatura.model.forms import RoleForm
+from nomenklatura.model.common import CommonMixIn, KEY_LENGTH
 
 
-class Role(db.Model):
+class Role(db.Model, CommonMixIn):
     __tablename__ = 'role'
 
     READ = 'read'
@@ -13,13 +12,9 @@ class Role(db.Model):
     NONE = 'none'
     ROLES = [READ, EDIT, MANAGE]
 
-    id = db.Column(db.Integer, primary_key=True)
     role = db.Column(db.Enum(*ROLES, name='roles'), nullable=False)
-    dataset_id = db.Column(db.Integer, db.ForeignKey('dataset.id'))
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow,
-                           onupdate=datetime.utcnow)
+    dataset_id = db.Column(db.String(KEY_LENGTH), db.ForeignKey('dataset.id'))
+    user_id = db.Column(db.String(KEY_LENGTH), db.ForeignKey('user.id'))
 
     @classmethod
     def update(cls, data, dataset):

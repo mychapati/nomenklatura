@@ -1,193 +1,83 @@
-from datetime import datetime
-
-from normality import normalize
-from formencode import Schema, All, Invalid, validators
-from formencode import FancyValidator
-from sqlalchemy import func
-from sqlalchemy.orm import joinedload_all, backref
-from sqlalchemy.dialects.postgresql import HSTORE
-
-from nomenklatura.core import db, url_for
+from nomenklatura.core import db
+from nomenklatura.model.common import make_key
+from nomenklatura.model.attribute import Attribute
+from nomenklatura.model.schema import attributes
+from nomenklatura.model.statement import Statement
 
 
-class EntityState():
+class Entity(object):
+    """ An entity is a subject for any data collected in the system.
+    It can represent a person, company or any other type of object,
+    within a context. Entities never span across different contexts.
+    All data associated to an entity is stored as statements, which
+    all have the entity's ID as their subject. """
 
-    def __init__(self, dataset, entity):
+    def __init__(self, dataset, id=None, statements=None):
         self.dataset = dataset
-        self.entity = entity
-
-
-class AvailableName(FancyValidator):
-
-    def _to_python(self, name, state):
-        entity = Entity.by_name(state.dataset, name)
-        if entity is None:
-            return name
-        if state.entity and entity.id == state.entity.id:
-            return name
-        raise Invalid('Entity already exists.', name, None)
-
-
-class ValidCanonicalEntity(FancyValidator):
-
-    def _to_python(self, value, state):
-        if isinstance(value, dict):
-            value = value.get('id')
-        entity = Entity.by_id(value)
-        if entity is None:
-            entity = Entity.by_name(state.dataset, value)
-        if entity is None:
-            raise Invalid('Entity does not exist: %s' % value, value, None)
-        if entity == state.entity:
-            return None
-        if entity.dataset != state.dataset:
-            raise Invalid('Entity belongs to a different dataset.',
-                          value, None)
-        return entity
-
-
-class AttributeSchema(Schema):
-    allow_extra_fields = True
-
-
-class EntitySchema(Schema):
-    allow_extra_fields = True
-    name = All(validators.String(min=0, max=5000), AvailableName())
-    attributes = AttributeSchema()
-    reviewed = validators.StringBool(if_empty=False, if_missing=False)
-    invalid = validators.StringBool(if_empty=False, if_missing=False)
-    canonical = ValidCanonicalEntity(if_missing=None, if_empty=None)
-
-
-class Entity(db.Model):
-    __tablename__ = 'entity'
-
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.Unicode)
-    normalized = db.Column(db.Unicode)
-    attributes = db.Column(HSTORE)
-    reviewed = db.Column(db.Boolean, default=False)
-    invalid = db.Column(db.Boolean, default=False)
-    canonical_id = db.Column(db.Integer,
-                             db.ForeignKey('entity.id'), nullable=True)
-    dataset_id = db.Column(db.Integer, db.ForeignKey('dataset.id'))
-    creator_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow,
-                           onupdate=datetime.utcnow)
-
-    canonical = db.relationship('Entity', remote_side='Entity.id',
-                                backref=backref('aliases', lazy='dynamic'))
-
-    def to_dict(self, shallow=False):
-        d = {
-            'id': self.id,
-            'api_url': url_for('entities.view', id=self.id),
-            'name': self.name,
-            'dataset': self.dataset.slug,
-            'reviewed': self.reviewed,
-            'invalid': self.invalid,
-            'canonical': self.canonical,
-            'created_at': self.created_at,
-            'updated_at': self.updated_at,
-        }
-        if not shallow:
-            d['creator'] = self.creator.to_dict()
-            d['attributes'] = self.attributes
-            d['num_aliases'] = self.aliases.count()
-        return d
-
-    def to_row(self):
-        row = self.attributes or {}
-        row = row.copy()
-        row.update(self.to_dict(shallow=True))
-        if self.canonical is not None:
-            row['canonical'] = self.canonical.name
-        return row
+        self.id = id or make_key()
+        self.statements = statements or []
 
     @property
-    def display_name(self):
-        return self.name
+    def attributes(self):
+        attributes = set()
+        for stmt in self.statements:
+            attributes.add(stmt.attribute)
+        return attributes
 
-    @classmethod
-    def by_name(cls, dataset, name):
-        q = cls.query.filter_by(dataset=dataset)
-        attr = Entity.name
-        if dataset.normalize_text:
-            attr = Entity.normalized
-            name = normalize(name)
-        if dataset.ignore_case:
-            attr = func.lower(attr)
-            if isinstance(name, basestring):
-                name = name.lower()
-        q = q.filter(attr == name)
-        return q.first()
+    def has(self, attribute):
+        return attribute in self.attributes
 
-    @classmethod
-    def by_id(cls, id):
-        try:
-            return cls.query.filter_by(id=int(id)).first()
-        except ValueError:
-            return None
+    def set(self, attribute, value, context=None):
+        if not isinstance(attribute, Attribute):
+            attribute = attributes.get(attribute)
+        stmt = Statement(self.dataset, self.id, attribute, value,
+                         context=context)
+        db.session.add(stmt)
+        self.statements.append(stmt)
+        return stmt
 
-    @classmethod
-    def id_map(cls, ids):
-        entities = {}
-        for entity in cls.query.filter(cls.id.in_(ids)):
-            entities[entity.id] = entity
-        return entities
+    def match(self, attribute):
+        if not isinstance(attribute, Attribute):
+            attribute = attributes.get(attribute)
+        for stmt in self.statements:
+            if stmt.attribute != attribute:
+                continue
+            yield stmt
 
-    @classmethod
-    def all(cls, dataset=None, query=None, eager_aliases=False, eager=False):
-        q = cls.query
-        if dataset is not None:
-            q = q.filter_by(dataset=dataset)
-        if query is not None and len(query.strip()):
-            q = q.filter(cls.name.ilike('%%%s%%' % query.strip()))
-        if eager_aliases:
-            q = q.options(joinedload_all(cls.aliases_static))
-        if eager:
-            q = q.options(db.joinedload('dataset'))
-            q = q.options(db.joinedload('creator'))
-        return q
+    def get(self, attribute):
+        for stmt in self.match(attribute):
+            return stmt.value
 
-    @classmethod
-    def create(cls, dataset, data, user):
-        state = EntityState(dataset, None)
-        data = EntitySchema().to_python(data, state)
-        entity = cls()
-        entity.dataset = dataset
-        entity.creator = user
-        entity.name = data['name']
-        entity.normalized = normalize(entity.name)
-        entity.attributes = data.get('attributes', {})
-        entity.reviewed = data['reviewed']
-        entity.invalid = data['invalid']
-        entity.canonical = data['canonical']
-        db.session.add(entity)
-        db.session.flush()
-        return entity
+    @property
+    def type(self):
+        return self.get(attributes.type)
 
-    def update(self, data, user):
-        state = EntityState(self.dataset, self)
-        data = EntitySchema().to_python(data, state)
-        self.creator = user
-        self.name = data['name']
-        self.normalized = normalize(self.name)
-        self.attributes = data['attributes']
-        self.reviewed = data['reviewed']
-        self.invalid = data['invalid']
-        self.canonical = data['canonical']
+    @type.setter
+    def type(self, type):
+        self.set(attributes.type, type)
 
-        # redirect all aliases of this entity
-        if self.canonical:
-            if self.canonical.canonical_id:
-                if self.canonial.canonical_id == self.id:
-                    self.canonical.canonical = None
-                else:
-                    self.canonical = self.canonical.canonical
+    @property
+    def label(self):
+        return self.get(attributes.label)
 
-            for alias in self.aliases:
-                alias.canonical = self.canonical
+    @label.setter
+    def label(self, label):
+        self.set(attributes.label, label)
 
-        db.session.add(self)
+    def to_dict(self):
+        data = {}
+        for attribute in self.attributes:
+            data[attribute.key] = self.get(attribute)
+        return data
+
+    def __repr__(self):
+        return u'<Entity(%r, %s, %r)>' % (self.id, self.type, self.label)
+
+    def __len__(self):
+        return len(self.statements)
+
+    def __iter__(self):
+        return self.statements
+
+    def __unicode__(self):
+        return self.label or self.id
