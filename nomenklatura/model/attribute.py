@@ -11,7 +11,6 @@ class Attribute(NamedMixIn):
         self.label = data.get('label')
         self.data_type = data.get('data_type')
         self.many = data.get('many', False)
-        self.key = data.get('key') or name
 
     @property
     def converter(self):
@@ -25,7 +24,6 @@ class Attribute(NamedMixIn):
         return {
             'name': self.name,
             'label': self.label,
-            'key': self.key,
             'many': self.many,
             'data_type': self.data_type
         }
