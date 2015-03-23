@@ -1,5 +1,7 @@
 import os
+
 import yaml
+from normality import normalize
 
 from nomenklatura.model.attribute import Attribute
 from nomenklatura.model.type import Type
@@ -22,6 +24,14 @@ class Map(object):
         if isinstance(name, self.cls):
             return name
         return self[name]
+
+    def suggest(self, prefix):
+        prefix = normalize(prefix)
+        for cand in self:
+            if normalize(cand.name).startswith(prefix):
+                yield cand
+            elif normalize(cand.label).startswith(prefix):
+                yield cand
 
     def __iter__(self):
         return iter(self._items.values())
