@@ -39,4 +39,4 @@ class Attribute(NamedMixIn):
         return self.name == other
 
     def __unicode__(self):
-        return self.label
+        return self.name

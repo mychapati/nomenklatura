@@ -49,10 +49,10 @@ class Entity(object):
         attribute = attributes.get(attribute)
         values = []
         for stmt in self.match(attribute):
-            if not attribute.many:
-                return stmt.value
             values.append(stmt.value)
-        return values if attribute.many else None
+        if not attribute.many:
+            return max(values) if len(values) else None
+        return values
 
     @property
     def type(self):
@@ -77,7 +77,7 @@ class Entity(object):
             'api_url': url
         }
         for attribute in self.attributes:
-            data[attribute.key] = self.get(attribute)
+            data[attribute.name] = self.get(attribute)
         return data
 
     @classmethod
@@ -92,8 +92,6 @@ class Entity(object):
         for attribute in attributes:
             if attribute.name in data:
                 self.set(attribute, data.get(attribute.name), context)
-            elif attribute.key in data:
-                self.set(attribute, data.get(attribute.key), context)
 
     def __repr__(self):
         return u'<Entity(%r, %s, %r)>' % (self.id, self.type, self.label)

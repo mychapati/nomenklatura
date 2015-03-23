@@ -1,6 +1,8 @@
+from sqlalchemy import exists, and_, or_
 from sqlalchemy.orm import aliased, joinedload
 
 from nomenklatura.core import db
+from nomenklatura.model.schema import attributes
 from nomenklatura.model.statement import Statement
 from nomenklatura.model.context import Context
 from nomenklatura.model.entity import Entity
@@ -8,15 +10,17 @@ from nomenklatura.model.entity import Entity
 
 class EntityQuery(object):
 
-    def __init__(self, dataset=None, limit=None, offset=None):
+    def __init__(self, dataset=None, limit=None, offset=None, same_as=True):
         self._dataset = dataset
         self._limit = limit
         self._offset = offset
+        self._same_as = same_as
 
     def clone(self, **kw):
         return EntityQuery(dataset=kw.get('dataset', self._dataset),
                            limit=kw.get('limit', self._limit),
-                           offset=kw.get('offset', self._offset))
+                           offset=kw.get('offset', self._offset),
+                           same_as=kw.get('same_as', self._same_as))
 
     def filter_dataset(self, dataset):
         return self.clone(dataset=dataset)
@@ -41,6 +45,14 @@ class EntityQuery(object):
         q = db.session.query(subj)
         q = q.filter(stmt.dataset_id == self._dataset.id)
 
+        # Filter out inferred identities (i.e. those which have 'same_as')
+        if self._same_as:
+            same_as = aliased(Statement)
+            q = q.filter(~exists().where(and_(
+                same_as._attribute == attributes.same_as.name,
+                same_as.subject == stmt.subject
+            )))
+
         q = q.distinct()
         if paginate:
             if self._limit is not None:
@@ -54,14 +66,14 @@ class EntityQuery(object):
         q = db.session.query(stmt)
         q = q.options(joinedload(stmt.context))
 
-        # if self._dataset is not None:
-        #     q = q.filter(stmt.dataset_id == self._dataset.id)
-
+        val = unicode(id)
         if sq is not None:
-            sq = sq.subquery()
-            q = q.outerjoin(sq, stmt.subject == sq.c.subject)
-        else:
-            q = q.filter(stmt.subject == unicode(id))
+            ssq = sq.subquery()
+            val = ssq.c.subject
+
+        q = q.filter(stmt.subject == val)
+        if not self._same_as:
+            q = q.filter(stmt.inferred == False) # noqa
 
         q = q.order_by(stmt.subject.asc())
         return q

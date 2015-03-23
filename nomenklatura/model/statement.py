@@ -15,6 +15,7 @@ class Statement(db.Model, CommonMixIn):
     subject = db.Column(db.String(KEY_LENGTH), index=True)
     _attribute = db.Column('attribute', db.String(1024), index=True)
     _value = db.Column('value', db.Unicode, index=True)
+    inferred = db.Column('inferred', db.Boolean, default=False)
 
     dataset_id = db.Column(db.String(KEY_LENGTH), db.ForeignKey('dataset.id'))
     dataset = db.relationship('Dataset', backref=db.backref('statements',
@@ -72,12 +73,14 @@ class Statement(db.Model, CommonMixIn):
     def __cmp__(self, other):
         if other is None:
             return 1
-        # active checks
+
+        if self.inferred and not other.inferred:
+            return -1
+        if not self.inferred and other.inferred:
+            return 1
+
         return cmp(self.updated_at, other.updated_at)
 
     def __repr__(self):
         return u'<Statement(%s,%s,%r)>' % (self.subject, self.attribute,
                                            self.value)
-
-    def __unicode__(self):
-        return self.object
