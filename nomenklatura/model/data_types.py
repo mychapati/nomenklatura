@@ -5,6 +5,9 @@ from nomenklatura.model.common import NKException
 
 class DataType(object):
 
+    def __init__(self, dataset):
+        self.dataset = dataset
+
     def serialize(self, value):
         return value
 
@@ -79,8 +82,7 @@ class Entity(DataType):
         return entity.id
 
     def deserialize(self, value):
-        # from nomenklatura.model.entity import Entity
-        raise NotImplemented()
+        return self.dataset.entities.by_id(value)
 
 
 DATA_TYPES = {

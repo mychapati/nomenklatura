@@ -16,19 +16,17 @@ attributes:
     type:
         label: "Type"
         data_type: type
-        key: "@type"
 
     id:
         label: "Identifier"
         many: true
         data_type: string
-        key: "@id"
 
     alias:
         label: "Alias"
         many: true
         data_type: string
 
-    sameAs:
+    same_as:
         label: "Same as"
-        data_type: string
+        data_type: entity
