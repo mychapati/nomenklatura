@@ -43,11 +43,13 @@ class Statement(db.Model, CommonMixIn):
 
     @hybrid_property
     def value(self):
-        return self.attribute.converter().deserialize(self._value)
+        conv = self.attribute.converter(self.dataset)
+        return conv.deserialize(self._value)
 
     @value.setter
     def value(self, value):
-        self._value = self.attribute.converter().serialize(value)
+        conv = self.attribute.converter(self.dataset)
+        self._value = conv.serialize(value)
 
     @property
     def active(self):
