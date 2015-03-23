@@ -13,10 +13,10 @@ class Map(object):
 
     def __init__(self, cls, items=None):
         self.cls = cls
-        self.items = items or {}
+        self._items = items or {}
 
     def __getitem__(self, name):
-        return self.items.get(name)
+        return self._items.get(name)
 
     def get(self, name):
         if isinstance(name, self.cls):
@@ -24,13 +24,10 @@ class Map(object):
         return self[name]
 
     def __iter__(self):
-        return iter(self.items.values())
-
-    def to_dict(self):
-        return self.items
+        return iter(self._items.values())
 
     def __contains__(self, name):
-        return name in self.items
+        return name in self._items
 
     def __getattr__(self, name):
         return self.__getitem__(name)
@@ -46,10 +43,10 @@ def load_schema():
         data = yaml.load(fh)
 
         for name, obj in data.get('types', {}).items():
-            types.items[name] = Type(name, obj)
+            types._items[name] = Type(name, obj)
 
         for name, obj in data.get('attributes', {}).items():
-            attributes.items[name] = Attribute(name, obj)
+            attributes._items[name] = Attribute(name, obj)
 
     return types, attributes
 

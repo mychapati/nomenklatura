@@ -63,7 +63,8 @@ nomenklatura.config(['$routeProvider', '$locationProvider', '$sceProvider', 'cfp
     controller: 'EntitiesViewCtrl',
     resolve: {
       'dataset': loadDataset,
-      'entity': loadEntity
+      'entity': loadEntity,
+      'schema': loadSchema
     }
   });
 

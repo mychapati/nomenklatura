@@ -71,14 +71,25 @@ class Entity(object):
         self.set(attributes.label, label)
 
     def to_dict(self):
+        data = self.to_index_dict()
+        for attribute in self.attributes:
+            vals = self.get(attribute)
+            vals = vals if attribute.many else [vals]
+            data[attribute.name] = []
+            for val in vals:
+                if hasattr(val, 'to_index_dict'):
+                    val = val.to_index_dict()
+                data[attribute.name].append(val)
+            if not attribute.many:
+                data[attribute.name] = data[attribute.name][0]
+        return data
+
+    def to_index_dict(self):
         url = url_for('entities.view', dataset=self.dataset.slug, id=self.id)
-        data = {
+        return {
             'id': self.id,
             'api_url': url
         }
-        for attribute in self.attributes:
-            data[attribute.name] = self.get(attribute)
-        return data
 
     @classmethod
     def create(cls, dataset, data, context):

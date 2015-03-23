@@ -10,6 +10,12 @@ class Type(NamedMixIn):
         self.label = data.get('label')
 
     def to_dict(self):
+        return {
+            'name': self.name,
+            'label': self.label
+        }
+
+    def to_index_dict(self):
         return self.name
 
     def __repr__(self):

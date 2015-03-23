@@ -30,6 +30,9 @@ class Attribute(NamedMixIn):
             'data_type': self.data_type
         }
 
+    def to_index_dict(self):
+        return self.name
+
     def __repr__(self):
         return '<Attribute(%r,%r)>' % (self.name, self.data_type)
 

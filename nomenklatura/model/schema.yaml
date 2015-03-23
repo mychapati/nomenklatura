@@ -17,7 +17,7 @@ attributes:
         label: "Type"
         data_type: type
 
-    id:
+    identifier:
         label: "Identifier"
         many: true
         data_type: string
