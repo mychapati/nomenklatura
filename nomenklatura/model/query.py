@@ -1,4 +1,4 @@
-from sqlalchemy import exists, and_, or_
+from sqlalchemy import exists, and_
 from sqlalchemy.orm import aliased, joinedload
 
 from nomenklatura.core import db
@@ -45,7 +45,7 @@ class EntityQuery(object):
         q = db.session.query(subj)
         q = q.filter(stmt.dataset_id == self._dataset.id)
 
-        # Filter out inferred identities (i.e. those which have 'same_as')
+        # Filter out inferred entities (i.e. those which have 'same_as')
         if self._same_as:
             same_as = aliased(Statement)
             q = q.filter(~exists().where(and_(
