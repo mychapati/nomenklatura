@@ -86,7 +86,7 @@ nomenklatura.controller('DatasetsViewCtrl', ['$scope', '$routeParams', '$locatio
         if (filterTimeout) { $timeout.cancel(filterTimeout); }
 
         filterTimeout = $timeout(function() {
-            var fparams = {filter_name: $scope.query},
+            var fparams = {prefix: $scope.query},
                 url = '/api/2/datasets/' + dataset.slug + '/entities';
             $scope.loadEntities(url, fparams);
         }, 500);

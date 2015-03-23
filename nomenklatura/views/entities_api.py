@@ -14,11 +14,10 @@ blueprint = Blueprint('entities', __name__)
 def index(dataset):
     authz.require(authz.dataset_read(dataset))
     dataset = obj_or_404(Dataset.by_slug(dataset))
-    q = dataset.entities
-    # filter_name = request.args.get('filter_name', '')
-    # if len(filter_name):
-    #    query = '%' + filter_name + '%'
-    #    entities = entities.filter(Entity.name.ilike(query))
+    q = dataset.entities.no_same_as()
+    prefix = request.args.get('prefix', '')
+    if len(prefix):
+        q = q.filter_prefix(prefix)
 
     # TODO, other filters.
     format = request.args.get('format', 'json').lower().strip()
@@ -51,17 +50,6 @@ def view(dataset, id):
     dataset = obj_or_404(Dataset.by_slug(dataset))
     entity = obj_or_404(dataset.entities.by_id(id))
     return jsonify(entity)
-
-
-# @blueprint.route('/datasets/<dataset>/entities/<id>/aliases', methods=['GET'])
-# def aliases(dataset, id):
-#     authz.require(authz.dataset_read(dataset))
-#     dataset = obj_or_404(Dataset.by_slug(dataset))
-#     entity = obj_or_404(dataset.entities.by_id(id))
-#     print "XXXXX"
-#     # pager = Pager(entity.aliases, dataset=dataset.slug, id=id)
-#     # return jsonify(pager.to_dict())
-#     return jsonify({})
 
 
 @blueprint.route('/datasets/<dataset>/entities/<id>', methods=['POST'])

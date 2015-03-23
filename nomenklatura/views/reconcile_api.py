@@ -146,47 +146,42 @@ def suggest_entity(dataset):
     authz.require(authz.dataset_read(dataset))
     dataset = obj_or_404(Dataset.by_slug(dataset))
 
-    prefix = '%%%s%%' % request.args.get('prefix', '')
+    prefix = request.args.get('prefix', '')
     log.info("Suggesting entities in %s: %r", dataset.slug, prefix)
 
-    q = db.session.query(Entity)
-    q = q.join(Property)
-    q = q.join(dataset)
-    q = q.filter(Property.name == 'name')
-    q = q.filter(Property.active == True) # noqa
-    q = q.filter(Property.entity_id == Entity.id)
-    q = q.filter(Property.value_string.ilike(prefix))
-    q = q.filter(dataset.slug == slug)
+    q = dataset.entities.no_same_as()
+    q = q.filter_prefix(prefix)
 
     if 'type' in request.args:
         schema_name = request.args.get('type')
         if '/' in schema_name:
             _, schema_name = schema_name.rsplit('/', 1)
-        q = q.join(Schema)
-        q = q.filter(Schema.name == schema_name)
+        q = q.filter_by(attributes.type, schema_name)
 
-    q = q.distinct()
     q = q.limit(get_limit(default=5))
 
     matches = []
-    for e in q:
+    for entity in q:
         data = {
-            'name': e['name'].value,
-            'n:type': {
-                'id': '/' + dataset.slug + '/' + e.schema.name,
-                'name': e.schema.label
-            },
-            'uri': url_for('entities.view', dataset=dataset.slug, id=e.id),
-            'id': e.id
+            'id': entity.id,
+            'name': entity.label,
+            'uri': url_for('entities.view', dataset=dataset.slug, id=entity.id)
         }
+        data_type = {'id': '/types/Undefined', 'name': 'Undefined'}
+        if entity.type:
+            data_type = {
+                'id': '/types/%s' % entity.type.name,
+                'name': entity.type.label
+            }
 
-        data['type'] = [data.get('n:type')]
+        data['n:type'] = data_type
+        data['type'] = [data_type]
         matches.append(data)
 
     return jsonify({
         "code": "/api/status/ok",
         "status": "200 OK",
-        "prefix": request.args.get('prefix', ''),
+        "prefix": prefix,
         "result": matches
     })
 

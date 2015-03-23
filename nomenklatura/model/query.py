@@ -1,3 +1,4 @@
+from normality import normalize
 from sqlalchemy import exists, and_
 from sqlalchemy.orm import aliased, joinedload
 
@@ -8,22 +9,99 @@ from nomenklatura.model.context import Context
 from nomenklatura.model.entity import Entity
 
 
+class Filter(object):
+
+    def _add_statement(self, main_stmt, q):
+        stmt = aliased(Statement)
+        ctx = aliased(Context)
+        q = q.filter(main_stmt.subject == stmt.subject)
+        q = q.filter(stmt.context_id == ctx.id)
+        q = q.filter(ctx.active == True) # noqa
+        return stmt, q
+
+
+class ValueFilter(Filter):
+
+    def __init__(self, attribute, value):
+        self.attribute = attribute
+        self.value = value
+
+    def apply(self, dataset, stmt, q):
+        conv = self.attribute.converter(dataset)
+        t_stmt, q = self._add_statement(stmt, q)
+        q = q.filter(t_stmt._attribute == unicode(self.attribute))
+        q = q.filter(t_stmt._value == conv.serialize(self.value))
+        return q
+
+
+class SameAsFilter(Filter):
+
+    def apply(self, dataset, stmt, q):
+        same_as = aliased(Statement)
+        return q.filter(~exists().where(and_(
+            same_as._attribute == attributes.same_as.name,
+            same_as.subject == stmt.subject
+        )))
+
+
+class LabelFilter(Filter):
+
+    def __init__(self, value, aliases=True):
+        self.value = value
+        self.aliases = aliases
+
+    def fields(self, stmt, q):
+        l_stmt, q = self._add_statement(stmt, q)
+        if self.aliases:
+            attrs = [unicode(attributes.label), unicode(attributes.alias)]
+            q = q.filter(l_stmt._attribute.in_(attrs))
+        else:
+            q = q.filter(l_stmt._attribute == unicode(attributes.label))
+        return l_stmt, q
+
+    def apply(self, dataset, stmt, q):
+        conv = self.attribute.converter(dataset)
+        l_stmt, q = self.fields(stmt, q)
+        return q.filter(l_stmt._value == conv.serialize(self.value))
+
+
+class PrefixFilter(LabelFilter):
+
+    def apply(self, dataset, stmt, q):
+        l_stmt, q = self.fields(stmt, q)
+        value = '%s%%' % normalize(self.value)
+        return q.filter(l_stmt.normalized.like(value))
+
+
 class EntityQuery(object):
 
-    def __init__(self, dataset=None, limit=None, offset=None, same_as=True):
+    def __init__(self, dataset=None, limit=None, offset=None, filters=None):
         self._dataset = dataset
         self._limit = limit
         self._offset = offset
-        self._same_as = same_as
+        self._filters = filters or []
 
     def clone(self, **kw):
         return EntityQuery(dataset=kw.get('dataset', self._dataset),
                            limit=kw.get('limit', self._limit),
                            offset=kw.get('offset', self._offset),
-                           same_as=kw.get('same_as', self._same_as))
+                           filters=kw.get('filters', self._filters))
 
-    def filter_dataset(self, dataset):
-        return self.clone(dataset=dataset)
+    def filter(self, filter):
+        filters = self._filters + [filter]
+        return self.clone(filters=filters)
+
+    def filter_by(self, attribute, value):
+        return self.filter(ValueFilter(attribute, value))
+
+    def no_same_as(self):
+        return self.filter(SameAsFilter())
+
+    def filter_label(self, value, aliases=True):
+        return self.filter(LabelFilter(value, aliases=aliases))
+
+    def filter_prefix(self, value, aliases=True):
+        return self.filter(PrefixFilter(value, aliases=aliases))
 
     def limit(self, n):
         return self.clone(limit=n)
@@ -31,27 +109,14 @@ class EntityQuery(object):
     def offset(self, n):
         return self.clone(offset=n)
 
-    def _stmt_q(self, main_stmt, q):
-        stmt = aliased(Statement)
-        ctx = aliased(Context)
-        q = q.filter(main_stmt.subject == stmt.subject)
-        q = q.filter(stmt.context_id == ctx.id)
-        q = q.filter(ctx.active == True) # noqa
-        return q, stmt
-
     def _sub_query(self, paginate=True):
         stmt = aliased(Statement)
         subj = stmt.subject.label('subject')
         q = db.session.query(subj)
         q = q.filter(stmt.dataset_id == self._dataset.id)
 
-        # Filter out inferred entities (i.e. those which have 'same_as')
-        if self._same_as:
-            same_as = aliased(Statement)
-            q = q.filter(~exists().where(and_(
-                same_as._attribute == attributes.same_as.name,
-                same_as.subject == stmt.subject
-            )))
+        for filter in self._filters:
+            q = filter.apply(self._dataset, stmt, q)
 
         q = q.distinct()
         if paginate:
@@ -72,8 +137,8 @@ class EntityQuery(object):
             val = ssq.c.subject
 
         q = q.filter(stmt.subject == val)
-        if not self._same_as:
-            q = q.filter(stmt.inferred == False) # noqa
+        # if not self._same_as:
+        #    q = q.filter(stmt.inferred == False) # noqa
 
         q = q.order_by(stmt.subject.asc())
         return q
