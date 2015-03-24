@@ -8,9 +8,21 @@ class Attribute(NamedMixIn):
 
     def __init__(self, name, data):
         self.name = name
+        self.abstract = False
         self.label = data.get('label')
         self.data_type = data.get('data_type')
+        self._types = data.get('types', ['Thing'])
         self.many = data.get('many', False)
+
+    @property
+    def types(self):
+        from nomenklatura.model.schema import types
+        types_ = []
+        for t in types:
+            for a in t.attributes:
+                if a.name == self.name:
+                    types_.append(t)
+        return types_
 
     @property
     def converter(self):

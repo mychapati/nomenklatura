@@ -46,14 +46,8 @@ def reconcile_index(dataset):
                 'service_path': '/api/2/reconcile/property'
             }
         },
-        'defaultTypes': []
+        'defaultTypes': [t.to_freebase_type() for t in types]
     }
-
-    for type_ in types:
-        meta['defaultTypes'].append({
-            'id': '/types/%s' % type_.name,
-            'name': type_.label
-        })
     return jsonify(meta)
 
 
@@ -82,14 +76,10 @@ def reconcile_op(dataset, query):
             'name': entity.label,
             'score': score,
             'id': entity.id,
+            'type': entity.type.to_freebase_type(),
             'uri': entity_ui(dataset, entity.id),
             'match': False  # match['score'] == 100
         }
-        if entity.type:
-            data['type'] = {
-                'id': '/types/%s' % entity.type.name,
-                'name': entity.type.label
-            }
         results.append(data)
 
     return {
@@ -165,17 +155,10 @@ def suggest_entity(dataset):
         data = {
             'id': entity.id,
             'name': entity.label,
+            'n:type': entity.type.to_freebase_type(),
             'uri': entity_ui(dataset, entity.id)
         }
-        data_type = {'id': '/types/Undefined', 'name': 'Undefined'}
-        if entity.type:
-            data_type = {
-                'id': '/types/%s' % entity.type.name,
-                'name': entity.type.label
-            }
-
-        data['n:type'] = data_type
-        data['type'] = [data_type]
+        data['type'] = [data['n:type']]
         matches.append(data)
 
     return jsonify({
@@ -216,10 +199,7 @@ def suggest_type():
 
     matches = []
     for type_ in list(types.suggest(prefix))[:5]:
-        matches.append({
-            'name': type_.label,
-            'id': '/types/%s' % type_.name
-        })
+        matches.append(type_.to_freebase_type())
     return jsonify({
         "code": "/api/status/ok",
         "status": "200 OK",

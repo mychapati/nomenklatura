@@ -28,6 +28,8 @@ class Map(object):
     def suggest(self, prefix):
         prefix = normalize(prefix)
         for cand in self:
+            if cand.abstract:
+                continue
             if normalize(cand.name).startswith(prefix):
                 yield cand
             elif normalize(cand.label).startswith(prefix):

@@ -1,6 +1,6 @@
 from nomenklatura.core import db, url_for
 from nomenklatura.model.common import make_key
-from nomenklatura.model.schema import attributes
+from nomenklatura.model.schema import attributes, types
 from nomenklatura.model.statement import Statement
 
 
@@ -56,7 +56,7 @@ class Entity(object):
 
     @property
     def type(self):
-        return self.get(attributes.type)
+        return self.get(attributes.type) or types.Thing
 
     @type.setter
     def type(self, type):
