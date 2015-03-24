@@ -16,7 +16,7 @@ class Statement(db.Model, CommonMixIn):
     subject = db.Column(db.String(KEY_LENGTH), index=True)
     _attribute = db.Column('attribute', db.String(1024), index=True)
     _value = db.Column('value', db.Unicode, index=True)
-    normalized = db.Column(db.Unicode)
+    normalized = db.deferred(db.Column(db.Unicode))
     inferred = db.Column('inferred', db.Boolean, default=False)
 
     dataset_id = db.Column(db.String(KEY_LENGTH), db.ForeignKey('dataset.id'))
@@ -67,7 +67,7 @@ class Statement(db.Model, CommonMixIn):
             'subject': self.subject.id,
             'attribute': self.attribute.name,
             'value': self.value,
-            'normalized': self.normalized,
+            'inferred': self.inferred,
             'context_id': self.context_id,
             'dataset_id': self.dataset_id,
             'created_at': self.created_at,
