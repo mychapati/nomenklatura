@@ -10,23 +10,25 @@ from nomenklatura.core import db, url_for
 from nomenklatura.model.schema import attributes, types
 from nomenklatura.model import Dataset
 
-# from grano.logic.reconcile import find_matches
-
 
 blueprint = Blueprint('reconcile_api', __name__)
 log = logging.getLogger(__name__)
 
 
+def entity_ui(dataset, id):
+    domain = url_for('index').strip('/')
+    return '%s/datasets/%s/entities/%s' % (domain, dataset.slug, id)
+
+
 def reconcile_index(dataset):
     domain = url_for('index').strip('/')
-    urlp = '%s/datasets/%s/entities/{{id}}' % (domain, dataset.slug)
     meta = {
         'name': dataset.label,
         'identifierSpace': 'http://rdf.freebase.com/ns/type.object.id',
         'schemaSpace': 'http://rdf.freebase.com/ns/type.object.id',
-        'view': {'url': urlp},
+        'view': {'url': entity_ui(dataset, '{{id}}')},
         'preview': {
-            'url': urlp + '?preview=true',
+            'url': entity_ui(dataset, '{{id}}') + '?preview=true',
             'width': 600,
             'height': 300
         },
@@ -58,38 +60,36 @@ def reconcile_index(dataset):
 def reconcile_op(dataset, query):
     log.info("Reconciling in %s: %r", dataset.slug, query)
 
-    schemata = []
-    if 'type' in query:
-        schemata = query.get('type')
-        if isinstance(schemata, basestring):
-            schemata = [schemata]
-        schemata = [s.rsplit('/', 1)[-1] for s in schemata]
+    # schemata = []
+    # if 'type' in query:
+    #     schemata = query.get('type')
+    #     if isinstance(schemata, basestring):
+    #         schemata = [schemata]
+    #     schemata = [s.rsplit('/', 1)[-1] for s in schemata]
 
-    properties = []
-    if 'properties' in query:
-        for p in query.get('properties'):
-            properties.append((p.get('pid'), p.get('v')))
+    # properties = []
+    # if 'properties' in query:
+    #     for p in query.get('properties'):
+    #         properties.append((p.get('pid'), p.get('v')))
 
-    matches = find_matches(dataset, request.account,
-                           query.get('query', ''),
-                           schemata=schemata,
-                           properties=properties)
-    matches = matches.limit(get_limit(default=5))
+    q = dataset.entities.no_same_as()
+    q = q.levenshtein(query.get('query', ''))
+    q = q.limit(get_limit(default=5))
 
     results = []
-    for match in matches:
+    for score, entity in q.scored():
         data = {
-            'name': match['entity']['name'].value,
-            'score': match['score'],
-            'type': [{
-                'id': '/' + dataset.slug + '/' + match['entity'].schema.name,
-                'name': match['entity'].schema.label
-            }],
-            'id': match['entity'].id,
-            'uri': url_for('entities_api.view', id=match['entity'].id,
-                           _external=True),
+            'name': entity.label,
+            'score': score,
+            'id': entity.id,
+            'uri': entity_ui(dataset, entity.id),
             'match': False  # match['score'] == 100
         }
+        if entity.type:
+            data['type'] = {
+                'id': '/types/%s' % entity.type.name,
+                'name': entity.type.label
+            }
         results.append(data)
 
     return {
@@ -165,7 +165,7 @@ def suggest_entity(dataset):
         data = {
             'id': entity.id,
             'name': entity.label,
-            'uri': url_for('entities.view', dataset=dataset.slug, id=entity.id)
+            'uri': entity_ui(dataset, entity.id)
         }
         data_type = {'id': '/types/Undefined', 'name': 'Undefined'}
         if entity.type:

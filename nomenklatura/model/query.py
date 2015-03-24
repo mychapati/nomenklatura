@@ -1,6 +1,7 @@
 from normality import normalize
-from sqlalchemy import exists, and_
+from sqlalchemy import exists, and_, func
 from sqlalchemy.orm import aliased, joinedload
+from sqlalchemy.sql.expression import literal_column
 
 from nomenklatura.core import db
 from nomenklatura.model.schema import attributes
@@ -32,6 +33,18 @@ class ValueFilter(Filter):
         q = q.filter(t_stmt._attribute == unicode(self.attribute))
         q = q.filter(t_stmt._value == conv.serialize(self.value))
         return q
+
+
+class SubjectFilter(Filter):
+
+    def __init__(self, subjects):
+        self.subjects = subjects
+
+    def apply(self, dataset, stmt, q):
+        if len(self.subjects) == 1:
+            return q.filter(stmt.subject == self.subjects[0])
+        else:
+            return q.filter(stmt.subject.in_(self.subjects))
 
 
 class SameAsFilter(Filter):
@@ -73,6 +86,26 @@ class PrefixFilter(LabelFilter):
         return q.filter(l_stmt.normalized.like(value))
 
 
+class Levenshtein(LabelFilter):
+
+    def apply(self, dataset, stmt, q):
+        l_stmt, q = self.fields(stmt, q)
+        value = normalize(self.value)[:254]
+        field = func.left(l_stmt.normalized, 254)
+
+        # calculate the difference percentage
+        rel = func.greatest(max(float(len(self.value)), 1.0),
+                            func.length(l_stmt.normalized))
+        distance = func.levenshtein(field, value)
+        score = ((rel - distance) / rel) * 100.0
+        score = func.max(score).label('score')
+
+        q = q.add_column(score)
+        q = q.having(score >= 1)
+        q = q.order_by(score.desc())
+        return q
+
+
 class EntityQuery(object):
 
     def __init__(self, dataset=None, limit=None, offset=None, filters=None):
@@ -80,6 +113,7 @@ class EntityQuery(object):
         self._limit = limit
         self._offset = offset
         self._filters = filters or []
+        self._count = None
 
     def clone(self, **kw):
         return EntityQuery(dataset=kw.get('dataset', self._dataset),
@@ -103,6 +137,9 @@ class EntityQuery(object):
     def filter_prefix(self, value, aliases=True):
         return self.filter(PrefixFilter(value, aliases=aliases))
 
+    def levenshtein(self, value, aliases=True):
+        return self.filter(Levenshtein(value, aliases=aliases))
+
     def limit(self, n):
         return self.clone(limit=n)
 
@@ -118,28 +155,22 @@ class EntityQuery(object):
         for filter in self._filters:
             q = filter.apply(self._dataset, stmt, q)
 
-        q = q.distinct()
+        q = q.group_by(subj)
+        # q = q.distinct()
         if paginate:
             if self._limit is not None:
                 q = q.limit(self._limit)
             if self._offset is not None:
                 q = q.offset(self._offset)
+
         return q
 
-    def _query(self, sq=None, id=None):
-        stmt = aliased(Statement)
+    def _query(self, sq):
+        stmt = aliased(Statement, name='stmt')
+        ssq = sq.subquery()
         q = db.session.query(stmt)
         q = q.options(joinedload(stmt.context))
-
-        val = unicode(id)
-        if sq is not None:
-            ssq = sq.subquery()
-            val = ssq.c.subject
-
-        q = q.filter(stmt.subject == val)
-        # if not self._same_as:
-        #    q = q.filter(stmt.inferred == False) # noqa
-
+        q = q.filter(stmt.subject == ssq.c.subject)
         q = q.order_by(stmt.subject.asc())
         return q
 
@@ -160,16 +191,33 @@ class EntityQuery(object):
                          statements=statements)
 
     def by_id(self, id):
-        for entity in self._collect(self._query(id=id)):
-            return entity
+        q = self.filter(SubjectFilter([id]))
+        q = q.limit(1)
+        for res in q:
+            return res
+
+    def scored(self):
+        sq = self._sub_query()
+        results = sq.all()
+
+        entity_ids = [r.subject for r in results]
+        q = self._dataset.entities.filter(SubjectFilter(entity_ids))
+        entities = list(q)
+
+        for row in results:
+            for ent in entities:
+                if ent.id == row.subject:
+                    yield int(row.score), ent
 
     def count(self):
-        return self._sub_query(paginate=False).count()
+        if self._count is None:
+            self._count = self._sub_query(paginate=False).count()
+        return self._count
 
     def __len__(self):
         return self.count()
 
     def __iter__(self):
         sq = self._sub_query()
-        for entity in self._collect(self._query(sq=sq)):
-            yield entity
+        for res in self._collect(self._query(sq=sq)):
+            yield res
