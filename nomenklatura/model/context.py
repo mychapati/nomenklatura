@@ -1,3 +1,5 @@
+from sqlalchemy_utils.types.json import JSONType
+
 from nomenklatura.core import db
 from nomenklatura.model.common import CommonMixIn, KEY_LENGTH
 
@@ -13,6 +15,9 @@ class Context(db.Model, CommonMixIn):
     publisher = db.Column(db.Unicode)
     publisher_url = db.Column(db.Unicode)
     active = db.Column(db.Boolean, default=True)
+
+    resource_name = db.Column(db.Unicode)
+    resource_mapping = db.Column(JSONType)
 
     dataset_id = db.Column(db.String(KEY_LENGTH), db.ForeignKey('dataset.id'))
     dataset = db.relationship('Dataset', backref=db.backref('contexts',

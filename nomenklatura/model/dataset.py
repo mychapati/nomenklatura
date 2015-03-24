@@ -18,8 +18,6 @@ class Dataset(db.Model, CommonMixIn):
     enable_invalid = db.Column(db.Boolean, default=True)
     owner_id = db.Column(db.String(KEY_LENGTH), db.ForeignKey('user.id'))
 
-    uploads = db.relationship('Upload', backref='dataset',
-                              lazy='dynamic')
     roles = db.relationship('Role', backref='dataset',
                             lazy='dynamic')
 

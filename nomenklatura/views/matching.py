@@ -24,8 +24,9 @@ def match():
 
 @section.route('/datasets/<dataset>/review', methods=['GET'])
 def review(dataset):
-    entities = Entity.all()
     dataset = obj_or_404(Dataset.by_slug(dataset))
+
+    entities = Entity.all()
     entities = entities.filter_by(dataset=dataset)
     entities = entities.filter(Entity.reviewed == False)  # noqa
     review_count = entities.count()

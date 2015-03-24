@@ -1,9 +1,8 @@
-import re
 import string
 from uuid import uuid4
 from datetime import datetime
 
-from sqlalchemy import Column, String, DateTime
+from nomenklatura.core import db
 
 
 ALPHABET = string.ascii_lowercase + string.digits
@@ -22,15 +21,11 @@ def make_key():
 KEY_LENGTH = len(make_key())
 
 
-class NKException(Exception):
-    pass
-
-
 class CommonMixIn(object):
-    id = Column(String(KEY_LENGTH), primary_key=True, default=make_key)
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow,
-                        onupdate=datetime.utcnow)
+    id = db.Column(db.String(KEY_LENGTH), primary_key=True, default=make_key)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow,
+                           onupdate=datetime.utcnow)
 
 
 class NamedMixIn(object):

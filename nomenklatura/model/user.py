@@ -21,8 +21,7 @@ class User(db.Model, CommonMixIn):
 
     datasets = db.relationship('Dataset', backref='owner',
                                lazy='dynamic')
-    uploads = db.relationship('Upload', backref='creator',
-                              lazy='dynamic')
+
     roles = db.relationship('Role', backref='user', lazy='dynamic')
 
     def to_dict(self):

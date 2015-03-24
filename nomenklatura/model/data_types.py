@@ -1,7 +1,5 @@
 import dateutil.parser
 
-from nomenklatura.model.common import NKException
-
 
 class DataType(object):
 
@@ -25,9 +23,9 @@ class DataType(object):
         try:
             return self.deserialize(value)
         except Exception, e:
-            if isinstance(e, NKException):
+            if isinstance(e, TypeError):
                 raise
-            raise NKException(unicode(e))
+            raise TypeError(unicode(e))
 
 
 class String(DataType):
@@ -72,7 +70,7 @@ class Type(DataType):
         from nomenklatura.model.schema import types
         type = types[value]
         if type is None:
-            raise NKException("Unknown entity type: %s" % value)
+            raise TypeError("Unknown entity type: %s" % value)
         return type
 
 

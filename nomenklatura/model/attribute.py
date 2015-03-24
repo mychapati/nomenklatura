@@ -1,5 +1,5 @@
 from nomenklatura.model.data_types import DATA_TYPES
-from nomenklatura.model.common import NamedMixIn, NKException
+from nomenklatura.model.common import NamedMixIn
 
 
 class Attribute(NamedMixIn):
@@ -28,8 +28,8 @@ class Attribute(NamedMixIn):
     def converter(self):
         """ Instantiate a type converter for this attribute. """
         if self.data_type not in DATA_TYPES:
-            raise NKException('Invalid data type: %s'
-                              % self.data_type)
+            raise TypeError('Invalid data type: %s'
+                            % self.data_type)
         return DATA_TYPES[self.data_type]
 
     def to_dict(self):

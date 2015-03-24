@@ -4,16 +4,16 @@ from apikit import jsonify, request_data, obj_or_404
 
 from nomenklatura import authz
 from nomenklatura.core import db
-from nomenklatura.model import Dataset, Upload
-from nomenklatura.importer import import_upload
+from nomenklatura.model import Dataset
 
-section = Blueprint('upload', __name__)
+blueprint = Blueprint('upload', __name__)
 
 
-@section.route('/datasets/<dataset>/uploads', methods=['POST'])
+@blueprint.route('/datasets/<dataset>/uploads', methods=['POST'])
 def upload(dataset):
-    dataset = obj_or_404(Dataset.by_slug(dataset))
     authz.require(authz.dataset_edit(dataset))
+    dataset = obj_or_404(Dataset.by_slug(dataset))
+
     file_ = request.files.get('file')
     if not file_ or not file_.filename:
         err = {'file': "You need to upload a file"}
@@ -23,18 +23,20 @@ def upload(dataset):
     return jsonify(upload)
 
 
-@section.route('/datasets/<dataset>/uploads/<id>', methods=['GET'])
+@blueprint.route('/datasets/<dataset>/uploads/<id>', methods=['GET'])
 def view(dataset, id):
-    dataset = obj_or_404(Dataset.by_slug(dataset))
     authz.require(authz.dataset_edit(dataset))
+    dataset = obj_or_404(Dataset.by_slug(dataset))
+
     upload = obj_or_404(Upload.by_id(dataset, id))
     return jsonify(upload)
 
 
-@section.route('/datasets/<dataset>/uploads/<id>', methods=['POST'])
+@blueprint.route('/datasets/<dataset>/uploads/<id>', methods=['POST'])
 def process(dataset, id):
-    dataset = obj_or_404(Dataset.by_slug(dataset))
     authz.require(authz.dataset_edit(dataset))
+    dataset = obj_or_404(Dataset.by_slug(dataset))
+
     upload = obj_or_404(Upload.by_id(dataset, id))
     mapping = request_data()
     mapping['reviewed'] = mapping.get('reviewed') or False
