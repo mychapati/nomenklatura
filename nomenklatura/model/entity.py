@@ -18,11 +18,11 @@ class Entity(object):
 
     @property
     def attributes(self):
-        attributes = set()
+        attrs = set()
         for stmt in self.statements:
             if stmt.active:
-                attributes.add(stmt.attribute)
-        return attributes
+                attrs.add(stmt.attribute)
+        return attrs
 
     def has(self, attribute):
         return attribute in self.attributes
@@ -88,7 +88,8 @@ class Entity(object):
         url = url_for('entities.view', dataset=self.dataset.slug, id=self.id)
         return {
             'id': self.id,
-            'api_url': url
+            'api_url': url,
+            'type': unicode(self.type)
         }
 
     @classmethod

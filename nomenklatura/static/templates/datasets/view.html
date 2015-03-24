@@ -34,7 +34,7 @@
   <div class="col-xs-12 col-md-12">
     <table class="table table-hover table-condensed">
         <tr>
-            <th width="95%" colspan="2">
+            <th width="95%" colspan="3">
               <form class="" role="form">
                 <div class="input-group">
                   <span class="input-group-addon"><i class="fa fa-search"></i></span>
@@ -47,6 +47,9 @@
         <tr ng-repeat="entity in entities.results">
             <td>
               <a href="/datasets/{{dataset.slug}}/entities/{{entity.id}}" class="structured">{{entity.label}}</a>
+            </td>
+            <td>
+              {{schema.types[entity.type].label}}
             </td>
             <td class="num">
               <span ng-show="entity.canonical" class="label label-info">Alias</span>

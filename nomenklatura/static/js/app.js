@@ -28,7 +28,8 @@ nomenklatura.config(['$routeProvider', '$locationProvider', '$sceProvider', 'cfp
     controller: 'DatasetsViewCtrl',
     resolve: {
       'dataset': loadDataset,
-      'entities': loadDatasetEntities
+      'entities': loadDatasetEntities,
+      'schema': loadSchema
     }
   });
 
@@ -46,7 +47,8 @@ nomenklatura.config(['$routeProvider', '$locationProvider', '$sceProvider', 'cfp
     controller: 'MappingCtrl',
     resolve: {
       'dataset': loadDataset,
-      'upload': loadUpload
+      'upload': loadUpload,
+      'schema': loadSchema
     }
   });
 
@@ -54,7 +56,8 @@ nomenklatura.config(['$routeProvider', '$locationProvider', '$sceProvider', 'cfp
     templateUrl: '/static/templates/review.html',
     controller: 'ReviewCtrl',
     resolve: {
-      'dataset': loadDataset
+      'dataset': loadDataset,
+      'schema': loadSchema
     }
   });
 

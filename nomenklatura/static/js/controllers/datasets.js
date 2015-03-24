@@ -59,10 +59,11 @@ var loadRoleUsers = ['$route', '$http', '$q', 'Session', function($route, $http,
 
 
 nomenklatura.controller('DatasetsViewCtrl', ['$scope', '$routeParams', '$location', '$http', '$modal',
-                                             '$timeout', 'dataset', 'entities',
-    function ($scope, $routeParams, $location, $http, $modal, $timeout, dataset, entities) {
+                                             '$timeout', 'dataset', 'schema', 'entities',
+    function ($scope, $routeParams, $location, $http, $modal, $timeout, dataset, schema, entities) {
 
     $scope.dataset = dataset;
+    $scope.schema = schema;
     $scope.entities = entities;
     $scope.new_entity = {};
     $scope.query = '';
