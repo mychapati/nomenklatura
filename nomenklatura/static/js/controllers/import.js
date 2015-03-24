@@ -1,6 +1,8 @@
-nomenklatura.controller('UploadCtrl', ['$scope', '$routeParams', '$modalInstance', '$location', '$http', '$sce', 'dataset',
+
+nomenklatura.controller('UploadCtrl', ['$scope', '$routeParams', '$modalInstance', '$location',
+                                       '$http', '$sce', 'dataset',
   function ($scope, $routeParams, $modalInstance, $location, $http, $sce, dataset) {
-  $scope.dataset = angular.copy(dataset);
+  $scope.dataset = dataset;
   $scope.form_action = '/api/2';
   $scope.upload = {};
 
@@ -37,10 +39,12 @@ var loadUpload = ['$route', '$http', '$q', function($route, $http, $q) {
 nomenklatura.controller('MappingCtrl', ['$scope', '$routeParams', '$location', '$http', 'dataset', 'upload',
   function ($scope, $routeParams, $location, $http, dataset, upload) {
 
-  $scope.errors = {};
+  //$scope.errors = {};
   $scope.dataset = dataset;
   $scope.upload = upload;
-  $scope.mapping = {'columns': {}, 'reviewed': true};
+
+  console.log(upload);
+  //$scope.mapping = {'columns': {}, 'reviewed': true};
 
   $scope.beginImport = function() {
     var dfd = $http.post(upload.api_url, $scope.mapping);

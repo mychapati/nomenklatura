@@ -7,7 +7,7 @@ from flask_oauthlib.client import OAuth
 from flask.ext.login import LoginManager
 from flask.ext.assets import Environment
 from flask.ext.migrate import Migrate
-
+from archivekit import open_archive
 from kombu import Exchange, Queue
 from celery import Celery
 
@@ -38,6 +38,10 @@ app.config['CELERY_QUEUES'] = (
 
 celery = Celery(app_name, broker=app.config['CELERY_BROKER_URL'])
 celery.config_from_object(app.config)
+
+archive = open_archive(app.config.get('ARCHIVE_TYPE'),
+                       **app.config.get('ARCHIVE_CONFIG'))
+
 
 oauth = OAuth()
 

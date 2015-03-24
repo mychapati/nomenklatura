@@ -3,11 +3,11 @@
     <a href="/datasets/{{dataset.slug}}">{{dataset.label}}</a>
   </li>
   <li>
-    Import: {{upload.filename}}
+    Import: {{upload.source.name}}
   </li>
 </ul>
 
-<div class="row" ng-show="upload.id">
+<div class="row" ng-show="upload.context.id">
   <div class="col-xs-12">
     <div class="alert alert-danger" ng-show="errors.status">
       <strong>The import could not be started.</strong> {{errors.description}}
@@ -17,8 +17,8 @@
       <table class="table table-bordered">
         <tr>
           <th>Column</th>
-          <th ng-repeat="header in upload.headers">
-            {{header}}
+          <th ng-repeat="(fieldname, field) in upload.table.fields">
+            {{field.title}}
           </th>
         </tr>
         <tr ng-repeat="row in upload.sample">
@@ -56,7 +56,7 @@
     </div>
   </div>
 </div>
-<div class="row" ng-show="upload.id">
+<div class="row" ng-show="upload.table">
   <div class="col-xs-12 col-md-6">
     <div class="checkbox">
       <label>
@@ -66,6 +66,6 @@
     </div>
   </div>
   <div class="col-xs-12 col-md-6">
-    <a ng-click="beginImport()" class="pull-right btn btn-default">Load {{upload.rows}} entities</a>
+    <a ng-click="beginImport()" class="pull-right btn btn-default">Load {{upload.table.num_records}} records</a>
   </div>
 </div>

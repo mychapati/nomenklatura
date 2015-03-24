@@ -41,6 +41,12 @@ class Context(db.Model, CommonMixIn):
         }
 
     @classmethod
+    def by_id(cls, id):
+        q = db.session.query(cls)
+        q = q.filter(cls.id == id)
+        return q.first()
+
+    @classmethod
     def create_generic(cls, dataset, user):
         ctx = cls()
         ctx.user = user
