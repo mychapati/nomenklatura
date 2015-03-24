@@ -7,13 +7,13 @@ from apikit import jsonify, obj_or_404
 from nomenklatura import authz
 from nomenklatura.core import db
 from nomenklatura.model import Dataset, Context
-from nomenklatura.model.importer import store_upload, get_package
-from nomenklatura.model.importer import analyze_upload, get_table
+from nomenklatura.model.imports import store_upload
+from nomenklatura.model.imports import analyze_upload, get_table
 
-blueprint = Blueprint('upload', __name__)
+blueprint = Blueprint('imports', __name__)
 
 
-@blueprint.route('/datasets/<dataset>/uploads', methods=['POST'])
+@blueprint.route('/datasets/<dataset>/imports', methods=['POST'])
 def upload(dataset):
     authz.require(authz.dataset_edit(dataset))
     dataset = obj_or_404(Dataset.by_slug(dataset))
@@ -27,7 +27,7 @@ def upload(dataset):
     return jsonify(context)
 
 
-@blueprint.route('/datasets/<dataset>/uploads/<id>', methods=['GET'])
+@blueprint.route('/datasets/<dataset>/imports/<id>', methods=['GET'])
 def view(dataset, id):
     authz.require(authz.dataset_edit(dataset))
     dataset = obj_or_404(Dataset.by_slug(dataset))
@@ -40,7 +40,7 @@ def view(dataset, id):
     })
 
 
-@blueprint.route('/datasets/<dataset>/uploads/<id>', methods=['POST'])
+@blueprint.route('/datasets/<dataset>/imports/<id>', methods=['POST'])
 def process(dataset, id):
     authz.require(authz.dataset_edit(dataset))
     dataset = obj_or_404(Dataset.by_slug(dataset))

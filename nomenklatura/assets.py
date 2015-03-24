@@ -21,7 +21,7 @@ app_assets = Bundle(
     'js/directives/keybinding.js',
     'js/directives/authz.js',
     'js/controllers/app.js',
-    'js/controllers/import.js',
+    'js/controllers/imports.js',
     'js/controllers/home.js',
     'js/controllers/docs.js',
     'js/controllers/review.js',

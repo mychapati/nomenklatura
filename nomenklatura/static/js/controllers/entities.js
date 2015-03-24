@@ -27,15 +27,15 @@ nomenklatura.controller('EntitiesViewCtrl', ['$scope', '$routeParams', '$locatio
   $scope.schema = schema;
   $scope.has_attributes = entity.attributes && Object.keys(entity.attributes).length > 0;
   $scope.aliases = {};
-  $scope.has_aliases = false;
+  // $scope.has_aliases = false;
   
-  function loadAliases(url) {
-    $http.get(url).then(function(res) {
-      $scope.aliases = res.data;
-      $scope.has_aliases = res.data.total > 0;
-    });
-  }
+  // function loadAliases(url) {
+  //   $http.get(url).then(function(res) {
+  //     $scope.aliases = res.data;
+  //     $scope.has_aliases = res.data.total > 0;
+  //   });
+  // }
 
-  var url = '/api/2/datasets/' + dataset.slug + '/entities/' + $routeParams.id + '/aliases';
-  loadAliases(url);
+  // var url = '/api/2/datasets/' + dataset.slug + '/entities/' + $routeParams.id + '/aliases';
+  // loadAliases(url);
 }]);

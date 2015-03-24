@@ -7,7 +7,7 @@ nomenklatura.controller('UploadCtrl', ['$scope', '$routeParams', '$modalInstance
   $scope.upload = {};
 
   $scope.$watch('dataset', function() {
-    $scope.form_action = $sce.trustAsResourceUrl('/api/2/datasets/' + $scope.dataset.slug + '/uploads');
+    $scope.form_action = $sce.trustAsResourceUrl('/api/2/datasets/' + $scope.dataset.slug + '/imports');
   });
 
   $scope.cancel = function() {
@@ -17,7 +17,7 @@ nomenklatura.controller('UploadCtrl', ['$scope', '$routeParams', '$modalInstance
   $scope.results = function(content) {
     if (!content.parse_error) {
       $modalInstance.dismiss('cancel');
-      $location.path('/datasets/' + $scope.dataset.slug + '/uploads/' + content.id);
+      $location.path('/datasets/' + $scope.dataset.slug + '/imports/' + content.id);
     } else {
       $scope.upload = content;
     }
@@ -28,7 +28,7 @@ nomenklatura.controller('UploadCtrl', ['$scope', '$routeParams', '$modalInstance
 var loadUpload = ['$route', '$http', '$q', function($route, $http, $q) {
   var dfd = $q.defer(),
       params = $route.current.params;
-  var url = '/api/2/datasets/' + params.dataset + '/uploads/' + params.upload;
+  var url = '/api/2/datasets/' + params.dataset + '/imports/' + params.upload;
   $http.get(url).then(function(res) {
     dfd.resolve(res.data);
   });

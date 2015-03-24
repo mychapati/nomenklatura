@@ -7,7 +7,7 @@ from nomenklatura.model import User
 from nomenklatura.views.ui import app
 from nomenklatura.views.sessions_api import blueprint as sessions_api
 from nomenklatura.views.users_api import blueprint as users_api
-from nomenklatura.views.upload_api import blueprint as upload_api
+from nomenklatura.views.imports_api import blueprint as imports_api
 from nomenklatura.views.datasets_api import blueprint as datasets_api
 from nomenklatura.views.roles_api import blueprint as roles_api
 from nomenklatura.views.entities_api import blueprint as entities_api
@@ -66,6 +66,6 @@ app.register_blueprint(entities_api, url_prefix='/api/2')
 app.register_blueprint(contexts_api, url_prefix='/api/2')
 app.register_blueprint(schema_api, url_prefix='/api/2')
 app.register_blueprint(reconcile_api, url_prefix='/api/2')
-app.register_blueprint(upload_api, url_prefix='/api/2')
+app.register_blueprint(imports_api, url_prefix='/api/2')
 
 app.register_blueprint(matching, url_prefix='/api/2')
