@@ -34,9 +34,8 @@ app_assets = Bundle(
 
 css_assets = Bundle(
     'vendor/font-awesome/less/font-awesome.less',
-    # 'vendor/angular-loading-bar/build/loading-bar.css',
     'style/style.less',
-    filters='less,cssrewrite',
+    filters='less,cssrewrite,cssmin',
     output='assets/style.css'
 )
 

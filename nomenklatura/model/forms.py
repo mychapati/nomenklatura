@@ -51,10 +51,6 @@ class DatasetEditForm(colander.MappingSchema):
     label = colander.SchemaNode(colander.String(),
         validator=colander.Length(min=3, max=500)) # noqa
     public = colander.SchemaNode(colander.Boolean())
-    normalize_text = colander.SchemaNode(colander.Boolean())
-    ignore_case = colander.SchemaNode(colander.Boolean())
-    enable_invalid = colander.SchemaNode(colander.Boolean())
-    match_aliases = colander.SchemaNode(colander.Boolean())
 
 
 class UserEditForm(colander.MappingSchema):

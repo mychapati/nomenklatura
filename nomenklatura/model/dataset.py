@@ -11,11 +11,7 @@ class Dataset(db.Model, CommonMixIn):
 
     slug = db.Column(db.Unicode)
     label = db.Column(db.Unicode)
-    ignore_case = db.Column(db.Boolean, default=False)
-    match_aliases = db.Column(db.Boolean, default=False)
     public = db.Column(db.Boolean, default=False)
-    normalize_text = db.Column(db.Boolean, default=True)
-    enable_invalid = db.Column(db.Boolean, default=True)
     owner_id = db.Column(db.String(KEY_LENGTH), db.ForeignKey('user.id'))
 
     roles = db.relationship('Role', backref='dataset',
@@ -32,11 +28,7 @@ class Dataset(db.Model, CommonMixIn):
             'api_url': url_for('datasets.view', dataset=self.slug),
             'label': self.label,
             'owner': self.owner.to_dict(),
-            'ignore_case': self.ignore_case,
-            'match_aliases': self.match_aliases,
             'public': self.public,
-            'normalize_text': self.normalize_text,
-            'enable_invalid': self.enable_invalid,
             'created_at': self.created_at,
             'updated_at': self.updated_at
         }
@@ -65,9 +57,5 @@ class Dataset(db.Model, CommonMixIn):
         data = DatasetEditForm().deserialize(data)
         self.label = data['label']
         self.public = data['public']
-        self.normalize_text = data['normalize_text']
-        self.ignore_case = data['ignore_case']
-        self.match_aliases = data['match_aliases']
-        self.enable_invalid = data['enable_invalid']
         db.session.add(self)
         db.session.flush()

@@ -5,7 +5,6 @@ from apikit import jsonify, Pager, request_data, obj_or_404
 from nomenklatura.core import db
 from nomenklatura import authz
 from nomenklatura.model import Dataset
-from nomenklatura.model.matching import attribute_keys
 
 blueprint = Blueprint('datasets', __name__)
 
@@ -30,12 +29,6 @@ def create():
 def view(dataset):
     dataset = obj_or_404(Dataset.by_slug(dataset))
     return jsonify(dataset)
-
-
-@blueprint.route('/datasets/<dataset>/attributes', methods=['GET'])
-def attributes(dataset):
-    dataset = obj_or_404(Dataset.by_slug(dataset))
-    return jsonify({'attributes': attribute_keys(dataset)})
 
 
 @blueprint.route('/datasets/<dataset>', methods=['POST'])
