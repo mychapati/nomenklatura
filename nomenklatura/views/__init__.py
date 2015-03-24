@@ -11,6 +11,7 @@ from nomenklatura.views.upload_api import blueprint as upload_api
 from nomenklatura.views.datasets_api import blueprint as datasets_api
 from nomenklatura.views.roles_api import blueprint as roles_api
 from nomenklatura.views.entities_api import blueprint as entities_api
+from nomenklatura.views.contexts_api import blueprint as contexts_api
 from nomenklatura.views.schema_api import blueprint as schema_api
 from nomenklatura.views.reconcile_api import blueprint as reconcile_api
 from nomenklatura.views.matching import section as matching
@@ -62,6 +63,7 @@ app.register_blueprint(users_api, url_prefix='/api/2')
 app.register_blueprint(datasets_api, url_prefix='/api/2')
 app.register_blueprint(roles_api, url_prefix='/api/2')
 app.register_blueprint(entities_api, url_prefix='/api/2')
+app.register_blueprint(contexts_api, url_prefix='/api/2')
 app.register_blueprint(schema_api, url_prefix='/api/2')
 app.register_blueprint(reconcile_api, url_prefix='/api/2')
 app.register_blueprint(upload_api, url_prefix='/api/2')

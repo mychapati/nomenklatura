@@ -68,3 +68,22 @@ class RoleForm(colander.MappingSchema):
     role = colander.SchemaNode(colander.String(),
         validator=colander.OneOf(['none', 'read', 'edit', 'manage'])) # noqa
     user = colander.SchemaNode(UserRef())
+
+
+class ContextEditForm(colander.MappingSchema):
+    source_url = colander.SchemaNode(colander.String(),
+                                     validator=colander.url,
+                                     missing=None,
+                                     default=None)
+    publisher = colander.SchemaNode(colander.String(),
+                                    missing=None, default=None)
+    publisher_url = colander.SchemaNode(colander.String(),
+                                        validator=colander.url,
+                                        missing=None,
+                                        default=None)
+    active = colander.SchemaNode(colander.Boolean(),
+                                 default=True, missing=True)
+    resource_name = colander.SchemaNode(colander.String(),
+                                        missing=None, default=None)
+    resource_mapping = colander.SchemaNode(colander.Mapping(unknown='preserve'),
+                                           missing=None, default=None)
