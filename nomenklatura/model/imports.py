@@ -1,5 +1,6 @@
 import logging
 
+from loadkit import logger
 from loadkit.types.table import Table
 from loadkit.operators.table import TableExtractOperator
 
@@ -10,6 +11,18 @@ from nomenklatura.model.schema import types, attributes
 
 log = logging.getLogger(__name__)
 COLLECTION = 'imports'
+
+
+def get_logger(package, context):
+    mods = ['nomenklatura', 'loadkit', 'archivekit']
+    return logger.capture(package, context.id, modules=mods)
+
+
+def get_logs(context, limit, offset):
+    package = get_package(context.dataset)
+    for line in logger.load(package, context.id, limit=limit, offset=offset):
+        dt, mod, level, message = line.split(' - ', 4)
+        yield {'time': dt, 'module': mod, 'level': level, 'message': message}
 
 
 def get_package(dataset):
@@ -45,11 +58,17 @@ def analyze_upload(context_id):
         log.warning("No resource associated with context: %r", context)
         return
     source, target = get_table(context)
-    if not source.exists():
-        log.warning("Source data does not exist: %r", context.resource_name)
-        return
-    operator = TableExtractOperator(None, 'temp', {})
-    operator.transform(source, target)
+    handler = get_logger(source.package, context)
+
+    try:
+        if not source.exists():
+            log.warning("Source data does not exist: %r",
+                        context.resource_name)
+            return
+        operator = TableExtractOperator(None, 'temp', {})
+        operator.transform(source, target)
+    finally:
+        handler.archive()
 
 
 @celery.task
@@ -58,12 +77,25 @@ def load_upload(context_id):
     if not context.resource_name or not context.resource_mapping:
         log.warning("No resource associated with context: %r", context)
         return
-    source, table = get_table(context)
-    for record in table.records():
-        load_entity(context, context.resource_mapping, record)
-
-    context.active = True
+    context.active = False
     db.session.commit()
+
+    source, table = get_table(context)
+    handler = get_logger(source.package, context)
+
+    try:
+        for record in table.records():
+            try:
+                load_entity(context, context.resource_mapping, record)
+            except Exception, e:
+                log.exception(e)
+
+        context.active = True
+        db.session.commit()
+        log.info("Loading of %r has finished.",
+                 context.resource_name)
+    finally:
+        handler.archive()
 
 
 def load_entity(context, mapping, record):

@@ -1,0 +1,16 @@
+<ul class="breadcrumb hidden-xs">
+  <li>
+    <a href="/datasets/{{dataset.slug}}">{{dataset.label}}</a>
+  </li>
+  <li>
+    Import: {{upload.source.name}}
+  </li>
+</ul>
+
+<table class="table table-condensed table-striped">
+  <tr ng-repeat="e in logs.entries">
+    <td>{{e.time}}</td>
+    <td>{{e.level}}</td>
+    <td>{{e.message}}</td>
+  </tr>
+</table>

@@ -44,11 +44,20 @@ nomenklatura.config(['$routeProvider', '$locationProvider', '$sceProvider', 'cfp
 
   $routeProvider.when('/datasets/:dataset/imports/:context', {
     templateUrl: '/static/templates/imports/mapping.html',
-    controller: 'MappingCtrl',
+    controller: 'ImportsMappingCtrl',
     resolve: {
       'dataset': loadDataset,
       'upload': loadUpload,
       'schema': loadSchema
+    }
+  });
+
+  $routeProvider.when('/datasets/:dataset/imports/:context/status', {
+    templateUrl: '/static/templates/imports/status.html',
+    controller: 'ImportsStatusCtrl',
+    resolve: {
+      'dataset': loadDataset,
+      'upload': loadUpload
     }
   });
 

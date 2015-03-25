@@ -126,7 +126,7 @@ nomenklatura.directive('entityMapping', ['RecursionHelper', function (RecursionH
 
 
 
-nomenklatura.controller('MappingCtrl', ['$scope', '$routeParams', '$location', '$timeout', '$q', '$http', 'dataset', 'upload', 'schema',
+nomenklatura.controller('ImportsMappingCtrl', ['$scope', '$routeParams', '$location', '$timeout', '$q', '$http', 'dataset', 'upload', 'schema',
   function ($scope, $routeParams, $location, $timeout, $q, $http, dataset, upload, schema) {
 
   var uploadCheck = null, importStarted = false;
@@ -183,7 +183,7 @@ nomenklatura.controller('MappingCtrl', ['$scope', '$routeParams', '$location', '
       importStarted = true;
       var dfd = $http.post(upload.api_url);
       dfd.success(function(res) {
-        $location.path('/datasets/' + $scope.dataset.slug);
+        $location.path('/datasets/' + $scope.dataset.slug + '/imports/' + upload.context.id + '/status');
       });
       dfd.error(function(res) {
         $scope.errors = res;
@@ -191,4 +191,25 @@ nomenklatura.controller('MappingCtrl', ['$scope', '$routeParams', '$location', '
       });  
     });
   };
+}]);
+
+
+nomenklatura.controller('ImportsStatusCtrl', ['$scope', '$routeParams', '$location', '$interval', '$q', '$http', 'dataset', 'upload',
+  function ($scope, $routeParams, $location, $interval, $q, $http, dataset, upload) {
+
+  var url = '/api/2/datasets/' + dataset.slug + '/imports/' + upload.context.id + '/logs';
+  $scope.dataset = dataset;
+  $scope.upload = upload;
+  $scope.logs = {};
+
+  var stopInterval = $interval(function() {
+    $http.get(url).then(function(res) {
+      $scope.logs = res.data;
+    })
+  }, 1000);
+
+  $scope.$on('$destroy', function() {
+    $interval.cancel(stopInterval);
+  });
+
 }]);
