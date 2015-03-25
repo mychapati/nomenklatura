@@ -35,6 +35,8 @@ def view(dataset, id):
     source, table = get_table(context)
     return jsonify({
         'context': context,
+        'context_statements': context.statements.count(),
+        'mapping': context.resource_mapping,
         'source': dict(source.meta),
         'table': dict(table.meta)
     })

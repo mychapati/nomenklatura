@@ -95,7 +95,7 @@ nomenklatura.controller('DatasetsViewCtrl', ['$scope', '$routeParams', '$locatio
 
     $scope.uploadFile = function(){
         var d = $modal.open({
-            templateUrl: '/static/templates/upload.html',
+            templateUrl: '/static/templates/imports/upload.html',
             controller: 'UploadCtrl',
             resolve: {
                 dataset: function () { return $scope.dataset; }

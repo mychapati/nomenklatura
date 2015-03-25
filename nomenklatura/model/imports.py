@@ -26,12 +26,12 @@ def store_upload(dataset, file, filename, user):
     package = get_package(dataset)
     meta = {'source_file': filename}
     source = package.ingest(file, meta=meta, overwrite=False)
-    context = Context()
-    context.active = False
-    context.dataset = dataset
-    context.user = user
-    context.resource_name = source.path
-    context.resource_mapping = {}
+    ctx = {
+        'active': False,
+        'resource_name': source.path,
+        'source_url': source.url
+    }
+    context = Context.create(dataset, user, ctx)
     db.session.add(context)
     return context
 
