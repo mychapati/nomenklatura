@@ -9,7 +9,7 @@
 
 <form class="form-horizontal" role="form" name="importsForm" ng-submit="import(importsForm)">
 
-  <div class="row">
+  <div class="row" ng-hide="isLoading() || isFailed() || isLoaded()">
     <div class="col-sm-12 col-md-6">
       <div class="form-group" ng-class="{'has-error': importsForm.publisher.$invalid}">
         <label class="col-sm-3 control-label" for="publisher">Publisher</label>
@@ -111,7 +111,6 @@
           <a ng-click="toggleActive()" ng-show="!isActive()" class="pull-right btn btn-success">
             Re-enable import
           </a>
-          <a ng-click="save(importsForm)" class="pull-right btn btn-default">Save metadata</a>
         </div>
       </div>
     </div>
