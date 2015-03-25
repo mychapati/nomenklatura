@@ -1,12 +1,13 @@
 
+nomenklatura.controller('ProfileCtrl', ['$scope', '$location', '$modalInstance', '$http', 'Session',
+  function ($scope, $location, $modalInstance, $http, Session) {
 
-function ProfileCtrl($scope, $location, $modalInstance, $http, Session) {
   $scope.session = {logged_in: false};
   $scope.user = {}
 
   Session.get(function(data) {
-      $scope.session = data;
-      $scope.user = data.user;
+    $scope.session = data;
+    $scope.user = data.user;
   });
 
   $scope.cancel = function() {
@@ -21,8 +22,5 @@ function ProfileCtrl($scope, $location, $modalInstance, $http, Session) {
       $modalInstance.dismiss('ok');
     });
     res.error(nomenklatura.handleFormError(form));
-  };  
-    
-}
-
-ProfileCtrl.$inject = ['$scope', '$location', '$modalInstance', '$http', 'Session'];
+  };
+}]);

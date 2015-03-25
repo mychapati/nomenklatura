@@ -20,6 +20,7 @@ app_assets = Bundle(
     'js/services/session.js',
     'js/directives/pagination.js',
     'js/directives/keybinding.js',
+    'js/directives/entity_mapping.js',
     'js/directives/authz.js',
     'js/controllers/app.js',
     'js/controllers/imports.js',
