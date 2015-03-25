@@ -5,6 +5,7 @@ from loadkit.operators.table import TableExtractOperator
 
 from nomenklatura.core import db, archive, celery
 from nomenklatura.model.context import Context
+from nomenklatura.model.schema import types, attributes
 
 log = logging.getLogger(__name__)
 COLLECTION = 'imports'
@@ -48,3 +49,14 @@ def analyze_upload(context_id):
         return
     operator = TableExtractOperator(None, 'temp', {})
     operator.transform(source, target)
+
+
+@celery.task
+def load_upload(context_id):
+    context = Context.by_id(context_id)
+    if not context.resource_name or not context.resource_mapping:
+        log.warning("No resource associated with context: %r", context)
+        return
+    source, table = get_table(context)
+    for record in table.records():
+        print record
