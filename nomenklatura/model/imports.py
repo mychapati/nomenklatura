@@ -5,6 +5,7 @@ from loadkit.operators.table import TableExtractOperator
 
 from nomenklatura.core import db, archive, celery
 from nomenklatura.model.context import Context
+from nomenklatura.model.entity import Entity
 from nomenklatura.model.schema import types, attributes
 
 log = logging.getLogger(__name__)
@@ -59,4 +60,43 @@ def load_upload(context_id):
         return
     source, table = get_table(context)
     for record in table.records():
-        print record
+        load_entity(context, context.resource_mapping, record)
+
+    context.active = True
+    db.session.commit()
+
+
+def load_entity(context, mapping, record):
+    type_ = types.get(mapping.get('type'))
+    if type_ is None:
+        log.warning("No type defined for entity in mapping: %r", mapping)
+        return
+
+    q = context.dataset.entities.filter_by(attributes.type, type_)
+    has_key = False
+
+    data = [(attributes.type, type_)]
+    for attr in type_.attributes:
+        if attr.name not in mapping or attr.name == 'type':
+            continue
+        attr_map = mapping[attr.name]
+        if attr.data_type == 'entity':
+            value = load_entity(context, attr_map, record)
+        else:
+            value = record.get(attr_map.get('field'))
+
+        if attr_map.get('key'):
+            has_key = True
+            q = q.filter_by(attr, value)
+
+        data.append((attr, value))
+
+    entity = q.first() if has_key else None
+    if entity is None:
+        entity = Entity(context.dataset)
+
+    for (attr, value) in data:
+        entity.set(attr, value, context)
+
+    log.info("Loaded entity: %r", entity)
+    return entity

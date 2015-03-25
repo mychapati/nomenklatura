@@ -190,11 +190,14 @@ class EntityQuery(object):
                          id=subject,
                          statements=statements)
 
-    def by_id(self, id):
-        q = self.filter(SubjectFilter([id]))
-        q = q.limit(1)
+    def first(self):
+        q = self.limit(1)
         for res in q:
             return res
+
+    def by_id(self, id):
+        q = self.filter(SubjectFilter([id]))
+        return q.first()
 
     def scored(self):
         sq = self._sub_query()
