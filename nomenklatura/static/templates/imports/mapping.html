@@ -3,7 +3,7 @@
     <a href="/datasets/{{dataset.slug}}">{{dataset.label}}</a>
   </li>
   <li>
-    Import: {{upload.source.name}}
+    Import: {{upload.source.name}} ({{upload.source.state}})
   </li>
 </ul>
 
@@ -43,14 +43,41 @@
     </div>
   </div>
 
-  <div ng-hide="hasTable" class="alert alert-info">
-    <i class="fa fa-spinner fa-pulse"></i>
-    <strong>Data is being extracted.</strong> Please wait while the source data
-    is extracted from the file you provided. Once it has been read, you will be
-    asked to define how it should be imported.
+  <div class="row" ng-show="isAnalyzing() || isLoading() || isFailed() || isLoaded()">
+    <div class="col-sm-4">
+      <div ng-show="isAnalyzing()" class="alert alert-info">
+        <i class="fa fa-spinner fa-pulse"></i>
+        <strong>Data is being extracted.</strong> Please wait while the source data
+        is extracted from the file you provided. Once it has been read, you will be
+        asked to define how it should be imported.
+      </div>
+      <div ng-show="isFailed()" class="alert alert-danger">
+        <strong>Data extraction failed.</strong> The data you uploaded could not be
+        interpreted as a table. Please try saving the file in a different format
+        before you upload it again.
+      </div>
+      <div ng-show="isLoading()" class="alert alert-info">
+        <i class="fa fa-spinner fa-pulse"></i>
+        <strong>Data is being loaded.</strong> Please wait as the data is imported 
+        into the database.
+      </div>
+      <div ng-show="isLoaded()" class="alert alert-success">
+        <strong>The import is complete.</strong> Verify that the import resulted in
+        the right entities being created, otherwise you can disable this import.
+      </div>
+    </div>
+    <div class="col-sm-8">
+      <table class="table table-condensed table-striped">
+        <tr ng-repeat="e in logs.entries">
+          <td>{{e.time}}</td>
+          <td>{{e.level}}</td>
+          <td>{{e.message}}</td>
+        </tr>
+      </table>
+    </div>
   </div>
-
-  <div class="row" ng-show="hasTable">
+  
+  <div class="row" ng-show="isAnalyzed()">
     <div class="col-xs-12">
       <hr/>
       <entity-mapping schema="schema" mapping="mapping" fields="upload.table.fields">
@@ -61,12 +88,30 @@
 
   <div class="row">
     <div class="col-xs-12">
-      <div class="form-group">
+      <div class="form-group" ng-show="isAnalyzed()">
         <div class="col-xs-12">
           <button type="submit"
             class="pull-right btn btn-primary"
             ng-disabled="!canImport()">Import {{upload.table.num_records}} records</button>
           <a ng-click="save(importsForm)" class="pull-right btn btn-default">Save</a>
+        </div>
+      </div>
+      <div class="form-group" ng-show="isFailed()">
+        <div class="col-xs-12">
+          <a ng-click="uploadFile()" class="pull-right btn btn-default">
+            Upload another file
+          </a>
+        </div>
+      </div>
+      <div class="form-group" ng-show="isLoaded()">
+        <div class="col-xs-12">
+          <a ng-click="toggleActive()" ng-show="isActive()" class="pull-right btn btn-warning">
+            Disable import
+          </a>
+          <a ng-click="toggleActive()" ng-show="!isActive()" class="pull-right btn btn-success">
+            Re-enable import
+          </a>
+          <a ng-click="save(importsForm)" class="pull-right btn btn-default">Save metadata</a>
         </div>
       </div>
     </div>

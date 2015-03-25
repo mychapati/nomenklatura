@@ -19,8 +19,9 @@
     <div class="form-group" ng-class="{'has-error': importFile.file.$invalid}">
       <label class="col-sm-3 control-label" for="file">Source file</label>
       <div class="col-sm-9">
-        <input type="file" id="file" name="file">
-        <p class="help-block" ng-show="importFile.file.$invalid" ng-bind="importFile.file.$message"></p>
+        <input type="file" class="form-control" id="file" name="file">
+        <p class="help-block" ng-show="importFile.file.$invalid"
+          ng-bind="importFile.file.$message"></p>
       </div>
     </div>
   </div>

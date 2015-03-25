@@ -37,40 +37,52 @@ var loadUpload = ['$route', '$http', '$q', function($route, $http, $q) {
 }];
 
 
-nomenklatura.controller('ImportsMappingCtrl', ['$scope', '$routeParams', '$location', '$timeout', '$q', '$http', 'dataset', 'upload', 'schema',
-  function ($scope, $routeParams, $location, $timeout, $q, $http, dataset, upload, schema) {
+nomenklatura.controller('ImportsMappingCtrl', ['$scope', '$routeParams', '$location', '$timeout', '$q', '$http', '$modal', 'dataset', 'upload', 'schema',
+  function ($scope, $routeParams, $location, $timeout, $q, $http, $modal, dataset, upload, schema) {
 
   var uploadCheck = null, importStarted = false;
-  $scope.hasTable = false;
   $scope.schema = schema;
   $scope.dataset = dataset;
   $scope.upload = upload;
   $scope.context = upload.context;
   $scope.mapping = upload.mapping;
+  $scope.state = null;
+  $scope.logs = {};
 
-  var checkAnalysis = function() {
-    if ($scope.upload.table && $scope.upload.table.fields) {
-      return $scope.hasTable = true;
+  $scope.isAnalyzing = function() { return $scope.state == 'analyzing'; };
+  $scope.isAnalyzed = function() { return $scope.state == 'analyzed'; };
+  $scope.isLoading = function() { return $scope.state == 'loading'; };
+  $scope.isLoaded = function() { return $scope.state == 'loaded'; };
+  $scope.isFailed = function() { return $scope.state == 'failed'; };
+
+  $scope.canImport = function() {
+    return $scope.isAnalyzed() && !importStarted && upload.context_statements <= 0;
+  };
+
+  var refreshData = function() {
+    var dt = new Date(),
+        config = {params: {'_': dt.getTime()}, ignoreLoadingBar: true};
+    $q.all([
+      $http.get(upload.api_url, config),
+      $http.get(upload.api_url + '/logs', config)
+    ]).then(function(res) {
+      $scope.upload.table = res[0].data.table;
+      $scope.context.active = res[0].data.context.active;
+      $scope.logs = res[1].data;
+      $scope.state = res[0].data.source.state || 'analyzing';
+      updateState();
+    });
+  };
+
+  var updateState = function() {
+    if ($scope.isAnalyzing() || $scope.isLoading()) {
+      uploadCheck = $timeout(refreshData, 1000);
     }
-    uploadCheck = $timeout(function() {
-      var dt = new Date(),
-          config = {params: {'_': dt.getTime()}, ignoreLoadingBar: true};
-      $http.get(upload.api_url, config).then(function(res) {
-        $scope.upload.table = res.data.table;
-        checkAnalysis();
-      });
-    }, 1000);
   };
 
   $scope.$on("$destroy", function() {
     $timeout.cancel(uploadCheck);
   });
-
-  checkAnalysis();
-
-  $scope.canImport = function() {
-    return $scope.hasTable && !importStarted && upload.context_statements <= 0;
-  }
 
   $scope.save = function(form) {
     var dfd = $q.defer(),
@@ -84,7 +96,16 @@ nomenklatura.controller('ImportsMappingCtrl', ['$scope', '$routeParams', '$locat
     });
     res.error(nomenklatura.handleFormError(form));
     return dfd.promise;
-  }
+  };
+
+  $scope.toggleActive = function() {
+    $scope.context.active = !$scope.context.active;
+    $scope.save();
+  };
+
+  $scope.isActive = function() {
+    return $scope.context.active;
+  };
 
   $scope.import = function(form) {
     if (!$scope.canImport()) {
@@ -92,35 +113,22 @@ nomenklatura.controller('ImportsMappingCtrl', ['$scope', '$routeParams', '$locat
     }
     $scope.save(form).then(function() {
       importStarted = true;
-      var dfd = $http.post(upload.api_url);
-      dfd.success(function(res) {
-        $location.path('/datasets/' + $scope.dataset.slug + '/imports/' + upload.context.id + '/status');
-      });
-      dfd.error(function(res) {
-        $scope.errors = res;
+      $http.post(upload.api_url).then(function(res) {
+        refreshData();
         importStarted = false;
-      });  
+      });
     });
   };
-}]);
 
+  $scope.uploadFile = function(){
+    var d = $modal.open({
+      templateUrl: '/static/templates/imports/upload.html',
+      controller: 'UploadCtrl',
+      resolve: {
+        dataset: function () { return dataset; }
+      }
+    });
+  };
 
-nomenklatura.controller('ImportsStatusCtrl', ['$scope', '$routeParams', '$location', '$interval', '$q', '$http', 'dataset', 'upload',
-  function ($scope, $routeParams, $location, $interval, $q, $http, dataset, upload) {
-
-  var url = '/api/2/datasets/' + dataset.slug + '/imports/' + upload.context.id + '/logs';
-  $scope.dataset = dataset;
-  $scope.upload = upload;
-  $scope.logs = {};
-
-  var stopInterval = $interval(function() {
-    $http.get(url).then(function(res) {
-      $scope.logs = res.data;
-    })
-  }, 1000);
-
-  $scope.$on('$destroy', function() {
-    $interval.cancel(stopInterval);
-  });
-
+  refreshData();
 }]);

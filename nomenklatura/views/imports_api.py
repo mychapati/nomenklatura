@@ -7,7 +7,7 @@ from apikit import jsonify, obj_or_404, get_limit, get_offset
 from nomenklatura import authz
 from nomenklatura.core import db
 from nomenklatura.model import Dataset, Context
-from nomenklatura.model.imports import store_upload, load_upload
+from nomenklatura.model.imports import store_upload, load_upload, set_state
 from nomenklatura.model.imports import analyze_upload, get_table, get_logs
 
 blueprint = Blueprint('imports', __name__)
@@ -47,6 +47,8 @@ def load(dataset, id):
     authz.require(authz.dataset_edit(dataset))
     dataset = obj_or_404(Dataset.by_slug(dataset))
     context = obj_or_404(Context.by_id(id))
+    source, table = get_table(context)
+    set_state(source, 'loading')
     load_upload.delay(context.id)
     return jsonify({'status': 'ok'})
 
@@ -56,5 +58,5 @@ def logs(dataset, id):
     authz.require(authz.dataset_edit(dataset))
     dataset = obj_or_404(Dataset.by_slug(dataset))
     context = obj_or_404(Context.by_id(id))
-    logs = get_logs(context, get_limit(default=1000), get_offset())
-    return jsonify({'entries': list(logs)[::-1]})
+    logs = get_logs(context, get_limit(default=10), get_offset())
+    return jsonify({'entries': list(logs)})

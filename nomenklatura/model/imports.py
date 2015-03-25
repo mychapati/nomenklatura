@@ -20,14 +20,17 @@ def get_logger(package, context):
 
 def get_logs(context, limit, offset):
     package = get_package(context.dataset)
-    for line in logger.load(package, context.id, limit=limit, offset=offset):
-        dt, mod, level, message = line.split(' - ', 4)
-        yield {'time': dt, 'module': mod, 'level': level, 'message': message}
+    return logger.load(package, context.id, limit=limit, offset=offset)
 
 
 def get_package(dataset):
     coll = archive.get(COLLECTION)
     return coll.get(dataset.slug)
+
+
+def set_state(source, state):
+    source.meta['state'] = state
+    source.meta.save()
 
 
 def get_table(context):
@@ -58,15 +61,21 @@ def analyze_upload(context_id):
         log.warning("No resource associated with context: %r", context)
         return
     source, target = get_table(context)
+    set_state(source, 'analyzing')
     handler = get_logger(source.package, context)
 
     try:
+        log.info("Extracting tabular data...")
         if not source.exists():
             log.warning("Source data does not exist: %r",
                         context.resource_name)
             return
         operator = TableExtractOperator(None, 'temp', {})
         operator.transform(source, target)
+        set_state(source, 'analyzed')
+    except Exception, e:
+        log.error(unicode(e))
+        set_state(source, 'failed')
     finally:
         handler.archive()
 
@@ -81,6 +90,7 @@ def load_upload(context_id):
     db.session.commit()
 
     source, table = get_table(context)
+    set_state(source, 'loading')
     handler = get_logger(source.package, context)
 
     try:
@@ -94,6 +104,7 @@ def load_upload(context_id):
         db.session.commit()
         log.info("Loading of %r has finished.",
                  context.resource_name)
+        set_state(source, 'loaded')
     finally:
         handler.archive()
 
@@ -130,5 +141,5 @@ def load_entity(context, mapping, record):
     for (attr, value) in data:
         entity.set(attr, value, context)
 
-    log.info("Loaded entity: %r", entity)
+    # log.info("Loaded entity: %r", entity)
     return entity
