@@ -37,11 +37,101 @@ var loadUpload = ['$route', '$http', '$q', function($route, $http, $q) {
 }];
 
 
-nomenklatura.controller('MappingCtrl', ['$scope', '$routeParams', '$location', '$timeout', '$q', '$http', 'dataset', 'upload',
-  function ($scope, $routeParams, $location, $timeout, $q, $http, dataset, upload) {
+nomenklatura.directive('entityMapping', ['RecursionHelper', function (RecursionHelper) {
+    return {
+        restrict: 'E',
+        scope: {
+          'schema': '=',
+          'mapping': '=',
+          'fields': '='
+        },
+        templateUrl: '/static/templates/imports/entity.html',
+        compile: function(element) {
+          return RecursionHelper.compile(element, function(scope, iElement, iAttrs, controller, transcludeFn){
+            scope.getTypes = function() {
+              var types = [];
+              angular.forEach(scope.schema.types, function(t) {
+                if (!t.abstract) {
+                  types.push(t);  
+                }
+              });
+              return types;
+            };
+
+            scope.getAttributes = function() {
+              if (!scope.mapping.type) {
+                return [];
+              }
+              var type = scope.schema.types[scope.mapping.type],
+                  attributes = [];
+              angular.forEach(type.attributes, function(a) {
+                if (!angular.isDefined(scope.mapping[a.name])) {
+                  attributes.push(a);
+                }
+              });
+              return attributes;
+            };
+
+            scope.getFields = function() {
+              var fields = []
+              angular.forEach(scope.fields, function(f) {
+                fields.push(f);
+              });
+              return fields;
+            };
+
+            scope.getSamples = function(field) {
+              var totalLen = 0, samples = [];
+              angular.forEach(field.samples, function(s) {
+                s = s + '';
+                if (totalLen <= 100) {
+                  samples.push(s);
+                  totalLen += s.length;
+                }
+              });
+              return samples;
+            };
+
+            scope.getMapped = function() {
+              var mapped = {};
+              angular.forEach(scope.mapping, function(spec, attr) {
+                if (attr != 'type' && scope.schema.attributes[attr]) {
+                  mapped[attr] = spec;
+                }
+              });
+              return mapped;
+            };
+
+            scope.mapAttribute = function(attribute) {
+              scope.mapping[attribute] = {
+                  'field': scope.getFields()[0].name,
+                  'key': attribute == 'label'
+              };
+              if (scope.getAttributes().length) {
+                scope.newAttribute = scope.getAttributes()[0].name;
+              }
+            };
+
+            scope.unmapAttribute = function(attribute) {
+              delete scope.mapping[attribute];
+            };
+
+            scope.mapping = scope.mapping || {};
+            scope.mapping.type = scope.mapping.type || scope.getTypes()[0].name;
+            scope.newAttribute = scope.getAttributes()[0].name;
+          });
+        },
+    };
+}]);
+
+
+
+nomenklatura.controller('MappingCtrl', ['$scope', '$routeParams', '$location', '$timeout', '$q', '$http', 'dataset', 'upload', 'schema',
+  function ($scope, $routeParams, $location, $timeout, $q, $http, dataset, upload, schema) {
 
   var uploadCheck = null, importStarted = false;
-  $scope.has_table = false;
+  $scope.hasTable = false;
+  $scope.schema = schema;
   $scope.dataset = dataset;
   $scope.upload = upload;
   $scope.context = upload.context;
@@ -49,7 +139,7 @@ nomenklatura.controller('MappingCtrl', ['$scope', '$routeParams', '$location', '
 
   var checkAnalysis = function() {
     if ($scope.upload.table && $scope.upload.table.fields) {
-      return $scope.has_table = true;
+      return $scope.hasTable = true;
     }
     uploadCheck = $timeout(function() {
       var dt = new Date(),
@@ -68,7 +158,7 @@ nomenklatura.controller('MappingCtrl', ['$scope', '$routeParams', '$location', '
   checkAnalysis();
 
   $scope.canImport = function() {
-    return $scope.has_table && !importStarted && upload.context_statements <= 0;
+    return $scope.hasTable && !importStarted && upload.context_statements <= 0;
   }
 
   $scope.save = function(form) {

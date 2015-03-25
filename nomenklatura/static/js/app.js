@@ -1,4 +1,4 @@
-var nomenklatura = angular.module('nomenklatura', ['ngRoute', 'ngUpload', 'angular-loading-bar', 'ui.bootstrap']);
+var nomenklatura = angular.module('nomenklatura', ['ngRoute', 'RecursionHelper', 'ngUpload', 'angular-loading-bar', 'ui.bootstrap']);
 
 nomenklatura.config(['$routeProvider', '$locationProvider', '$sceProvider', 'cfpLoadingBarProvider',
     function($routeProvider, $locationProvider, $sceProvider, cfpLoadingBarProvider) {

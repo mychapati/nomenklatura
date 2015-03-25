@@ -43,14 +43,23 @@
     </div>
   </div>
 
-  <div ng-hide="has_table" class="alert alert-info">
+  <div ng-hide="hasTable" class="alert alert-info">
     <i class="fa fa-spinner fa-pulse"></i>
     <strong>Data is being extracted.</strong> Please wait while the source data
     is extracted from the file you provided. Once it has been read, you will be
     asked to define how it should be imported.
   </div>
 
-  <div class="row" ng-show="has_table">
+  <div class="row" ng-show="hasTable">
+    <div class="col-xs-12">
+      <hr/>
+      <entity-mapping schema="schema" mapping="mapping" fields="upload.table.fields">
+      </entity-mapping>
+      <hr/>
+    </div>
+  </div>
+
+  <div class="row">
     <div class="col-xs-12">
       <div class="form-group">
         <div class="col-xs-12">

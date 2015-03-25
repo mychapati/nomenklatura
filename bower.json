@@ -15,7 +15,8 @@
     "angular-bootstrap": "~0.12.1",
     "moment": "~2.9.0",
     "ngUpload": "~0.5.14",
-    "angular-loading-bar": "~0.7.1"
+    "angular-loading-bar": "~0.7.1",
+    "angular-recursion": "~1.0.5"
   },
   "resolutions": {
     "angular": "~1.2.3"

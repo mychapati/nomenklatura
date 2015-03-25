@@ -1,0 +1,74 @@
+<div class="panel panel-default">
+  <div class="panel-heading">Import field mapping: {{schema.types[mapping.type].label}}</div>
+  <div class="panel-body">
+    <div class="form-group">
+      <label class="col-sm-2 control-label" for="publisher_url">Type</label>
+      <div class="col-sm-10">
+        <select name="type" class="form-control"
+          ng-model="mapping.type"
+          ng-options="t.name as t.label for t in getTypes()"></select>
+      </div>
+    </div>
+
+    <div class="form-group" ng-repeat="(attribute, map) in getMapped()">
+      <label class="col-sm-2 control-label">
+        {{schema.attributes[attribute].label}}
+      </label>
+      <div class="col-sm-9" ng-show="schema.attributes[attribute].data_type == 'entity'">
+        <entity-mapping schema="schema" mapping="map" fields="fields">
+        </entity-mapping>
+      </div>
+      <div class="col-sm-7" ng-show="schema.attributes[attribute].data_type != 'entity'">
+        <select name="type" class="form-control"
+          ng-model="map.field"
+          ng-options="f.name as f.title for f in getFields()"></select>
+        <p class="help-text">
+          Examples: <span ng-repeat="s in getSamples(fields[map.field])"><code>{{s}}</code>, </span>...
+        </p>
+      </div>
+      <div class="col-sm-2" ng-show="schema.attributes[attribute].data_type != 'entity'">
+        <div class="checkbox">
+          <label>
+            <input type="checkbox" ng-model="map.key">
+            Use as key
+          </label>
+        </div>
+      </div>
+      <div class="col-sm-1">
+        <div class="checkbox">
+          <label>
+            <a ng-click="unmapAttribute(attribute)"><i class="fa fa-trash"></i></a>
+          </label>
+        </div>
+        
+      </div>
+    </div>
+
+    <div class="form-group" ng-show="getAttributes().length">
+      <label class="col-sm-2 control-label"></label>
+      <div class="col-sm-6">
+        <select name="type" class="form-control"
+          ng-model="newAttribute"
+          ng-init="getAttributes()[0].name"
+          ng-options="t.name as t.label for t in getAttributes()"></select>
+      </div>
+      <div class="col-sm-4">
+        <button type="button" class="btn btn-default"
+          ng-click="mapAttribute(newAttribute)">Add attribute</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!--div class="form-group" ng-repeat="attribute in getAttributes()" >
+  <label class="col-sm-2 control-label">{{attribute.label}}</label>
+  <div class="col-sm-10" ng-show="attribute.data_type != 'entity'">
+    {{attribute.data_type}}  
+  </div>
+  <div class="col-sm-10" ng-show="attribute.data_type == 'entity'">
+    <entity-mapping schema="schema" mapping="mapping[attribute.name]"
+      fields="upload.table.fields">
+    </entity-mapping>
+  </div>
+</div-->

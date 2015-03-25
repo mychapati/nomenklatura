@@ -7,6 +7,7 @@ deps_assets = Bundle(
     'vendor/bootstrap/js/collapse.js',
     'vendor/angular/angular.js',
     'vendor/angular-route/angular-route.js',
+    'vendor/angular-recursion/angular-recursion.js',
     'vendor/angular-loading-bar/build/loading-bar.js',
     'vendor/angular-bootstrap/ui-bootstrap-tpls.js',
     'vendor/ngUpload/ng-upload.js',
