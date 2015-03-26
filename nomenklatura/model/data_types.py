@@ -34,10 +34,8 @@ class DataType(object):
         if value is None:
             return None
         try:
-            value = self.serialize(value)
-            # Check if this can be unpacked again:
-            self.deserialize_safe(value)
-            return value
+            obj = self.deserialize_safe(value)
+            return self.serialize(obj)
         except DataException:
             raise
         except Exception, e:
@@ -76,6 +74,8 @@ class Boolean(DataType):
         return unicode(value)
 
     def deserialize(self, value):
+        if isinstance(value, bool):
+            return value
         return value.lower() in BOOL_TRUISH
 
 
@@ -94,6 +94,10 @@ class Date(DataType):
         return value.isoformat() if isinstance(value, date) else value
 
     def deserialize(self, value):
+        if isinstance(value, date):
+            return value
+        if isinstance(value, datetime):
+            return value.date()
         return dateutil.parser.parse(value).date()
 
 
@@ -103,6 +107,8 @@ class DateTime(DataType):
         return value.isoformat() if isinstance(value, datetime) else value
 
     def deserialize(self, value):
+        if isinstance(value, (date, datetime)):
+            return value
         return dateutil.parser.parse(value)
 
 
@@ -114,7 +120,10 @@ class Type(DataType):
         return value
 
     def deserialize(self, value):
+        from nomenklatura.model.type import Type
         from nomenklatura.model.schema import types
+        if isinstance(value, Type):
+            return value
         type_ = types[value]
         if type_ is None:
             raise TypeError("Unknown entity type: %s" % value)
@@ -124,9 +133,14 @@ class Type(DataType):
 class Entity(DataType):
 
     def serialize(self, entity):
-        return entity.id
+        if hasattr(entity, 'id'):
+            return entity.id
+        return entity
 
     def deserialize(self, value):
+        from nomenklatura.model.entity import Entity
+        if isinstance(value, Entity):
+            return value
         ent = self.dataset.entities.by_id(value)
         if ent is None:
             raise TypeError("Entity does not exist: %r" % value)
