@@ -20,7 +20,7 @@ def angular_templates():
 @app.route('/entities/<path:id>')
 @app.route('/datasets')
 @app.route('/datasets/<path:id>')
-@app.route('/profile')
+@app.route('/login')
 @app.route('/docs/<path:id>')
 @app.route('/')
 def index(**kw):

@@ -1,5 +1,5 @@
-from flask import Blueprint
-from flask.ext.login import current_user
+from flask import Blueprint, request
+from flask.ext.login import login_user, current_user
 from apikit import obj_or_404, request_data, jsonify
 
 from nomenklatura.model import User
@@ -38,3 +38,29 @@ def update(id):
     # db.session.add(user)
     db.session.commit()
     return jsonify(user)
+
+
+@blueprint.route('/users/login', methods=['POST', 'PUT'])
+def login():
+    user = User.by_email(request.args.get('email'))
+    if user is not None and user.password == request.args.get('password'):
+        login_user(user, remember=True)
+        return jsonify({'status': 'ok', 'user': user})
+    return jsonify({'status': 'error',
+                    'errors': {'email': 'Invalid email or password.'}},
+                   status=400)
+
+
+@blueprint.route('/users/register', methods=['POST', 'PUT'])
+def register(id):
+    return jsonify({})
+
+
+@blueprint.route('/users/reset', methods=['POST', 'PUT'])
+def reset_password(id):
+    return jsonify({})
+
+
+@blueprint.route('/users/validate', methods=['GET'])
+def validate_account(id):
+    return jsonify({})

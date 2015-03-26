@@ -1,0 +1,84 @@
+<div class="row">
+  <div class="col-md-6">
+    <h2 class="page-header">Login</h2>
+    <form class="form-horizontal" role="form" name="loginUser"
+      ng-submit="login(loginUser)">
+
+      <div class="form-group" ng-class="{'has-error': loginUser.email.$invalid}">
+        <label class="col-sm-3 control-label" for="email">E-Mail</label>
+        <div class="col-sm-9">
+          <input type="text" class="form-control" id="email" name="email" ng-model="loginData.email"
+            placeholder="Your E-Mail">
+          <p class="help-block" ng-show="loginUser.email.$invalid"
+            ng-bind="loginUser.email.$message"></p>
+        </div>
+      </div>
+
+      <div class="form-group" ng-class="{'has-error': loginUser.password.$invalid}">
+        <label class="col-sm-3 control-label" for="password">Password</label>
+        <div class="col-sm-9">
+          <input type="password" class="form-control" id="password" name="password"
+            ng-model="loginData.password">
+          <p class="help-block" ng-show="loginUser.password.$invalid" ng-bind="loginUser.password.$message"></p>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="col-sm-offset-3 col-sm-9">
+          <button type="submit" ng-disabled="!canLogin()"
+            class="btn btn-primary">Login</button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div class="col-md-6">
+    <h2 class="page-header">Register</h2>
+    <form class="form-horizontal" role="form" name="registerUser"
+      ng-submit="register(registerUser)">
+      <div class="form-group" ng-class="{'has-error': newUser.display_name.$invalid}">
+        <label class="col-sm-3 control-label" for="display_name">Name</label>
+        <div class="col-sm-9">
+          <input type="text" class="form-control" id="display_name" name="display_name" ng-model="newUser.display_name"
+            placeholder="Your full name">
+          <p class="help-block" ng-show="registerUser.full_name.$invalid"
+            ng-bind="registerUser.full_name.$message"></p>
+        </div>
+      </div>
+
+      <div class="form-group" ng-class="{'has-error': newUser.email.$invalid}">
+        <label class="col-sm-3 control-label" for="email">E-Mail</label>
+        <div class="col-sm-9">
+          <input type="text" class="form-control" id="email" name="email" ng-model="newUser.email"
+            placeholder="Your E-Mail">
+          <p class="help-block" ng-show="registerUser.email.$invalid"
+            ng-bind="registerUser.email.$message"></p>
+        </div>
+      </div>
+
+      <div class="form-group" ng-class="{'has-error': registerUser.password.$invalid}">
+        <label class="col-sm-3 control-label" for="password">Password</label>
+        <div class="col-sm-9">
+          <input type="password" class="form-control" id="password" name="password"
+            ng-model="newUser.password">
+          <p class="help-block" ng-show="registerUser.password.$invalid" ng-bind="registerUser.password.$message"></p>
+        </div>
+      </div>
+
+      <div class="form-group" ng-class="{'has-error': passwordMismatch()}">
+        <label class="col-sm-3 control-label" for="password">Password (repeat)</label>
+        <div class="col-sm-9">
+          <input type="password" class="form-control" id="passwordRepeat" name="passwordRepeat"
+            ng-model="newUser.passwordRepeat">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="col-sm-offset-3 col-sm-9">
+          <button type="submit" ng-disabled="!canRegister()"
+            class="btn btn-primary">Register</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

@@ -23,6 +23,11 @@ nomenklatura.config(['$routeProvider', '$locationProvider', '$sceProvider', 'cfp
     controller: 'DocsCtrl'
   });
 
+  $routeProvider.when('/login', {
+    templateUrl: '/static/templates/users/login.html',
+    controller: 'LoginCtrl'
+  });
+
   $routeProvider.when('/datasets/:dataset', {
     templateUrl: '/static/templates/datasets/view.html',
     controller: 'DatasetsViewCtrl',

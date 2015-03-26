@@ -29,7 +29,7 @@ app_assets = Bundle(
     'js/controllers/review.js',
     'js/controllers/datasets.js',
     'js/controllers/entities.js',
-    'js/controllers/profile.js',
+    'js/controllers/users.js',
     filters='uglifyjs',
     output='assets/app.js'
 )
