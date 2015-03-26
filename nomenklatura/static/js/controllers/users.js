@@ -82,7 +82,7 @@ nomenklatura.controller('UsersLoginCtrl', ['$scope', '$location', '$modal', '$ht
     if (!$scope.canRegister()) {
       return;
     }
-    var res = $http.post('/api/2/users/register', $scope.newUser);
+    var res = $http.post('/api/2/users/register', angular.copy($scope.newUser));
     $scope.newUser.password = '';
     $scope.newUser.passwordRepeat = '';
     res.success(function(data) {
@@ -102,7 +102,7 @@ nomenklatura.controller('UsersLoginCtrl', ['$scope', '$location', '$modal', '$ht
     if (!$scope.canLogin()) {
       return;
     }
-    var res = $http.post('/api/2/users/login', $scope.loginData);
+    var res = $http.post('/api/2/users/login', angular.copy($scope.loginData));
     $scope.loginData.password = null;
     res.success(function(data) {
       $location.path('/');

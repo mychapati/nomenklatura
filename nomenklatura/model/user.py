@@ -1,4 +1,4 @@
-from sqlalchemy_utils.types.password import PasswordType
+from passlib.hash import sha256_crypt
 
 from nomenklatura.core import db, url_for, login_manager
 from nomenklatura.model.forms import UserEditForm, UserCreateForm
@@ -15,7 +15,7 @@ class User(db.Model, CommonMixIn):
 
     display_name = db.Column(db.Unicode)
     email = db.Column(db.Unicode)
-    password_ = db.Column('password', PasswordType)
+    password = db.Column(db.Unicode)
     validated = db.Column(db.Boolean, default=False)
     validation_token = db.Column(db.Unicode, default=make_key)
     api_key = db.Column(db.Unicode, default=make_key)
@@ -57,8 +57,13 @@ class User(db.Model, CommonMixIn):
         data = UserEditForm().deserialize(data)
         self.display_name = data.get('display_name')
         self.email = data.get('email')
-        if data.get('password'):
-            self.password = data.get('password')
+        if data.get('password') is not None:
+            self.password = sha256_crypt.encrypt(data.get('password'))
+
+    def verify(self, password):
+        if password is None or self.password is None:
+            return False
+        return sha256_crypt.verify(password, self.password)
 
     @classmethod
     def all(cls):
@@ -82,6 +87,6 @@ class User(db.Model, CommonMixIn):
         user = cls()
         user.display_name = data.get('display_name')
         user.email = data.get('email')
-        user.password = data.get('password')
+        user.password = sha256_crypt.encrypt(data.get('password'))
         db.session.add(user)
         return user

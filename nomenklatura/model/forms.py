@@ -65,8 +65,7 @@ class UserCreateForm(colander.MappingSchema):
         validator=colander.All(colander.Email(),
             colander.Function(email_available, 'E-Mail already registered'))) # noqa
     password = colander.SchemaNode(colander.String(),
-        validator=colander.Length(min=3, max=500), # noqa
-        missing=None, default=None) # noqa
+        validator=colander.Length(min=3, max=500)) # noqa
 
 
 class UserEditForm(colander.MappingSchema):

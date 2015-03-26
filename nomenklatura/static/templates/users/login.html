@@ -15,9 +15,9 @@
       </div>
 
       <div class="form-group" ng-class="{'has-error': loginUser.password.$invalid}">
-        <label class="col-sm-3 control-label" for="regPassword">Password</label>
+        <label class="col-sm-3 control-label" for="password">Password</label>
         <div class="col-sm-9">
-          <input type="password" class="form-control" id="regPassword" name="regPassword"
+          <input type="password" class="form-control" id="password" name="password"
             ng-model="loginData.password">
           <p class="help-block" ng-show="loginUser.password.$invalid" ng-bind="loginUser.password.$message"></p>
         </div>

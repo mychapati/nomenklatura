@@ -42,8 +42,9 @@ def update(id):
 
 @blueprint.route('/users/login', methods=['POST', 'PUT'])
 def login():
-    user = User.by_email(request.args.get('email'))
-    if user is not None and user.password == request.args.get('password'):
+    data = request_data()
+    user = User.by_email(data.get('email'))
+    if user is not None and user.verify(data.get('password')):
         login_user(user, remember=True)
         return jsonify({'status': 200, 'user': user})
     message = {'password': 'Invalid email or password.'}
