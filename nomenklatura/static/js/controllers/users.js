@@ -1,5 +1,5 @@
 
-nomenklatura.controller('ProfileCtrl', ['$scope', '$location', '$modalInstance', '$http', 'Validation', 'Session',
+nomenklatura.controller('UsersProfileCtrl', ['$scope', '$location', '$modalInstance', '$http', 'Validation', 'Session',
   function ($scope, $location, $modalInstance, $http, Validation, Session) {
 
   $scope.session = {logged_in: false};
@@ -9,6 +9,10 @@ nomenklatura.controller('ProfileCtrl', ['$scope', '$location', '$modalInstance',
     $scope.session = data;
     $scope.user = data.user;
   });
+
+  $scope.passwordMismatch = function() {
+    return $scope.user.password && $scope.user.password != $scope.user.passwordRepeat;
+  };
 
   $scope.cancel = function() {
     $modalInstance.dismiss('cancel');
@@ -26,8 +30,25 @@ nomenklatura.controller('ProfileCtrl', ['$scope', '$location', '$modalInstance',
 }]);
 
 
+nomenklatura.controller('UsersResetCtrl', ['$scope', '$location', '$modalInstance', '$http', 'Validation',
+  function ($scope, $location, $modalInstance, $http, Validation) {
+  $scope.data = {};
 
-nomenklatura.controller('LoginCtrl', ['$scope', '$location', '$modal', '$http', '$window', 'Validation', 'Session', 'Flash',
+  $scope.cancel = function() {
+    $modalInstance.dismiss('cancel');
+  };
+
+  $scope.reset = function(form) {
+    var res = $http.post('/api/2/users/reset', $scope.data);
+    res.success(function(data) {
+      $modalInstance.dismiss('ok');
+    });
+    res.error(Validation.handle(form));
+  };
+}]);
+
+
+nomenklatura.controller('UsersLoginCtrl', ['$scope', '$location', '$modal', '$http', '$window', 'Validation', 'Session', 'Flash',
   function ($scope, $location, $modal, $http, $window, Validation, Session, Flash) {
 
   $scope.session = {logged_in: false};
@@ -38,6 +59,13 @@ nomenklatura.controller('LoginCtrl', ['$scope', '$location', '$modal', '$http', 
   Session.get(function(data) {
     $scope.session = data;
   });
+
+  $scope.openReset = function() {
+    var d = $modal.open({
+      templateUrl: '/static/templates/users/reset.html',
+      controller: 'UsersResetCtrl'
+    });
+  };
 
   $scope.passwordMismatch = function() {
     return $scope.newUser.password != $scope.newUser.passwordRepeat;

@@ -4,7 +4,7 @@ nomenklatura.factory('Validation', ['Flash', function(Flash) {
   return {
     handle: function(form) {
       return function(res) {
-        if (res.status == 400 || !form) {
+        if (res.status == 400) {
           var errors = [];
           
           for (var field in res.errors) {

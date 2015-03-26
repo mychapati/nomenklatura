@@ -1,0 +1,26 @@
+<div class="modal-header">
+  <button type="button" class="close" ng-click="cancel()" aria-hidden="true">&times;</button>
+  <h4 class="modal-title">Reset your password</h4>
+</div>
+
+<form class="form-horizontal" role="form" name="resetForm" ng-submit="reset(resetForm)">
+  <div class="modal-body">
+    <p>
+      Please enter your email address below. You will receive an email with a 
+      reset link that you can use to log in.
+    </p>
+    <div class="form-group" ng-class="{'has-error': resetForm.email.$invalid}">
+      <label class="col-sm-2 control-label" for="email">E-Mail</label>
+      <div class="col-sm-10">
+        <input type="text" class="form-control" id="email" name="email" ng-model="data.email"
+          placeholder="Your E-Mail">
+        <p class="help-block" ng-show="resetForm.email.$invalid" ng-bind="resetForm.email.$message"></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button type="button" class="btn btn-default" ng-click="cancel()">Cancel</button>
+    <button type="submit" class="btn btn-primary">Request reset link</button>
+  </div>
+</form>

@@ -9,10 +9,6 @@ CELERY_BROKER_URL = 'amqp://guest:guest@localhost:5672//'
 ARCHIVE_TYPE = 'file'
 ARCHIVE_CONFIG = {'path': '/Users/fl/Data/nk-uploads'}
 
-
-# GITHUB_CLIENT_ID = ''
-# GITHUB_CLIENT_SECRET = ''
-
 ALLOWED_EXTENSIONS = set(['csv', 'tsv', 'ods', 'xls', 'xlsx', 'txt'])
 
 ALEMBIC_DIR = path.join(path.dirname(__file__), 'migrate')
@@ -23,3 +19,8 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TIMEZONE = 'UTC'
 CELERY_IMPORTS = ('nomenklatura.model.importer', )
+
+MAIL_SERVER = 'localhost'
+MAIL_PORT = 25
+MAIL_DEBUG = True
+MAIL_DEFAULT_SENDER = 'nomenklatura@grano.cc'

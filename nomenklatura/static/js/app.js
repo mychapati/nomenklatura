@@ -25,7 +25,7 @@ nomenklatura.config(['$routeProvider', '$locationProvider', '$sceProvider', 'cfp
 
   $routeProvider.when('/login', {
     templateUrl: '/static/templates/users/login.html',
-    controller: 'LoginCtrl'
+    controller: 'UsersLoginCtrl'
   });
 
   $routeProvider.when('/datasets/:dataset', {

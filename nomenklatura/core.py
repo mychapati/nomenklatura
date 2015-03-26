@@ -4,6 +4,7 @@ from flask import Flask
 from flask import url_for as _url_for
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask_oauthlib.client import OAuth
+from flask_mail import Mail
 from flask.ext.login import LoginManager
 from flask.ext.assets import Environment
 from flask.ext.migrate import Migrate
@@ -24,6 +25,7 @@ db = SQLAlchemy(app)
 migrate = Migrate(app, db, directory=app.config.get('ALEMBIC_DIR'))
 
 assets = Environment(app)
+mail = Mail(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'index'

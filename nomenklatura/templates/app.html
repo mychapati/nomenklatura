@@ -31,14 +31,12 @@
       </div>
 
       <div class="collapse navbar-collapse navbar-ex1-collapse navbar-right">
-        <ul class="nav navbar-nav">
+        <ul class="nav navbar-nav" ng-cloak>
           <li ng-show="session.logged_in">
             <a ng-click="showProfile()"><i class="fa fa-cogs"></i> Profile</a>
           </li>
           <li ng-hide="session.logged_in">
-            <li ng-cloak>
-              <a href='/login'><i class="fa fa-lock"></i> Sign in or register</a>
-            </li>
+            <a href='/login'><i class="fa fa-lock"></i> Sign in or register</a>
           </li>
           <li ng-show="session.logged_in">
             <a target="_self" href="/api/2/sessions/logout"><i class="fa fa-sign-out"></i> Sign Out</a>
