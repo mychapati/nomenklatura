@@ -1,5 +1,6 @@
-function AppCtrl($scope, $window, $routeParams, $location, $modal, Session) {
+function AppCtrl($scope, $window, $routeParams, $location, $modal, Session, Flash) {
     $scope.session = {logged_in: false};
+    $scope.flash = Flash;
 
     Session.get(function(data) {
         $scope.session = data;
@@ -19,4 +20,4 @@ function AppCtrl($scope, $window, $routeParams, $location, $modal, Session) {
     };
 }
 
-AppCtrl.$inject = ['$scope', '$window', '$routeParams', '$location', '$modal', 'Session'];
+AppCtrl.$inject = ['$scope', '$window', '$routeParams', '$location', '$modal', 'Session', 'Flash'];

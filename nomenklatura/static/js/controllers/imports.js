@@ -37,8 +37,8 @@ var loadUpload = ['$route', '$http', '$q', function($route, $http, $q) {
 }];
 
 
-nomenklatura.controller('ImportsMappingCtrl', ['$scope', '$routeParams', '$location', '$timeout', '$q', '$http', '$modal', 'dataset', 'upload', 'schema',
-  function ($scope, $routeParams, $location, $timeout, $q, $http, $modal, dataset, upload, schema) {
+nomenklatura.controller('ImportsMappingCtrl', ['$scope', '$routeParams', '$location', '$timeout', '$q', '$http', '$modal', 'Validation', 'dataset', 'upload', 'schema',
+  function ($scope, $routeParams, $location, $timeout, $q, $http, $modal, Validation, dataset, upload, schema) {
 
   var uploadCheck = null, importStarted = false;
   $scope.schema = schema;
@@ -94,7 +94,7 @@ nomenklatura.controller('ImportsMappingCtrl', ['$scope', '$routeParams', '$locat
       $scope.context = data;
       dfd.resolve();
     });
-    res.error(nomenklatura.handleFormError(form));
+    res.error(Validation.handle(form));
     return dfd.promise;
   };
 

@@ -19,3 +19,5 @@ nomenklatura.directive('nkAuthz', ['$timeout', 'Session', function ($timeout, Se
         }
     };
 }]);
+
+

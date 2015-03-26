@@ -59,21 +59,14 @@ var loadRoleUsers = ['$route', '$http', '$q', 'Session', function($route, $http,
 
 
 nomenklatura.controller('DatasetsViewCtrl', ['$scope', '$routeParams', '$location', '$http', '$modal',
-                                             '$timeout', 'dataset', 'schema', 'entities',
-    function ($scope, $routeParams, $location, $http, $modal, $timeout, dataset, schema, entities) {
+                                             '$timeout', 'Validation', 'dataset', 'schema', 'entities',
+    function ($scope, $routeParams, $location, $http, $modal, $timeout, Validation, dataset, schema, entities) {
 
     $scope.dataset = dataset;
     $scope.schema = schema;
     $scope.entities = entities;
     $scope.new_entity = {};
     $scope.query = '';
-
-    // $scope.aliases_percent = Math.ceil((dataset.stats.num_aliases / dataset.stats.num_entities)*100);
-    // $scope.invalid_percent = Math.ceil((dataset.stats.num_invalid / dataset.stats.num_entities)*100);
-    // $scope.review_percent = Math.ceil((dataset.stats.num_review / dataset.stats.num_entities)*100);
-    // $scope.normal_percent = 100 - $scope.aliases_percent - $scope.invalid_percent - $scope.review_percent;
-    // $scope.normal_num = dataset.stats.num_entities - dataset.stats.num_aliases -
-    //     dataset.stats.num_invalid - dataset.stats.num_review;
 
     $scope.loadEntities = function(url, params) {
         $http.get(url, {params: params}).then(function(res) {
@@ -108,13 +101,13 @@ nomenklatura.controller('DatasetsViewCtrl', ['$scope', '$routeParams', '$locatio
         res.success(function(data) {
             $location.path('/datasets/' + dataset.slug + '/entities/' + data.id);
         });
-        res.error(nomenklatura.handleFormError(form));
+        res.error(Validation.handle(form));
     };
 }]);
 
 
-nomenklatura.controller('DatasetsNewCtrl', ['$scope', '$routeParams', '$modalInstance', '$location', '$http',
-  function ($scope, $routeParams, $modalInstance, $location, $http) {
+nomenklatura.controller('DatasetsNewCtrl', ['$scope', '$routeParams', '$modalInstance', '$location', '$http', 'Validation',
+  function ($scope, $routeParams, $modalInstance, $location, $http, Validation) {
   $scope.dataset = {};
 
   $scope.cancel = function() {
@@ -127,13 +120,13 @@ nomenklatura.controller('DatasetsNewCtrl', ['$scope', '$routeParams', '$modalIns
       $location.path('/datasets/' + data.slug);
       $modalInstance.dismiss('ok');
     });
-    res.error(nomenklatura.handleFormError(form));
+    res.error(Validation.handle(form));
   };
 }]);
 
 
-nomenklatura.controller('DatasetsSettingsCtrl', ['$scope', '$route', '$routeParams', '$location', '$http', 'dataset', 'users',
-  function ($scope, $route, $routeParams, $location, $http, dataset, users) {
+nomenklatura.controller('DatasetsSettingsCtrl', ['$scope', '$route', '$routeParams', '$location', '$http', 'Validation', 'dataset', 'users',
+  function ($scope, $route, $routeParams, $location, $http, Validation, dataset, users) {
   $scope.dataset = dataset;
   $scope.users = users;
 
@@ -151,6 +144,6 @@ nomenklatura.controller('DatasetsSettingsCtrl', ['$scope', '$route', '$routePara
     res.success(function(data) {
       $location.path('/datasets/' + $scope.dataset.slug);
     });
-    res.error(nomenklatura.handleFormError(form));
+    res.error(Validation.handle(form));
   };
 }]);

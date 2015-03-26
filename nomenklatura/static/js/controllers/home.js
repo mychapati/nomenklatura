@@ -10,8 +10,8 @@ var loadDatasets = ['$route', '$http', '$q', 'Session', function($route, $http, 
 }];
 
 
-nomenklatura.controller('HomeCtrl', ['$scope', '$location', '$http', '$modal', 'datasets',
-  function ($scope, $location, $http, $modal, datasets) {
+nomenklatura.controller('HomeCtrl', ['$scope', '$location', '$http', '$modal', 'datasets', 'Flash',
+  function ($scope, $location, $http, $modal, datasets, Flash) {
   $scope.datasets = datasets;
 
   $scope.loadDatasets = function(url) {
@@ -19,7 +19,7 @@ nomenklatura.controller('HomeCtrl', ['$scope', '$location', '$http', '$modal', '
       $scope.datasets = data.data;
     });
   };
-  
+
   $scope.newDataset = function(){
     var d = $modal.open({
       templateUrl: '/static/templates/datasets/new.html',

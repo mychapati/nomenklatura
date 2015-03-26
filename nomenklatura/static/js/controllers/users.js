@@ -1,6 +1,6 @@
 
-nomenklatura.controller('ProfileCtrl', ['$scope', '$location', '$modalInstance', '$http', 'Session',
-  function ($scope, $location, $modalInstance, $http, Session) {
+nomenklatura.controller('ProfileCtrl', ['$scope', '$location', '$modalInstance', '$http', 'Validation', 'Session',
+  function ($scope, $location, $modalInstance, $http, Validation, Session) {
 
   $scope.session = {logged_in: false};
   $scope.user = {}
@@ -21,14 +21,14 @@ nomenklatura.controller('ProfileCtrl', ['$scope', '$location', '$modalInstance',
       $scope.session.user = data;
       $modalInstance.dismiss('ok');
     });
-    res.error(nomenklatura.handleFormError(form));
+    res.error(Validation.handle(form));
   };
 }]);
 
 
 
-nomenklatura.controller('LoginCtrl', ['$scope', '$location', '$modal', '$http', '$window', 'Session',
-  function ($scope, $location, $modal, $http, $window, Session) {
+nomenklatura.controller('LoginCtrl', ['$scope', '$location', '$modal', '$http', '$window', 'Validation', 'Session', 'Flash',
+  function ($scope, $location, $modal, $http, $window, Validation, Session, Flash) {
 
   $scope.session = {logged_in: false};
   $scope.newUser = {};
@@ -58,9 +58,11 @@ nomenklatura.controller('LoginCtrl', ['$scope', '$location', '$modal', '$http', 
     $scope.newUser.password = '';
     $scope.newUser.passwordRepeat = '';
     res.success(function(data) {
-      sessionReset();
+      $location.path('/');
+      var message = 'You will receive a confirmation email with an activation link.';
+      Flash.message('Thank you for registering. ' + message, 'success');
     });
-    res.error(nomenklatura.handleFormError(form));
+    res.error(Validation.handle(form));
   };
 
   $scope.canLogin = function() {
@@ -75,14 +77,10 @@ nomenklatura.controller('LoginCtrl', ['$scope', '$location', '$modal', '$http', 
     var res = $http.post('/api/2/users/login', $scope.loginData);
     $scope.loginData.password = null;
     res.success(function(data) {
-      sessionReset();
+      $location.path('/');
+      $window.location.reload(true);
     });
-    res.error(nomenklatura.handleFormError(form));
-  };
-
-  var sessionReset = function() {
-    $location.path('/');
-    $window.location.reload(true);
+    res.error(Validation.handle(form));
   };
 
 }]);
