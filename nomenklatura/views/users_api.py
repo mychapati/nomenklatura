@@ -46,14 +46,16 @@ def login():
     if user is not None and user.password == request.args.get('password'):
         login_user(user, remember=True)
         return jsonify({'status': 'ok', 'user': user})
-    return jsonify({'status': 'error',
-                    'errors': {'email': 'Invalid email or password.'}},
-                   status=400)
+    message = {'password': 'Invalid email or password.'}
+    return jsonify({'status': 'error', 'errors': message}, status=400)
 
 
 @blueprint.route('/users/register', methods=['POST', 'PUT'])
-def register(id):
-    return jsonify({})
+def register():
+    user = User.create(request_data())
+    db.session.commit()
+    login_user(user, remember=True)
+    return jsonify(user)
 
 
 @blueprint.route('/users/reset', methods=['POST', 'PUT'])

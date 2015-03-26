@@ -36,26 +36,8 @@
             <a ng-click="showProfile()"><i class="fa fa-cogs"></i> Profile</a>
           </li>
           <li ng-hide="session.logged_in">
-            <li ng-show="!session.logged_in && session.logins.twitter" ng-cloak>
-              {% raw %}
-                <a href='{{session.logins.twitter}}' target='_self'>
-                  <i class="fa fa-twitter"></i> Sign in
-                </a>
-              {% endraw %}
-            </li>
-            <li ng-show="!session.logged_in && session.logins.github" ng-cloak>
-              {% raw %}
-                <a href='{{session.logins.github}}' target='_self'>
-                  <i class="fa fa-github"></i> Sign in
-                </a>
-              {% endraw %}
-            </li>
-            <li ng-show="!session.logged_in && session.logins.facebook" ng-cloak>
-              {% raw %}
-                <a href='{{session.logins.facebook}}' target='_self'>
-                  <i class="fa fa-facebook-official"></i> Sign in
-                </a>
-              {% endraw %}
+            <li ng-cloak>
+              <a href='/login'><i class="fa fa-lock"></i> Sign in or register</a>
             </li>
           </li>
           <li ng-show="session.logged_in">

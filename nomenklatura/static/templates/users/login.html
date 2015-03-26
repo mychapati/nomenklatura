@@ -1,6 +1,6 @@
 <div class="row">
   <div class="col-md-6">
-    <h2 class="page-header">Login</h2>
+    <h3 class="page-header">Login</h3>
     <form class="form-horizontal" role="form" name="loginUser"
       ng-submit="login(loginUser)">
 
@@ -33,10 +33,10 @@
   </div>
 
   <div class="col-md-6">
-    <h2 class="page-header">Register</h2>
+    <h3 class="page-header">Register</h3>
     <form class="form-horizontal" role="form" name="registerUser"
       ng-submit="register(registerUser)">
-      <div class="form-group" ng-class="{'has-error': newUser.display_name.$invalid}">
+      <div class="form-group" ng-class="{'has-error': registerUser.display_name.$invalid}">
         <label class="col-sm-3 control-label" for="display_name">Name</label>
         <div class="col-sm-9">
           <input type="text" class="form-control" id="display_name" name="display_name" ng-model="newUser.display_name"
@@ -46,7 +46,7 @@
         </div>
       </div>
 
-      <div class="form-group" ng-class="{'has-error': newUser.email.$invalid}">
+      <div class="form-group" ng-class="{'has-error': registerUser.email.$invalid}">
         <label class="col-sm-3 control-label" for="email">E-Mail</label>
         <div class="col-sm-9">
           <input type="text" class="form-control" id="email" name="email" ng-model="newUser.email"

@@ -27,8 +27,8 @@ nomenklatura.controller('ProfileCtrl', ['$scope', '$location', '$modalInstance',
 
 
 
-nomenklatura.controller('LoginCtrl', ['$scope', '$location', '$modal', '$http', 'Session',
-  function ($scope, $location, $modal, $http, Session) {
+nomenklatura.controller('LoginCtrl', ['$scope', '$location', '$modal', '$http', '$window', 'Session',
+  function ($scope, $location, $modal, $http, $window, Session) {
 
   $scope.session = {logged_in: false};
   $scope.newUser = {};
@@ -55,10 +55,10 @@ nomenklatura.controller('LoginCtrl', ['$scope', '$location', '$modal', '$http', 
       return;
     }
     var res = $http.post('/api/2/users/register', $scope.newUser);
+    $scope.newUser.password = '';
+    $scope.newUser.passwordRepeat = '';
     res.success(function(data) {
-      //$scope.user = data;
-      //$scope.session.user = data;
-      //$modalInstance.dismiss('ok');
+      sessionReset();
     });
     res.error(nomenklatura.handleFormError(form));
   };
@@ -75,10 +75,14 @@ nomenklatura.controller('LoginCtrl', ['$scope', '$location', '$modal', '$http', 
     var res = $http.post('/api/2/users/login', $scope.loginData);
     $scope.loginData.password = null;
     res.success(function(data) {
-      //$scope.user = data;
-      //$scope.session.user = data;
-      //$modalInstance.dismiss('ok');
+      sessionReset();
     });
     res.error(nomenklatura.handleFormError(form));
   };
+
+  var sessionReset = function() {
+    $location.path('/');
+    $window.location.reload(true);
+  };
+
 }]);
