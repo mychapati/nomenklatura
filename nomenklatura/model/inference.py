@@ -16,6 +16,8 @@ def clear():
 
 
 def clone(src, subject):
+    if subject == src.subject:
+        return
     dst = Statement(src.dataset, subject, src.attribute, src.value,
                     src.context)
     dst.inferred = True

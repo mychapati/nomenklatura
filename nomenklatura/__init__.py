@@ -4,3 +4,4 @@ warnings.filterwarnings('ignore', 'Unicode type received non-unicode bind param 
 
 from sqlalchemy.exc import SAWarning
 warnings.filterwarnings('ignore', category=SAWarning)
+

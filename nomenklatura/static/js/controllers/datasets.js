@@ -106,8 +106,8 @@ nomenklatura.controller('DatasetsViewCtrl', ['$scope', '$routeParams', '$locatio
 }]);
 
 
-nomenklatura.controller('DatasetsNewCtrl', ['$scope', '$routeParams', '$modalInstance', '$location', '$http', 'Validation',
-  function ($scope, $routeParams, $modalInstance, $location, $http, Validation) {
+nomenklatura.controller('DatasetsNewCtrl', ['$scope', '$routeParams', '$modalInstance', '$location', '$http', 'Validation', 'Session',
+  function ($scope, $routeParams, $modalInstance, $location, $http, Validation, Session) {
   $scope.dataset = {};
 
   $scope.cancel = function() {
@@ -117,6 +117,7 @@ nomenklatura.controller('DatasetsNewCtrl', ['$scope', '$routeParams', '$modalIns
   $scope.create = function(form) {
     var res = $http.post('/api/2/datasets', $scope.dataset);
     res.success(function(data) {
+      Session.reset();
       $location.path('/datasets/' + data.slug);
       $modalInstance.dismiss('ok');
     });
