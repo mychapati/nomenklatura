@@ -4,6 +4,7 @@ from apikit import jsonify
 
 from nomenklatura.core import login_manager
 from nomenklatura.model import User
+from nomenklatura.model.data_types import DataException
 from nomenklatura.views.ui import app
 from nomenklatura.views.sessions_api import blueprint as sessions_api
 from nomenklatura.views.users_api import blueprint as users_api
@@ -54,6 +55,20 @@ def handle_invalid(exc):
         'status': 400,
         'name': 'Invalid Data',
         'errors': exc.asdict()
+    }
+    return jsonify(body, status=400)
+
+
+@app.errorhandler(DataException)
+def handle_data_exception(exc):
+    body = {
+        'status': 400,
+        'name': exc.message,
+        'errors': {
+            exc.attribute.name: exc.message
+        },
+        'data_type': unicode(exc.data_type),
+        'value': exc.value
     }
     return jsonify(body, status=400)
 

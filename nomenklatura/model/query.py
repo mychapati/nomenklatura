@@ -1,7 +1,6 @@
 from normality import normalize
 from sqlalchemy import exists, and_, func
 from sqlalchemy.orm import aliased, joinedload
-from sqlalchemy.sql.expression import literal_column
 
 from nomenklatura.core import db
 from nomenklatura.model.schema import attributes
@@ -28,10 +27,10 @@ class ValueFilter(Filter):
         self.value = value
 
     def apply(self, dataset, stmt, q):
-        conv = self.attribute.converter(dataset)
+        conv = self.attribute.converter(dataset, self.attribute)
         t_stmt, q = self._add_statement(stmt, q)
         q = q.filter(t_stmt._attribute == unicode(self.attribute))
-        q = q.filter(t_stmt._value == conv.serialize(self.value))
+        q = q.filter(t_stmt._value == conv.serialize_safe(self.value))
         return q
 
 
@@ -73,9 +72,9 @@ class LabelFilter(Filter):
         return l_stmt, q
 
     def apply(self, dataset, stmt, q):
-        conv = self.attribute.converter(dataset)
+        conv = self.attribute.converter(dataset, attributes.label)
         l_stmt, q = self.fields(stmt, q)
-        return q.filter(l_stmt._value == conv.serialize(self.value))
+        return q.filter(l_stmt._value == conv.serialize_safe(self.value))
 
 
 class PrefixFilter(LabelFilter):

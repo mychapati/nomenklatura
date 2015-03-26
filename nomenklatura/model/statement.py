@@ -46,12 +46,12 @@ class Statement(db.Model, CommonMixIn):
 
     @hybrid_property
     def value(self):
-        conv = self.attribute.converter(self.dataset)
+        conv = self.attribute.converter(self.dataset, self.attribute)
         return conv.deserialize_safe(self._value)
 
     @value.setter
     def value(self, value):
-        conv = self.attribute.converter(self.dataset)
+        conv = self.attribute.converter(self.dataset, self.attribute)
         self._value = conv.serialize_safe(value)
         self.normalized = normalize(self._value)
 

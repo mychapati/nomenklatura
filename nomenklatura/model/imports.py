@@ -7,6 +7,7 @@ from loadkit.operators.table import TableExtractOperator
 from nomenklatura.core import db, archive, celery
 from nomenklatura.model.context import Context
 from nomenklatura.model.entity import Entity
+from nomenklatura.model.data_types import DataException
 from nomenklatura.model.schema import types, attributes
 
 log = logging.getLogger(__name__)
@@ -97,6 +98,9 @@ def load_upload(context_id):
         for record in table.records():
             try:
                 load_entity(context, context.resource_mapping, record)
+            except DataException, de:
+                log.error("Cannot convert '%s' to %s for attribute '%s': %s",
+                          de.value, de.data_type, de.attribute, de.message)
             except Exception, e:
                 log.exception(e)
 

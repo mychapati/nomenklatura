@@ -1,10 +1,28 @@
+from datetime import datetime, date
+
+from apikit.args import BOOL_TRUISH
 import dateutil.parser
+
+
+class DataException(Exception):
+
+    def __init(self, data_type, value, message=None, exc=None):
+        self.data_type = data_type
+        self.value = value
+        self.exc = exc
+        if message is None:
+            if hasattr(exc, 'message'):
+                message = exc.message
+            elif exc is not None:
+                message = unicode(exc)
+        self.message = message
 
 
 class DataType(object):
 
-    def __init__(self, dataset):
+    def __init__(self, dataset, attribute):
         self.dataset = dataset
+        self.attribute = attribute
 
     def serialize(self, value):
         return value
@@ -15,17 +33,28 @@ class DataType(object):
     def serialize_safe(self, value):
         if value is None:
             return None
-        return self.serialize(value)
+        try:
+            value = self.serialize(value)
+            # Check if this can be unpacked again:
+            self.deserialize_safe(value)
+            return value
+        except DataException:
+            raise
+        except Exception, e:
+            raise DataException(self, value, e)
 
     def deserialize_safe(self, value):
         if value is None:
             return None
         try:
             return self.deserialize(value)
+        except DataException:
+            raise
         except Exception, e:
-            if isinstance(e, TypeError):
-                raise
-            raise TypeError(unicode(e))
+            raise DataException(self, value, e)
+
+    def __unicode__(self):
+        return self.__class__.__name__.lower()
 
 
 class String(DataType):
@@ -41,6 +70,15 @@ class Integer(DataType):
         return int(value)
 
 
+class Boolean(DataType):
+
+    def serialize(self, value):
+        return unicode(value)
+
+    def deserialize(self, value):
+        return value.lower() in BOOL_TRUISH
+
+
 class Float(DataType):
 
     def serialize(self, value):
@@ -50,10 +88,19 @@ class Float(DataType):
         return float(value)
 
 
+class Date(DataType):
+
+    def serialize(self, value):
+        return value.isoformat() if isinstance(value, date) else value
+
+    def deserialize(self, value):
+        return dateutil.parser.parse(value).date()
+
+
 class DateTime(DataType):
 
     def serialize(self, value):
-        return value.isoformat()
+        return value.isoformat() if isinstance(value, datetime) else value
 
     def deserialize(self, value):
         return dateutil.parser.parse(value)
@@ -68,10 +115,10 @@ class Type(DataType):
 
     def deserialize(self, value):
         from nomenklatura.model.schema import types
-        type = types[value]
-        if type is None:
+        type_ = types[value]
+        if type_ is None:
             raise TypeError("Unknown entity type: %s" % value)
-        return type
+        return type_
 
 
 class Entity(DataType):
@@ -80,16 +127,21 @@ class Entity(DataType):
         return entity.id
 
     def deserialize(self, value):
-        return self.dataset.entities.by_id(value)
+        ent = self.dataset.entities.by_id(value)
+        if ent is None:
+            raise TypeError("Entity does not exist: %r" % value)
+        return ent
 
 
 DATA_TYPES = {
     'string': String,
+    'boolean': Boolean,
     'text': String,
     'integer': Integer,
     'int': Integer,
     'float': Float,
     'datetime': DateTime,
+    'date': Date,
     'type': Type,
     'entity': Entity
 }
