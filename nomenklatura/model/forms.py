@@ -53,11 +53,30 @@ class DatasetEditForm(colander.MappingSchema):
     public = colander.SchemaNode(colander.Boolean())
 
 
+def email_available(value):
+    from nomenklatura.model.user import User
+    return User.by_email(value) is None
+
+
+class UserCreateForm(colander.MappingSchema):
+    display_name = colander.SchemaNode(colander.String(),
+        validator=colander.Length(min=3, max=500)) # noqa
+    email = colander.SchemaNode(colander.String(),
+        validator=colander.All(colander.Email(),
+            colander.Function(email_available, 'E-Mail already registered'))) # noqa
+    password = colander.SchemaNode(colander.String(),
+        validator=colander.Length(min=3, max=500), # noqa
+        missing=None, default=None) # noqa
+
+
 class UserEditForm(colander.MappingSchema):
     display_name = colander.SchemaNode(colander.String(),
         validator=colander.Length(min=3, max=500)) # noqa
     email = colander.SchemaNode(colander.String(),
         validator=colander.Email()) # noqa
+    password = colander.SchemaNode(colander.String(),
+        validator=colander.Length(min=3, max=500), # noqa
+        missing=None, default=None) # noqa
 
 
 class RoleForm(colander.MappingSchema):
