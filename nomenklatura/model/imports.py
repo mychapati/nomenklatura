@@ -145,5 +145,6 @@ def load_entity(context, mapping, record):
     for (attr, value) in data:
         entity.set(attr, value, context)
 
+    db.session.flush()
     # log.info("Loaded entity: %r", entity)
     return entity
