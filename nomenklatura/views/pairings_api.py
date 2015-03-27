@@ -33,7 +33,7 @@ def store(dataset):
     dataset = obj_or_404(Dataset.by_slug(dataset))
 
     pairing = Pairing.update(request_data(), dataset, current_user)
-    # TODO: create the actual same_as mapping!
+    pairing.apply()
 
     db.session.commit()
     return jsonify(pairing)

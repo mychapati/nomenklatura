@@ -1,9 +1,11 @@
-from sqlalchemy import or_
+from sqlalchemy import or_, and_
 
 from nomenklatura.core import db
 from nomenklatura.model.common import CommonMixIn, KEY_LENGTH
 from nomenklatura.model.forms import PairingForm
 from nomenklatura.model.schema import attributes
+from nomenklatura.model.statement import Statement
+from nomenklatura.model.context import Context
 
 
 class Pairing(db.Model, CommonMixIn):
@@ -40,6 +42,27 @@ class Pairing(db.Model, CommonMixIn):
     @classmethod
     def all(cls):
         return cls.query
+
+    def apply(self):
+        if not self.decided:
+            return
+        q = db.session.query(Statement)
+        q = q.filter(Statement.dataset == self.dataset)
+        q = q.filter(Statement._attribute == attributes.same_as.name)
+        q = q.filter(or_(
+            and_(Statement.subject == self.left_id,
+                 Statement._value == self.right_id),
+            and_(Statement.subject == self.right_id,
+                 Statement._value == self.left_id)
+        ))
+        stmt = q.first()
+        if self.decision is True and stmt is None:
+            context = Context.create(self.dataset, self.decider, {})
+            stmt = Statement(self.dataset, self.left_id, attributes.same_as,
+                             self.right_id, context)
+            db.session.add(context)
+            db.session.add(stmt)
+        # TODO: figure out how to delete a statement.
 
     @classmethod
     def update(cls, data, dataset, user, score=None):
@@ -94,11 +117,11 @@ class Pairing(db.Model, CommonMixIn):
         return next_
 
     @classmethod
-    def generate(cls, dataset, num_rounds=10, cutoff=90):
+    def generate(cls, dataset, num_rounds=20, cutoff=90):
         best_pair = None
         best_score = 0
         for i in range(num_rounds):
-            ent = dataset.entities.random()
+            ent = dataset.entities.no_same_as().random()
             avoid = [ent.id] + list(cls.existing(dataset, ent.id))
             for label in [ent.label] + ent.get(attributes.alias):
                 q = dataset.entities.not_subject(avoid).levenshtein(label)

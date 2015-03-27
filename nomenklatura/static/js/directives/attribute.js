@@ -12,7 +12,9 @@ nomenklatura.directive('nkAttribute', ['$timeout', function ($timeout) {
             };
 
             scope.uiUrl = function() {
-                return scope.value.api_url.split('/api/2')[1];
+                if (scope.value.api_url) {
+                    return scope.value.api_url.split('/api/2')[1];    
+                }
             };
         }
     };
