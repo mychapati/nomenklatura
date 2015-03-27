@@ -89,6 +89,7 @@ class Entity(object):
         return {
             'id': self.id,
             'api_url': url,
+            'label': self.label,
             'type': unicode(self.type)
         }
 

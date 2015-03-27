@@ -6,12 +6,6 @@ function AppCtrl($scope, $window, $routeParams, $location, $modal, Session, Flas
         $scope.session = data;
     });
 
-    $scope.keyDownNotify = function($event) {
-        if(angular.lowercase($event.target.tagName) == 'body') {
-            $scope.$broadcast('key-pressed', $event.keyCode);
-        }
-    };
-
     $scope.showProfile = function() {
         var d = $modal.open({
             templateUrl: '/static/templates/users/profile.html',

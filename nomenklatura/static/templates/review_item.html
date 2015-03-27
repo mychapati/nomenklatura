@@ -1,0 +1,11 @@
+<div class="panel panel-default">
+  <div class="panel-heading">
+    {{entity.label}} ({{type.label}})
+  </div>
+  <table class="table">
+    <tr ng-repeat="row in rows">
+      <th width="40%">{{row.attr.label}}</th>
+      <td><nk-attribute attribute="row.attr" value="row.value"></nk-attribute></td>
+    </tr>
+  </table>
+</div>
