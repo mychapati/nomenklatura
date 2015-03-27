@@ -102,7 +102,7 @@ class Pairing(db.Model, CommonMixIn):
             avoid = [ent.id] + list(cls.existing(dataset, ent.id))
             for label in [ent.label] + ent.get(attributes.alias):
                 q = dataset.entities.not_subject(avoid).levenshtein(label)
-                q = q.no_same_as().limit(1)
+                q = q.no_same_as().not_the_same_as(ent.id).limit(1)
                 for score, otr in q.scored():
                     if score >= cutoff:
                         return cls.update({

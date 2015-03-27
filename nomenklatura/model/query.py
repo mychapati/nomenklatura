@@ -62,6 +62,20 @@ class HasSameAsFilter(Filter):
         )))
 
 
+class NotSameAsFilter(Filter):
+
+    def __init__(self, other):
+        self.other = other
+
+    def apply(self, dataset, stmt, q):
+        same_as = aliased(Statement)
+        return q.filter(~exists().where(and_(
+            same_as._attribute == attributes.same_as.name,
+            same_as._value == stmt.subject,
+            same_as.subject == self.other
+        )))
+
+
 class RandomFilter(Filter):
 
     def apply(self, dataset, stmt, q):
@@ -141,6 +155,9 @@ class EntityQuery(object):
 
     def no_same_as(self):
         return self.filter(HasSameAsFilter())
+
+    def not_the_same_as(self, other):
+        return self.filter(NotSameAsFilter(other))
 
     def not_subject(self, subject):
         return self.filter(SubjectFilter(subject, invert=True))
