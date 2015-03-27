@@ -1,5 +1,5 @@
 from normality import normalize
-from sqlalchemy import exists, and_, func
+from sqlalchemy import exists, and_, or_, func
 from sqlalchemy.orm import aliased, joinedload
 
 from nomenklatura.core import db
@@ -11,10 +11,11 @@ from nomenklatura.model.entity import Entity
 
 class Filter(object):
 
-    def _add_statement(self, main_stmt, q):
+    def _add_statement(self, main_stmt, q, link=True):
         stmt = aliased(Statement)
         ctx = aliased(Context)
-        q = q.filter(main_stmt.subject == stmt.subject)
+        if link:
+            q = q.filter(main_stmt.subject == stmt.subject)
         q = q.filter(stmt.context_id == ctx.id)
         q = q.filter(ctx.active == True) # noqa
         return stmt, q
@@ -36,17 +37,22 @@ class ValueFilter(Filter):
 
 class SubjectFilter(Filter):
 
-    def __init__(self, subjects):
+    def __init__(self, subjects, invert=False):
         self.subjects = subjects
+        self.invert = invert
 
     def apply(self, dataset, stmt, q):
-        if len(self.subjects) == 1:
-            return q.filter(stmt.subject == self.subjects[0])
-        else:
+        if isinstance(self.subjects, (list, tuple, set)):
+            if self.invert:
+                return q.filter(~stmt.subject.in_(self.subjects))
             return q.filter(stmt.subject.in_(self.subjects))
+        else:
+            if self.invert:
+                return q.filter(stmt.subject != self.subjects[0])
+            return q.filter(stmt.subject == self.subjects[0])
 
 
-class SameAsFilter(Filter):
+class HasSameAsFilter(Filter):
 
     def apply(self, dataset, stmt, q):
         same_as = aliased(Statement)
@@ -54,6 +60,12 @@ class SameAsFilter(Filter):
             same_as._attribute == attributes.same_as.name,
             same_as.subject == stmt.subject
         )))
+
+
+class RandomFilter(Filter):
+
+    def apply(self, dataset, stmt, q):
+        return q.order_by(func.random())
 
 
 class LabelFilter(Filter):
@@ -128,7 +140,10 @@ class EntityQuery(object):
         return self.filter(ValueFilter(attribute, value))
 
     def no_same_as(self):
-        return self.filter(SameAsFilter())
+        return self.filter(HasSameAsFilter())
+
+    def not_subject(self, subject):
+        return self.filter(SubjectFilter(subject, invert=True))
 
     def filter_label(self, value, aliases=True):
         return self.filter(LabelFilter(value, aliases=aliases))
@@ -155,13 +170,12 @@ class EntityQuery(object):
             q = filter.apply(self._dataset, stmt, q)
 
         q = q.group_by(subj)
-        # q = q.distinct()
+        q = q.order_by(subj.asc())
         if paginate:
             if self._limit is not None:
                 q = q.limit(self._limit)
             if self._offset is not None:
                 q = q.offset(self._offset)
-
         return q
 
     def _query(self, sq):
@@ -193,6 +207,10 @@ class EntityQuery(object):
         q = self.limit(1)
         for res in q:
             return res
+
+    def random(self):
+        q = self.filter(RandomFilter())
+        return q.first()
 
     def by_id(self, id):
         q = self.filter(SubjectFilter([id]))

@@ -101,3 +101,10 @@ class ContextEditForm(colander.MappingSchema):
                                         missing=None, default=None)
     resource_mapping = colander.SchemaNode(colander.Mapping(unknown='preserve'),
                                            missing=None, default=None)
+
+
+class PairingForm(colander.MappingSchema):
+    decision = colander.SchemaNode(colander.Boolean(),
+                                   default=None, missing=None)
+    left_id = colander.SchemaNode(colander.String())
+    right_id = colander.SchemaNode(colander.String())
