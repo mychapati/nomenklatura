@@ -51,19 +51,19 @@
       <tr ng-repeat="user in users.results">
         <td>{{user.display_name}}</td>
         <td>
-          <input type="radio" name="role" ng-model="user.role" value="read"
+          <input type="radio" name="role.{{user.id}}" ng-model="user.role" value="read"
             ng-change="roleChange(user)" ng-hide="readonlyRole(user)">
         </td>
         <td>
-          <input type="radio" name="role" ng-model="user.role" value="edit"
+          <input type="radio" name="role.{{user.id}}" ng-model="user.role" value="edit"
             ng-change="roleChange(user)" ng-hide="readonlyRole(user)">
         </td>
         <td>
-          <input type="radio" name="role" ng-model="user.role" value="manage"
+          <input type="radio" name="role.{{user.id}}" ng-model="user.role" value="manage"
             ng-change="roleChange(user)" ng-hide="readonlyRole(user)">
         </td>
         <td>
-          <input type="radio" name="role" ng-model="user.role" value="none"
+          <input type="radio" name="role.{{user.id}}" ng-model="user.role" value="none"
             ng-change="roleChange(user)" ng-hide="readonlyRole(user)">
         </td>
       </tr>

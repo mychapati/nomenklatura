@@ -1,5 +1,36 @@
 
-nomenklatura.controller('UploadCtrl', ['$scope', '$routeParams', '$modalInstance', '$location',
+var loadDatasetImports = ['$route', '$http', '$q', 'Session', function($route, $http, $q, Session) {
+  var dfd = $q.defer();
+      
+  Session.get(function(s) {
+    var url = '/api/2/datasets/' + $route.current.params.dataset + '/contexts';
+    var params = {params: {_uid: s.cbq, imports: true}};
+    $http.get(url, params).then(function(res) {
+      dfd.resolve(res.data);
+    });
+  });
+  return dfd.promise;
+}];
+
+nomenklatura.controller('ImportsIndexCtrl', ['$scope', '$routeParams', '$modal', '$location',
+                                             '$http', '$sce', 'dataset', 'imports',
+  function ($scope, $routeParams, $modal, $location, $http, $sce, dataset, imports) {
+  $scope.dataset = dataset;
+  $scope.imports = imports;
+
+  $scope.upload = function(){
+    var d = $modal.open({
+      templateUrl: '/static/templates/imports/upload.html',
+      controller: 'ImportsUploadCtrl',
+      resolve: {
+        dataset: function () { return dataset; }
+      }
+    });
+  };
+
+}]);
+
+nomenklatura.controller('ImportsUploadCtrl', ['$scope', '$routeParams', '$modalInstance', '$location',
                                        '$http', '$sce', 'dataset',
   function ($scope, $routeParams, $modalInstance, $location, $http, $sce, dataset) {
   $scope.dataset = dataset;

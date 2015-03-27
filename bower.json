@@ -16,7 +16,8 @@
     "moment": "~2.9.0",
     "ngUpload": "~0.5.14",
     "angular-loading-bar": "~0.7.1",
-    "angular-recursion": "~1.0.5"
+    "angular-recursion": "~1.0.5",
+    "angular-moment": "~0.9.2"
   },
   "resolutions": {
     "angular": "~1.2.3"

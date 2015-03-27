@@ -16,8 +16,9 @@
 <h2 class="page-header">
   {{entity.label}}
   <div class="btn-group pull-right">
-    <a nk-authz dataset="dataset" op="edit" class="btn btn-default" ng-href="/datasets/{{dataset.slug}}/review/{{entity.id}}">
-      <i class="fa fa-link"></i> Review</a>
+    <!--a nk-authz dataset="dataset" op="edit" class="btn btn-default" ng-href="/datasets/{{dataset.slug}}/review/{{entity.id}}">
+      <i class="fa fa-link"></i> Review
+    </a-->
   </div>
 </h2>
 
@@ -52,25 +53,5 @@
     </table>
   </div>
   <div class="col-xs-12 col-md-6">
-    <table class="table table-condensed">
-      <tr>
-        <th colspan="1">Aliases <span class="explainer">other names</span></th>
-      </tr>
-      <tr ng-hide="has_aliases">
-        <td colspan="1">
-          <div class="alert alert-info">
-            There are no aliases defined for this entity.
-          </div>
-        </td>
-      </tr>
-      <tr ng-repeat="alias in aliases.results">
-        <td>
-          <a ng-href="/datasets/{{dataset.slug}}/review/{{alias.id}}"
-            class="pull-right label label-danger">review</a>
-          <a ng-href="/datasets/{{dataset.slug}}/entities/{{alias.id}}" class="structured">{{alias.label}}</a>
-        </td>
-      </tr>
-    </table>
-    <nk-pager class="pull-right" response="aliases" load="loadAliases(url)"></odis-pager>
   </div>
 </div>

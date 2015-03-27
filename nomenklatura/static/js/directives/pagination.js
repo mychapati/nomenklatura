@@ -34,7 +34,7 @@ nomenklatura.directive('nkPager', ['$timeout', function ($timeout) {
                         url = scope.response.format.replace('LIMIT', scope.response.limit).replace('OFFSET', offset);
                     pages.push({
                         page: page,
-                        current: page==current,
+                        current: page == current,
                         url: url
                     });
                 }

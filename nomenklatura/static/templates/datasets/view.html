@@ -19,13 +19,16 @@
   <div class="col-xs-12 col-md-5">
     <div class="btn-group pull-right">
       <a nk-authz dataset="dataset" op="edit" class="btn btn-default" ng-href="/datasets/{{dataset.slug}}/review">
-        <i class="fa fa-link"></i> Review</a>
+        <i class="fa fa-link"></i> De-duplicate
+      </a>
       <a nk-authz dataset="dataset" op="manage" class="btn btn-default" ng-href="/datasets/{{dataset.slug}}/settings">
-        <i class="fa fa-cog"></i> Settings</a>
-      <a nk-authz dataset="dataset" op="manage" class="btn btn-default" ng-click="uploadFile()">
-        <i class="fa fa-cloud-upload"></i> Import</a>
+        <i class="fa fa-cog"></i> Settings
+      </a>
+      <a nk-authz dataset="dataset" op="manage" class="btn btn-default" ng-href="/datasets/{{dataset.slug}}/imports">
+        <i class="fa fa-cloud-upload"></i> Import
+      </a>
       <a class="btn btn-default" ng-href="/api/2/datasets/{{dataset.slug}}/entities?format=csv&download=true" target="_self">
-          <i class="fa fa-cloud-download"></i> Export
+        <i class="fa fa-cloud-download"></i> Export
       </a>
     </div>
   </div>

@@ -117,7 +117,7 @@ class Pairing(db.Model, CommonMixIn):
         return next_
 
     @classmethod
-    def generate(cls, dataset, num_rounds=20, cutoff=90):
+    def generate(cls, dataset, num_rounds=15, cutoff=90):
         best_pair = None
         best_score = 0
         for i in range(num_rounds):

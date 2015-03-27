@@ -36,6 +36,7 @@ class Context(db.Model, CommonMixIn):
             'created_at': self.created_at,
             'updated_at': self.updated_at,
             'source_url': self.source_url,
+            'resource_name': self.resource_name,
             'active': self.active,
             'user_id': self.user_id,
             'publisher': self.publisher,

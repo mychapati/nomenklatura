@@ -79,6 +79,9 @@ nomenklatura.controller('PairingsReviewCtrl', ['$scope', '$routeParams', '$locat
     if(event.which === 120) { // x
       $scope.decide(true)
     }
+    if(event.which === 121) { // x
+      $scope.decide(true)
+    }
     if(event.which === 110) { // n
       $scope.decide(false)
     }

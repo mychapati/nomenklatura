@@ -1,4 +1,4 @@
-var nomenklatura = angular.module('nomenklatura', ['ngRoute', 'RecursionHelper', 'ngUpload', 'angular-loading-bar', 'ui.bootstrap']);
+var nomenklatura = angular.module('nomenklatura', ['ngRoute', 'angularMoment', 'RecursionHelper', 'ngUpload', 'angular-loading-bar', 'ui.bootstrap']);
 
 nomenklatura.config(['$routeProvider', '$locationProvider', '$sceProvider', 'cfpLoadingBarProvider',
     function($routeProvider, $locationProvider, $sceProvider, cfpLoadingBarProvider) {
@@ -44,6 +44,16 @@ nomenklatura.config(['$routeProvider', '$locationProvider', '$sceProvider', 'cfp
     resolve: {
       'dataset': loadDataset,
       'users': loadRoleUsers
+    }
+  });
+
+  $routeProvider.when('/datasets/:dataset/imports', {
+    templateUrl: '/static/templates/imports/index.html',
+    controller: 'ImportsIndexCtrl',
+    resolve: {
+      'dataset': loadDataset,
+      'imports': loadDatasetImports,
+      'schema': loadSchema
     }
   });
 

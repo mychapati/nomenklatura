@@ -1,6 +1,6 @@
 from flask import Blueprint, redirect
 from flask.ext.login import current_user
-from apikit import jsonify, Pager, request_data, obj_or_404
+from apikit import jsonify, Pager, request_data, obj_or_404, arg_bool
 
 from nomenklatura.core import db, url_for
 from nomenklatura import authz
@@ -13,7 +13,11 @@ blueprint = Blueprint('contexts', __name__)
 def index(dataset):
     authz.require(authz.dataset_read(dataset))
     dataset = obj_or_404(Dataset.by_slug(dataset))
-    return jsonify(Pager(dataset.contexts, dataset=dataset.slug))
+    q = dataset.contexts
+    if arg_bool('imports'):
+        q = q.filter(Context.resource_name != None) # noqa
+    q = q.order_by(Context.updated_at.desc())
+    return jsonify(Pager(q, dataset=dataset.slug))
 
 
 @blueprint.route('/datasets/<dataset>/contexts', methods=['POST'])
