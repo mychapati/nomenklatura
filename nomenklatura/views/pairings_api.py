@@ -19,7 +19,12 @@ def load(dataset):
     db.session.commit()
     if next is None:
         return {'status': 'done'}
-    return jsonify(next)
+    return jsonify({
+        'status': 'next',
+        'left': dataset.entities.by_id(next.left_id),
+        'right': dataset.entities.by_id(next.right_id),
+        'pairing': next
+    })
 
 
 @blueprint.route('/datasets/<dataset>/pairings', methods=['POST', 'PUT'])

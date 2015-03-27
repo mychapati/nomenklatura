@@ -37,47 +37,10 @@
               name="query" placeholder="Type a partial match...">
           </div>
         </form>
-      </th>
-      
-  </tr>
-
-  <tr ng-repeat="match in matches.results">
-    <td>
-      <input type="radio" name="r" ng-model="entity.selection"
-        value="{{match.entity.id}}" nk-bind-key="{{49 + $index}}" key-do='click'>
-    </td>
-    <td>
-      <a href="/datasets/{{dataset.slug}}/entities/{{match.entity.id}}"
-        target="_new" class="structured">{{match.entity.name}}</a>
-    </td>
-    <td class="num" width="10%">{{match.score}} %</td>
-  </tr>
-  <tr>
-    <td></td>
-    <td colspan="2">
-      <nk-pager class="pull-right" response="matches" load="loadMatches(url)"></odis-pager>
-    </td>
-  </tr>
-  <tr>
-      <td>
-        <input type="radio" name="r" ng-model="entity.selection"
-          value="ENTITY" nk-bind-key="78" key-do='click'>
-      </td>
-      <td colspan="2">
-          <input type="text" name="name" class="form-control" id="new-text"
-            ng-model="entity.name" nk-bind-key="78">
-      </td>
-  </tr>
-  <tr ng-show="dataset.enable_invalid">
-      <td>
-        <input type="radio" name="r" ng-model="entity.selection"
-          value="INVALID" nk-bind-key="73" key-do='click'>
-      </td>
-      <td colspan="2">
-          <strong>Invalid alias</strong>
-      </td>
+      </th>      
   </tr>
 </table>
+
 <div ng-show="random">
   <button type="submit" class="btn btn-success btn-lg"
     ng-click="updateEntity()" nk-bind-key="13" key-do="click">

@@ -66,9 +66,9 @@ nomenklatura.config(['$routeProvider', '$locationProvider', '$sceProvider', 'cfp
     }
   });
 
-  $routeProvider.when('/datasets/:dataset/review/:what', {
+  $routeProvider.when('/datasets/:dataset/review', {
     templateUrl: '/static/templates/review.html',
-    controller: 'ReviewCtrl',
+    controller: 'PairingsReviewCtrl',
     resolve: {
       'dataset': loadDataset,
       'schema': loadSchema
