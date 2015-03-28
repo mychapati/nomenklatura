@@ -2,7 +2,7 @@ from normality import normalize
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from nomenklatura.core import db
-from nomenklatura.model.schema import attributes
+from nomenklatura.schema import attributes
 from nomenklatura.model.common import CommonMixIn, KEY_LENGTH
 
 

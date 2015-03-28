@@ -1,9 +1,9 @@
 from sqlalchemy import or_, and_
 
 from nomenklatura.core import db
+from nomenklatura.schema import attributes
 from nomenklatura.model.common import CommonMixIn, KEY_LENGTH
 from nomenklatura.model.forms import PairingForm
-from nomenklatura.model.schema import attributes
 from nomenklatura.model.statement import Statement
 from nomenklatura.model.context import Context
 

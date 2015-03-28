@@ -1,7 +1,7 @@
 from flask import Blueprint
 from apikit import jsonify
 
-from nomenklatura.model.schema import attributes, types
+from nomenklatura.schema import attributes, types
 
 
 blueprint = Blueprint('schema', __name__)

@@ -6,8 +6,8 @@ from apikit import jsonify, get_limit, obj_or_404
 from werkzeug.exceptions import BadRequest
 
 from nomenklatura import authz
-from nomenklatura.core import db, url_for
-from nomenklatura.model.schema import attributes, types
+from nomenklatura.core import url_for
+from nomenklatura.schema import attributes, types
 from nomenklatura.model import Dataset
 
 

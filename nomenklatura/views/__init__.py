@@ -3,8 +3,8 @@ from colander import Invalid
 from apikit import jsonify
 
 from nomenklatura.core import login_manager
+from nomenklatura.schema import DataException
 from nomenklatura.model import User
-from nomenklatura.model.data_types import DataException
 from nomenklatura.views.ui import app
 from nomenklatura.views.sessions_api import blueprint as sessions_api
 from nomenklatura.views.users_api import blueprint as users_api

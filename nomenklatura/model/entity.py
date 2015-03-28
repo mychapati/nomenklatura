@@ -1,6 +1,6 @@
 from nomenklatura.core import db, url_for
+from nomenklatura.schema import attributes, types
 from nomenklatura.model.common import make_key
-from nomenklatura.model.schema import attributes, types
 from nomenklatura.model.statement import Statement
 
 

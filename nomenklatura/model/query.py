@@ -1,9 +1,9 @@
 from normality import normalize
-from sqlalchemy import exists, and_, or_, func
+from sqlalchemy import exists, and_, func
 from sqlalchemy.orm import aliased, joinedload
 
 from nomenklatura.core import db
-from nomenklatura.model.schema import attributes
+from nomenklatura.schema import attributes
 from nomenklatura.model.statement import Statement
 from nomenklatura.model.context import Context
 from nomenklatura.model.entity import Entity
