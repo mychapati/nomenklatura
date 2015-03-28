@@ -56,7 +56,7 @@ class Entity(object):
 
     @property
     def type(self):
-        return self.get(attributes.type) or types.Thing
+        return self.get(attributes.type) or types.Object
 
     @type.setter
     def type(self, type):

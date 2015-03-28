@@ -1,27 +1,27 @@
 from nomenklatura.schema import attributes
+from nomenklatura.query.util import parse_name, is_list
 
 
 class QueryNode(object):
 
     def __init__(self, parent, name, data):
         self.parent = parent
-        self.name = name
-        self.raw = data
+        self.data = value = data
 
-        self.many = False
-        if isinstance(data, (list, tuple, set)):
-            self.many = True
-            if not len(data):
-                data = None
-            data = data[0]
+        parts = parse_name(name)
+        self.name, self.inverted, self._op = parts
 
-        if data is not None and isinstance(data, dict):
-            self.limit = data.pop('limit', 15)
+        self.many = is_list(value)
+        if self.many:
+            value = None if not len(value) else value[0]
+
+        if isinstance(value, dict):
+            self.limit = value.pop('limit', 15)
             if not self.many:
                 self.limit = 1
-            self.offset = data.pop('offset', 0)
+            self.offset = value.pop('offset', 0)
 
-        self.data = data
+        self.value = value
         self.attribute = attributes[self.name]
 
     @property
@@ -36,21 +36,22 @@ class QueryNode(object):
         return self.parent is None
 
     @property
-    def blank(self):
-        return self.data is None
+    def op(self):
+        if self.leaf and not self.blank:
+            return self._op
 
     @property
-    def value(self):
-        return self.data
+    def blank(self):
+        return self.value is None
 
     @property
     def leaf(self):
-        return not isinstance(self.data, dict)
+        return not isinstance(self.value, dict)
 
     @property
     def filtered(self):
         if self.leaf:
-            return self.data is not None
+            return self.value is not None
         for child in self.children:
             if child.filtered:
                 return True
@@ -60,7 +61,7 @@ class QueryNode(object):
     def children(self):
         if self.leaf:
             return
-        for name, data in self.data.items():
+        for name, data in self.value.items():
             yield QueryNode(self, name, data)
 
     def to_dict(self):
@@ -74,8 +75,11 @@ class QueryNode(object):
         if self.root:
             data['limit'] = self.limit
             data['offset'] = self.offset
+            del data['name']
         if self.leaf:
-            data['value'] = self.data if self.leaf else None
+            data['value'] = self.value if self.leaf else None
+            data['op'] = self.op
+            data['inverted'] = self.inverted
         else:
             data['children'] = [c.to_dict() for c in self.children]
         return data

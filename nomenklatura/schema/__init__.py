@@ -5,7 +5,7 @@ from normality import normalize
 
 from nomenklatura.schema.attribute import Attribute
 from nomenklatura.schema.type import Type
-from nomenklatura.schema.data_type import DataException # noqa
+from nomenklatura.schema.data_types import DataException # noqa
 
 
 DEFAULT_SCHEMA = os.path.join(os.path.dirname(__file__), 'schema.yaml')

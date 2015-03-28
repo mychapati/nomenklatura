@@ -1,6 +1,6 @@
 types:
-    Thing:
-        label: "Thing"
+    Object:
+        label: "Object"
         abstract: true
 
     Company:
@@ -9,38 +9,38 @@ types:
 
     Organization:
         label: "Organization"
-        parent: Thing
+        parent: Object
 
     Person:
         label: "Person"
-        parent: Thing
+        parent: Object
 
 attributes:
     label:
         label: "Label"
         data_type: string
         types:
-            - 'Thing'
+            - 'Object'
 
     type:
         label: "Type"
         data_type: type
         types:
-            - 'Thing'
+            - 'Object'
 
     identifier:
         label: "Identifier"
         many: true
         data_type: string
         types:
-            - 'Thing'
+            - 'Object'
 
     alias:
         label: "Alias"
         many: true
         data_type: string
         types:
-            - 'Thing'
+            - 'Object'
 
     same_as:
         label: "Same as"

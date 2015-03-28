@@ -1,9 +1,11 @@
+from normality import normalize
 from sqlalchemy.orm import aliased
 
 from nomenklatura.core import db, url_for
 from nomenklatura.schema import attributes
 from nomenklatura.model.statement import Statement
 from nomenklatura.model.context import Context
+from nomenklatura.query.util import OP_EQ, OP_LIKE, OP_IN, OP_NOT
 # from nomenklatura.model.type import Type
 
 
@@ -34,23 +36,32 @@ class QueryBuilder(object):
         q = q.filter(ctx.active == True) # noqa
         return stmt, q
 
-    def filter_value(self, q, stmt):
-        q = q.filter(stmt._value == self.node.value)
-        return q
-
     def filter(self, q, stmt):
         """ Apply filters to the given query recursively. """
         if not self.node.filtered:
             return q
 
         filter_stmt, q = self._add_statement(q)
-        q = q.filter(stmt.subject == filter_stmt.subject)
+        col_subj, col_val = filter_stmt.subject, filter_stmt._value
+        if self.node.inverted:
+            col_subj, col_val = col_val, col_subj
+
+        q = q.filter(stmt.subject == col_subj)
 
         if self.node.attribute:
             q = q.filter(stmt._attribute == self.node.attribute.name)
 
         if self.node.leaf:
-            return self.filter_value(q, filter_stmt)
+            if self.node.op == OP_EQ:
+                q = q.filter(col_val == self.node.value)
+            elif self.node.op == OP_NOT:
+                q = q.filter(col_val != self.node.value)
+            elif self.node.op == OP_IN:
+                q = q.filter(col_val.in_(self.node.data))
+            elif self.node.op == OP_LIKE:
+                value = '%%%s%%' % normalize(self.node.value)
+                q = q.filter(filter_stmt.normalized.like(value))
+            return q
 
         for child in self.children:
             q = child.filter(q, stmt)
@@ -93,7 +104,7 @@ class QueryBuilder(object):
         level of the query. """
         attrs = set()
         for child in self.children:
-            if child.node.blank and child.node.leaf:
+            if child.node.leaf:
                 attrs.update(child.node.attributes)
         attrs = attrs if len(attrs) else attributes
         skip_nested = [n.node.attribute for n in self.nested()]
@@ -109,9 +120,8 @@ class QueryBuilder(object):
             'parent_id': data.get('parent_id')
         }
         for child in self.children:
-            if child.node.leaf and child.node.filtered:
-                obj[child.node.name] = child.node.raw
-            return obj
+            if self.node.blank:
+                obj[child.node.name] = child.node.data
         return obj
 
     def get_node(self, name):
@@ -154,6 +164,7 @@ class QueryBuilder(object):
             id = data.get('id')
             if id not in results:
                 results[id] = self.base_object(data)
+
             value = data.get('value')
             attr = attributes[data.get('attribute')]
             if attr.data_type not in ['type', 'entity']:
