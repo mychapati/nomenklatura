@@ -1,5 +1,5 @@
-from nomenklatura.model.data_types import DATA_TYPES
-from nomenklatura.model.common import NamedMixIn
+from nomenklatura.schema.data_types import DATA_TYPES
+from nomenklatura.schema.common import NamedMixIn
 
 
 class Attribute(NamedMixIn):
@@ -16,7 +16,7 @@ class Attribute(NamedMixIn):
 
     @property
     def types(self):
-        from nomenklatura.model.schema import types
+        from nomenklatura.schema import types
         types_ = []
         for t in types:
             for a in t.attributes:

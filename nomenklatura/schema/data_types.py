@@ -120,8 +120,8 @@ class Type(DataType):
         return value
 
     def deserialize(self, value):
-        from nomenklatura.model.type import Type
-        from nomenklatura.model.schema import types
+        from nomenklatura.schema.type import Type
+        from nomenklatura.schema import types
         if isinstance(value, Type):
             return value
         type_ = types[value]
