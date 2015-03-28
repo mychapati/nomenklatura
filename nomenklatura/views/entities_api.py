@@ -8,7 +8,7 @@ from apikit import jsonify, Pager, request_data, obj_or_404
 from nomenklatura.core import db
 from nomenklatura import authz
 from nomenklatura.model import Entity, Dataset, Context
-from nomenklatura.query import QueryNode, QueryBuilder
+from nomenklatura.query import execute_query
 
 blueprint = Blueprint('entities', __name__)
 
@@ -44,20 +44,11 @@ def query(dataset):
         try:
             q = json.loads(request.args.get('q'))
         except (TypeError, ValueError):
-            return jsonify({'status': 'error', 'message': 'invalid query'},
-                           status=400)
+            data = {'status': 'error', 'message': 'Invalid query'}
+            return jsonify(data, status=400)
     else:
         q = request_data()
-    qb = QueryBuilder(dataset, None, QueryNode(None, None, q))
-    t = time.time()
-    result = qb.query()
-    duration = (time.time() - t) * 1000
-    return jsonify({
-        'status': 'ok',
-        'query': qb.node.to_dict(),
-        'result': result,
-        'time': duration
-    })
+    return jsonify(execute_query(dataset, q))
 
 
 @blueprint.route('/datasets/<dataset>/entities', methods=['POST'])

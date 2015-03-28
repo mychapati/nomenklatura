@@ -45,3 +45,27 @@ attributes:
     same_as:
         label: "Same as"
         data_type: entity
+
+    email:
+        label: "E-Mail"
+        data_type: string
+        types:
+            - 'Person'
+
+    gender:
+        label: "Gender"
+        data_type: string
+        types:
+            - 'Person'
+
+    birth_date:
+        label: "Birth date"
+        data_type: date
+        types:
+            - 'Person'
+
+    death_date:
+        label: "Death date"
+        data_type: date
+        types:
+            - 'Person'

@@ -36,35 +36,34 @@ class QueryBuilder(object):
         q = q.filter(ctx.active == True) # noqa
         return stmt, q
 
-    def filter(self, q, stmt):
+    def filter(self, q, subject):
         """ Apply filters to the given query recursively. """
         if not self.node.filtered:
             return q
 
         filter_stmt, q = self._add_statement(q)
-        col_subj, col_val = filter_stmt.subject, filter_stmt._value
-        if self.node.inverted:
-            col_subj, col_val = col_val, col_subj
-
-        q = q.filter(stmt.subject == col_subj)
-
         if self.node.attribute:
-            q = q.filter(stmt._attribute == self.node.attribute.name)
+            q = q.filter(filter_stmt._attribute == self.node.attribute.name)
 
         if self.node.leaf:
+            q = q.filter(subject == filter_stmt.subject)
             if self.node.op == OP_EQ:
-                q = q.filter(col_val == self.node.value)
+                q = q.filter(filter_stmt._value == self.node.value)
             elif self.node.op == OP_NOT:
-                q = q.filter(col_val != self.node.value)
+                q = q.filter(filter_stmt._value != self.node.value)
             elif self.node.op == OP_IN:
-                q = q.filter(col_val.in_(self.node.data))
+                q = q.filter(filter_stmt._value.in_(self.node.data))
             elif self.node.op == OP_LIKE:
                 value = '%%%s%%' % normalize(self.node.value)
                 q = q.filter(filter_stmt.normalized.like(value))
             return q
-
-        for child in self.children:
-            q = child.filter(q, stmt)
+        else:
+            col_subj, col_val = filter_stmt.subject, filter_stmt._value
+            if self.node.inverted:
+                col_subj, col_val = col_val, col_subj
+            q = q.filter(subject == col_subj)
+            for child in self.children:
+                q = child.filter(q, col_val)
         return q
 
     def filter_query(self, parents=None):
@@ -80,7 +79,7 @@ class QueryBuilder(object):
             q = q.filter(parent_stmt._attribute == self.node.attribute.name)
             q = q.filter(parent_stmt.subject.in_(parents))
 
-        q = self.filter(q, stmt)
+        q = self.filter(q, stmt.subject)
         q = q.group_by(stmt.subject)
         q = q.order_by(stmt.subject.asc())
 
