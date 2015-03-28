@@ -1,11 +1,14 @@
+import time
+import json
+
 from flask import Blueprint, request, url_for, redirect
 from flask.ext.login import current_user
-from apikit import jsonify, Pager, arg_bool, request_data, obj_or_404
+from apikit import jsonify, Pager, request_data, obj_or_404
 
 from nomenklatura.core import db
-from nomenklatura.views.common import csvify, dataset_filename
 from nomenklatura import authz
 from nomenklatura.model import Entity, Dataset, Context
+from nomenklatura.query import QueryNode, QueryBuilder
 
 blueprint = Blueprint('entities', __name__)
 
@@ -20,16 +23,41 @@ def index(dataset):
         q = q.filter_prefix(prefix)
 
     # TODO, other filters.
-    format = request.args.get('format', 'json').lower().strip()
-    if format == 'csv':
-        res = csvify(q)
-    else:
-        res = jsonify(Pager(q, dataset=dataset.slug))
+    # format = request.args.get('format', 'json').lower().strip()
+    # if format == 'csv':
+    #     res = csvify(q)
+    # else:
+    #     res = jsonify(Pager(q, dataset=dataset.slug))
 
-    if arg_bool('download'):
-        fn = dataset_filename(dataset or 'all', format)
-        res.headers['Content-Disposition'] = 'attachment; filename=' + fn
-    return res
+    # if arg_bool('download'):
+    #     fn = dataset_filename(dataset or 'all', format)
+    #     res.headers['Content-Disposition'] = 'attachment; filename=' + fn
+    # return res
+    return jsonify(Pager(q, dataset=dataset.slug))
+
+
+@blueprint.route('/datasets/<dataset>/query', methods=['GET', 'POST', 'PUT'])
+def query(dataset):
+    authz.require(authz.dataset_read(dataset))
+    dataset = obj_or_404(Dataset.by_slug(dataset))
+    if request.method == 'GET':
+        try:
+            q = json.loads(request.args.get('q'))
+        except (TypeError, ValueError):
+            return jsonify({'status': 'error', 'message': 'invalid query'},
+                           status=400)
+    else:
+        q = request_data()
+    qb = QueryBuilder(dataset, None, QueryNode(None, None, q))
+    t = time.time()
+    result = qb.query()
+    duration = (time.time() - t) * 1000
+    return jsonify({
+        'status': 'ok',
+        'query': qb.node.to_dict(),
+        'result': result,
+        'time': duration
+    })
 
 
 @blueprint.route('/datasets/<dataset>/entities', methods=['POST'])

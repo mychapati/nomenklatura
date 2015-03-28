@@ -5,7 +5,7 @@ from flask.ext.migrate import MigrateCommand, upgrade
 from nomenklatura.core import db
 from nomenklatura.views import app
 from nomenklatura.assets import assets
-from nomenklatura.model import inference
+from nomenklatura.model import inference, Dataset
 
 manager = Manager(app)
 manager.add_command('assets', ManageAssets(assets))
@@ -22,9 +22,10 @@ def sync():
 
 
 @manager.command
-def infer():
+def infer(slug):
     """ Run inference of sameAs. """
-    inference.infer()
+    dataset = Dataset.by_slug(slug)
+    inference.infer(dataset)
 
 
 if __name__ == '__main__':
