@@ -16,7 +16,7 @@ nomenklatura.directive('nkPairingItem', ['$timeout', function ($timeout) {
             scope.type = scope.schema.types[e.type];
             var rows = [];
             angular.forEach(scope.type.attributes, function(a) {
-              if (a.name == 'type') return;
+              //if (a.name == 'type') return;
               var value = scope.entity[a.name];
               if (angular.isDefined(value)) {
                 rows.push({
