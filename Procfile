@@ -1,3 +1,3 @@
 web: python nomenklatura/manage.py runserver -p $PORT -t 0.0.0.0
 webdev: python nomenklatura/manage.py runserver -t 0.0.0.0
-celeryd: NOMENKLATURA_SETTINGS=/app/heroku_settings.py celery -A nomenklatura.model.imports worker
+worker: celery -l INFO -c 10 -A nomenklatura.processing worker

@@ -38,15 +38,16 @@ def query_pairings(dataset):
 
 def make_data(dataset, fields):
     data = {}
-    for e in EntityQuery(dataset):
+    q = {'same_as': {'optional': 'forbidden'}, 'limit': None}
+    for e in EntityQuery(dataset, q):
         ent = {}
         for field in fields:
             name = field.get('field')
             ent[name] = e.get(name)
             if isinstance(ent[name], list):
-                ent[name] = tuple([v or '' for v in ent[name]])
+                ent[name] = tuple([unicode(v) or '' for v in ent[name]])
             else:
-                ent[name] = ent[name] or ''
+                ent[name] = unicode(ent[name]) or ''
         data[e.id] = ent
     return data
 
@@ -54,6 +55,8 @@ def make_data(dataset, fields):
 def make_pairs(dataset, data):
     pairs = {'match': [], 'distinct': []}
     for pairing in query_pairings(dataset):
+        if pairing.left_id not in data or pairing.right_id not in data:
+            continue
         pair = (data.get(pairing.left_id), data.get(pairing.right_id))
         if pairing.decision is True:
             pairs['match'].append(pair)

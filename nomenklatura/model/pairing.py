@@ -148,6 +148,6 @@ class Pairing(db.Model, CommonMixIn):
 
         if best_pair is not None:
             return cls.update({
-                'left_id': best_pair[0].id,
-                'right_id': best_pair[1].id
+                'left_id': best_pair[0],
+                'right_id': best_pair[1]
             }, dataset, None, score=best_score)
