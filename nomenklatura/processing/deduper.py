@@ -85,7 +85,7 @@ def generate_pairings(slug, threshold=15):
                         key=lambda (id, s): s, reverse=True)
         scored = list(scored)[:2]
         (e1, s1), (e2, s2) = scored
-        score = (s1 + s2) / 2.0
+        score = ((s1 + s2) / 2.0) * 100.0
         matches.append((e1, e2, score))
 
     matches = sorted(matches, key=lambda (e, a, s): s, reverse=True)
