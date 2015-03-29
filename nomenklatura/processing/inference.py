@@ -2,8 +2,9 @@ import logging
 from sqlalchemy import exists, and_
 from sqlalchemy.orm import aliased
 
-from nomenklatura.core import db
+from nomenklatura.core import db, celery
 from nomenklatura.schema import attributes
+from nomenklatura.model.dataset import Dataset
 from nomenklatura.model.statement import Statement
 
 log = logging.getLogger(__name__)
@@ -51,7 +52,9 @@ def generate_same_as_copies(dataset):
     db.session.flush()
 
 
-def infer(dataset):
+@celery.task
+def generate_inferred(slug):
+    dataset = Dataset.by_slug(slug)
     delete_inferred_statements(dataset)
     db.session.flush()
     generate_same_as_copies(dataset)
