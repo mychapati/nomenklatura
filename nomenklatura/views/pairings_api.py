@@ -6,6 +6,7 @@ from nomenklatura import authz
 from nomenklatura.core import db
 from nomenklatura.model import Dataset, Pairing
 from nomenklatura.query import EntityQuery
+from nomenklatura.processing.deduper import request_pairing
 
 
 blueprint = Blueprint('pairing', __name__)
@@ -16,7 +17,7 @@ def load(dataset):
     authz.require(authz.dataset_edit(dataset))
     dataset = obj_or_404(Dataset.by_slug(dataset))
 
-    next = Pairing.next(dataset, exclude=request.args.get('exclude'))
+    next = request_pairing(dataset, exclude=request.args.getlist('exclude'))
     db.session.commit()
     if next is None:
         return {'status': 'done'}
