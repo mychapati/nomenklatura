@@ -7,8 +7,9 @@ from apikit import jsonify, obj_or_404, get_limit, get_offset
 from nomenklatura import authz
 from nomenklatura.core import db
 from nomenklatura.model import Dataset, Context
-from nomenklatura.model.imports import store_upload, load_upload, set_state
-from nomenklatura.model.imports import analyze_upload, get_table, get_logs
+from nomenklatura.processing.imports import store_upload, load_upload
+from nomenklatura.processing.imports import analyze_upload, get_table
+from nomenklatura.processing.imports import set_state, get_logs
 
 blueprint = Blueprint('imports', __name__)
 

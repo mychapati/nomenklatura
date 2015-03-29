@@ -5,11 +5,9 @@ from loadkit.types.table import Table
 from loadkit.operators.table import TableExtractOperator
 
 from nomenklatura.core import db, archive, celery
-from nomenklatura.schema import DataException
-from nomenklatura.schema import types, attributes
-
-from nomenklatura.model.context import Context
-from nomenklatura.model.entity import Entity
+from nomenklatura.schema import types, attributes, DataException
+from nomenklatura.model import Context, Entity
+from nomenklatura.query import EntityQuery
 
 log = logging.getLogger(__name__)
 COLLECTION = 'imports'
@@ -143,7 +141,6 @@ def load_entity(context, mapping, record):
 
         data.append((attr, value))
 
-    from nomenklatura.query import EntityQuery
     query = EntityQuery(context.dataset, query)
     entity = query.first() if has_key else None
     if entity is None:
