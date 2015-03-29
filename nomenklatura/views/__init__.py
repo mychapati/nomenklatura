@@ -2,7 +2,7 @@ from flask import request
 from colander import Invalid
 from apikit import jsonify
 
-from nomenklatura.core import login_manager
+from nomenklatura.core import login_manager, app_name, app_title
 from nomenklatura.schema import DataException
 from nomenklatura.model import User
 from nomenklatura.views.ui import app
@@ -21,6 +21,14 @@ def load_user_from_request(request):
         or request.args.get('api_key')
     if api_key is not None:
         return User.by_api_key(api_key)
+
+
+@app.context_processor
+def template_context_processor():
+    return {
+        'APP_NAME': app_name,
+        'APP_TITLE': app_title
+    }
 
 
 @app.errorhandler(401)
