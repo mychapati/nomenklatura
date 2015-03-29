@@ -107,6 +107,10 @@ def load_upload(context_id):
 
         context.active = True
         db.session.commit()
+
+        from nomenklatura.processing import process_updates
+        process_updates.delay(context.dataset.slug)
+
         log.info("Loading of %r has finished.",
                  context.resource_name)
         set_state(source, 'loaded')

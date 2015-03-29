@@ -9,6 +9,7 @@ from nomenklatura.core import db
 from nomenklatura import authz
 from nomenklatura.model import Entity, Dataset, Context
 from nomenklatura.query import execute_query
+from nomenklatura.processing import process_updates
 
 blueprint = Blueprint('entities', __name__)
 
@@ -59,6 +60,7 @@ def create(dataset):
     context = Context.create(dataset, current_user, {})
     entity = Entity.create(dataset, data, context)
     db.session.commit()
+    process_updates.delay(dataset.slug, entity_id=entity.id)
     return redirect(url_for('.view', dataset=dataset.slug, id=entity.id))
 
 
@@ -78,4 +80,5 @@ def update(dataset, id):
     context = Context.create(dataset, current_user, {})
     entity.update(request_data(), context)
     db.session.commit()
+    process_updates.delay(dataset.slug, entity_id=entity.id)
     return redirect(url_for('.view', dataset=dataset.slug, id=entity.id))

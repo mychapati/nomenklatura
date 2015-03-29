@@ -62,7 +62,12 @@ class Pairing(db.Model, CommonMixIn):
                              self.right_id, context)
             db.session.add(context)
             db.session.add(stmt)
+
         # TODO: figure out how to delete a statement.
+
+        if stmt is not None:
+            from nomenklatura.processing import process_updates
+            process_updates.delay(self.dataset.slug, statement_id=stmt.id)
 
     @classmethod
     def update(cls, data, dataset, user, score=None):
