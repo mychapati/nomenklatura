@@ -103,9 +103,9 @@ def dedupe_generate_pairings(slug, threshold=15):
 def generate_pairings(slug, threshold=30):
     dataset = Dataset.by_slug(slug)
 
-    # training_size = query_pairings(dataset, True).count()
-    # if training_size > threshold and training_size % threshold != 0:
-    #     dedupe_generate_pairings.delay(slug)
+    training_size = query_pairings(dataset, True).count()
+    if training_size > threshold and training_size % threshold != 0:
+        dedupe_generate_pairings.delay(slug)
 
     while query_pairings(dataset, False).count() < KEEP_SIZE:
         generate_best_random_pairing(dataset)
