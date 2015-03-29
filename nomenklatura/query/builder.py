@@ -14,14 +14,6 @@ from nomenklatura.query.util import OP_EQ, OP_LIKE, OP_IN, OP_NOT, OP_SIM, OP_NI
 # TODO: split out the parts that affect graph filtering and
 # results processing / reconstruction.
 
-# TODO: optional/forbidden
-# same_as = aliased(Statement)
-# return q.filter(~exists().where(and_(
-#     same_as._attribute == attributes.same_as.name,
-#     same_as._value == stmt.subject,
-#     same_as.subject == self.other
-# )))
-
 class QueryBuilder(object):
 
     def __init__(self, dataset, parent, node):
@@ -77,44 +69,52 @@ class QueryBuilder(object):
             q = q.order_by(score.desc())
         return q
 
-    def filter_subject(self, q, filter_stmt):
+    def filter_subject(self, q, subject):
         if self.node.op == OP_EQ:
-            q = q.filter(filter_stmt.subject == self.node.value)
+            q = q.filter(subject == self.node.value)
         elif self.node.op == OP_NOT:
-            q = q.filter(filter_stmt.subject != self.node.value)
+            q = q.filter(subject != self.node.value)
         elif self.node.op == OP_IN:
-            q = q.filter(filter_stmt.subject.in_(self.node.data))
+            q = q.filter(subject.in_(self.node.data))
         elif self.node.op == OP_NIN:
-            q = q.filter(~filter_stmt.subject.in_(self.node.data))
+            q = q.filter(~subject.in_(self.node.data))
         return q
 
-    def filter(self, q, subject):
+    def filter(self, q, subject, query_root=False):
         """ Apply filters to the given query recursively. """
         if not self.node.filtered:
             return q
 
+        # outer_q = q
+        # if self.node.forbidden:
+        #     q = db.session.query()
+
         filter_stmt, q = self._add_statement(q)
-        if self.node.attribute:
+        current_subject = subject
+        next_subject = filter_stmt._value
+
+        if query_root:
+            next_subject = filter_stmt.subject
+        else:
             q = q.filter(filter_stmt._attribute == self.node.attribute.name)
+
+        if self.node.inverted:
+            next_subject, current_subject = current_subject, next_subject
+
+        q = q.filter(current_subject == filter_stmt.subject)
 
         if self.node.leaf:
             # The child will be value-filtered directly.
-            q = q.filter(subject == filter_stmt.subject)
-            return self.filter_value(q, filter_stmt)
+            q = self.filter_value(q, filter_stmt)
+        else:
+            for child in self.children:
+                if child.node.name == 'id':
+                    q = child.filter_subject(q, next_subject)
+                else:
+                    q = child.filter(q, next_subject)
 
-        for child in self.children:
-            if child.node.name == 'id':
-                # If the child is a query for an ID, don't recurse.
-                q = q.filter(subject == filter_stmt.subject)
-                q = child.filter_subject(q, filter_stmt)
-            else:
-                # Inverted queries apply to non-leaf children only.
-                col_subj, col_val = filter_stmt.subject, filter_stmt._value
-                if self.node.inverted:
-                    col_subj, col_val = col_val, col_subj
-                q = q.filter(subject == col_subj)
-                q = child.filter(q, col_val)
-
+        # if self.node.forbidden:
+        #    q = outer_q.filter(~exists().where(q.whereclause))
         return q
 
     def filter_query(self, parents=None):
@@ -124,17 +124,25 @@ class QueryBuilder(object):
         stmt, q = self._add_statement(q)
         q = q.add_column(stmt.subject)
 
-        if parents is not None and self.node.attribute:
+        parent_col = None
+        if parents is not None:
             parent_stmt, q = self._add_statement(q)
             q = q.filter(stmt.subject == parent_stmt._value)
             q = q.filter(parent_stmt._attribute == self.node.attribute.name)
             q = q.filter(parent_stmt.subject.in_(parents))
+            parent_col = parent_stmt.subject.label('parent_id')
+            q = q.add_column(parent_col)
 
-        q = self.filter(q, stmt.subject)
+        q = self.filter(q, stmt.subject, query_root=True)
         q = q.group_by(stmt.subject)
-        # q = q.order_by(stmt.subject.asc())
+        if parents is not None:
+            q = q.group_by(parent_col)
+
+        # TODO: implement other sorts
         if self.node.sort == 'random':
             q = q.order_by(func.random())
+
+        q = q.order_by(stmt.subject.asc())
 
         if self.node.root and self.node.limit is not None:
             q = q.limit(self.node.limit)
@@ -146,9 +154,8 @@ class QueryBuilder(object):
         """ A list of all sub-entities for which separate queries will
         be conducted. """
         for child in self.children:
-            if child.node.leaf or not child.node.attribute:
-                continue
-            if child.node.attribute.data_type == 'entity':
+            if child.node.attribute and \
+                    child.node.attribute.data_type == 'entity':
                 yield child
 
     def project(self):
@@ -209,11 +216,14 @@ class QueryBuilder(object):
             q = q.add_column(score)
             q = q.order_by(score.desc())
 
-        if parents is not None and self.node.attribute:
-            parent_stmt, q = self._add_statement(q)
-            q = q.filter(stmt.subject == parent_stmt._value)
-            q = q.filter(parent_stmt._attribute == self.node.attribute.name)
-            q = q.add_column(parent_stmt.subject.label('parent_id'))
+        if parents is not None:
+            q = q.add_column(filter_sq.c.parent_id.label('parent_id'))
+
+        # if parents is not None and self.node.attribute:
+        #     parent_stmt, q = self._add_statement(q)
+        #     q = q.filter(stmt.subject == parent_stmt._value)
+        #     q = q.filter(parent_stmt._attribute == self.node.attribute.name)
+        #     q = q.add_column(parent_stmt.subject.label('parent_id'))
 
         q = q.order_by(filter_sq.c.subject.desc())
         q = q.order_by(stmt.created_at.asc())

@@ -1,7 +1,6 @@
 from nomenklatura.core import db, url_for
 from nomenklatura.model.common import CommonMixIn, KEY_LENGTH
 from nomenklatura.model.role import Role
-from nomenklatura.model.query import EntityQuery
 from nomenklatura.model.forms import DatasetCreateForm
 from nomenklatura.model.forms import DatasetEditForm
 

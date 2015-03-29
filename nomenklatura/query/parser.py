@@ -15,8 +15,10 @@ class QueryNode(object):
         if self.many:
             value = None if not len(value) else value[0]
 
+        self.optional, self.sort = None, None
         if isinstance(value, dict):
             self.sort = value.pop('sort', None)
+            self.optional = value.pop('optional', None)
             self.limit = value.pop('limit', 15)
             if not self.many:
                 self.limit = 1
@@ -37,6 +39,10 @@ class QueryNode(object):
     @property
     def root(self):
         return self.parent is None
+
+    @property
+    def forbidden(self):
+        return self.optional == 'forbidden'
 
     @property
     def op(self):
@@ -63,6 +69,8 @@ class QueryNode(object):
 
     @property
     def filtered(self):
+        if self.forbidden:
+            return True
         if self.leaf:
             return self.value is not None
         for child in self.children:
@@ -92,7 +100,9 @@ class QueryNode(object):
         if self.leaf:
             data['value'] = self.value if self.leaf else None
             data['op'] = self.op
-            data['inverted'] = self.inverted
         else:
+            data['inverted'] = self.inverted
+            data['optional'] = self.optional
+            data['sort'] = self.sort
             data['children'] = [c.to_dict() for c in self.children]
         return data
