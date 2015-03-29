@@ -38,7 +38,7 @@ def query_pairings(dataset):
 
 def make_data(dataset, fields):
     data = {}
-    q = {'same_as': {'optional': 'forbidden'}, 'limit': None}
+    q = {'limit': None}
     for e in EntityQuery(dataset, q):
         ent = {}
         for field in fields:
