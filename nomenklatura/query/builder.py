@@ -36,6 +36,27 @@ class QueryBuilder(object):
         q = q.filter(ctx.active == True) # noqa
         return stmt, q
 
+    def filter_value(self, q, filter_stmt):
+        if self.node.op == OP_EQ:
+            q = q.filter(filter_stmt._value == self.node.value)
+        elif self.node.op == OP_NOT:
+            q = q.filter(filter_stmt._value != self.node.value)
+        elif self.node.op == OP_IN:
+            q = q.filter(filter_stmt._value.in_(self.node.data))
+        elif self.node.op == OP_LIKE:
+            value = '%%%s%%' % normalize(self.node.value)
+            q = q.filter(filter_stmt.normalized.like(value))
+        return q
+
+    def filter_subject(self, q, filter_stmt):
+        if self.node.op == OP_EQ:
+            q = q.filter(filter_stmt.subject == self.node.value)
+        elif self.node.op == OP_NOT:
+            q = q.filter(filter_stmt.subject != self.node.value)
+        elif self.node.op == OP_IN:
+            q = q.filter(filter_stmt.subject.in_(self.node.data))
+        return q
+
     def filter(self, q, subject):
         """ Apply filters to the given query recursively. """
         if not self.node.filtered:
@@ -47,22 +68,17 @@ class QueryBuilder(object):
 
         if self.node.leaf:
             q = q.filter(subject == filter_stmt.subject)
-            if self.node.op == OP_EQ:
-                q = q.filter(filter_stmt._value == self.node.value)
-            elif self.node.op == OP_NOT:
-                q = q.filter(filter_stmt._value != self.node.value)
-            elif self.node.op == OP_IN:
-                q = q.filter(filter_stmt._value.in_(self.node.data))
-            elif self.node.op == OP_LIKE:
-                value = '%%%s%%' % normalize(self.node.value)
-                q = q.filter(filter_stmt.normalized.like(value))
-            return q
-        else:
-            col_subj, col_val = filter_stmt.subject, filter_stmt._value
-            if self.node.inverted:
-                col_subj, col_val = col_val, col_subj
-            q = q.filter(subject == col_subj)
-            for child in self.children:
+            return self.filter_value(q, filter_stmt)
+
+        for child in self.children:
+            if child.node.name == 'id':
+                q = q.filter(subject == filter_stmt.subject)
+                q = child.filter_subject(q, filter_stmt)
+            else:
+                col_subj, col_val = filter_stmt.subject, filter_stmt._value
+                if self.node.inverted:
+                    col_subj, col_val = col_val, col_subj
+                q = q.filter(subject == col_subj)
                 q = child.filter(q, col_val)
         return q
 
@@ -139,7 +155,9 @@ class QueryBuilder(object):
 
         filter_sq = filter_q.subquery()
         q = q.filter(stmt.subject == filter_sq.c.subject)
-        q = q.filter(stmt._attribute.in_(self.project()))
+
+        projected_attributes = self.project()
+        q = q.filter(stmt._attribute.in_(projected_attributes))
 
         q = q.add_column(stmt.subject.label('id'))
         q = q.add_column(stmt._attribute.label('attribute'))

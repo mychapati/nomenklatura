@@ -26,6 +26,8 @@ class QueryNode(object):
 
     @property
     def attributes(self):
+        if self.name == 'id':
+            return set()
         if self.name == '*':
             return set(attributes)
         if self.attribute is not None:
