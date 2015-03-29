@@ -8,7 +8,7 @@ from nomenklatura.model.dataset import Dataset
 from nomenklatura.model.pairing import Pairing
 from nomenklatura.query import EntityQuery, execute_query
 
-KEEP_SIZE = 15
+KEEP_SIZE = 20
 log = logging.getLogger(__name__)
 
 
@@ -97,7 +97,6 @@ def dedupe_generate_pairings(slug, threshold=15):
     for (left_id, right_id, score) in matches:
         Pairing.update({'left_id': left_id, 'right_id': right_id},
                        dataset, None, score=score)
-    db.session.commit()
 
 
 @celery.task
@@ -134,22 +133,27 @@ def generate_random_pairing(dataset):
 def generate_best_random_pairing(dataset, num_rounds=10, cutoff=None):
     best_pair = None
     best_score = 0
+    pairing = None
     for i in range(num_rounds):
         left_id, right_id, score = generate_random_pairing(dataset)
         if cutoff is not None and score >= cutoff:
-            return Pairing.update({
+            pairing = Pairing.update({
                 'left_id': left_id,
                 'right_id': right_id
             }, dataset, None, score=score)
+            break
         if score > best_score:
             best_score = score
             best_pair = (left_id, right_id)
 
-    if best_pair is not None:
-        return Pairing.update({
+    if pairing is None and best_pair is not None:
+        pairing = Pairing.update({
             'left_id': best_pair[0],
             'right_id': best_pair[1]
         }, dataset, None, score=best_score)
+
+    db.session.commit()
+    return pairing
 
 
 def request_pairing(dataset, num_rounds=10, cutoff=95, exclude=None):

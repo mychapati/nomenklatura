@@ -36,14 +36,16 @@ nomenklatura.directive('nkPairingItem', ['$timeout', function ($timeout) {
 nomenklatura.controller('PairingsReviewCtrl', ['$scope', '$routeParams', '$location', '$document', '$timeout', '$http', 'dataset', 'schema',
   function ($scope, $routeParams, $location, $document, $timeout, $http, dataset, schema) {
   var pairingUrl = dataset.api_url + '/pairings',
-      nextPairing = null;
+      nextPairing = null,
+      seen = [];
 
   $scope.dataset = dataset;
   $scope.schema = schema;
   $scope.pairing = {};
 
+
   var loadNext = function(exclude) {
-    var params = {params: {exclude: exclude}, ignoreLoadingBar: true};
+    var params = {params: {exclude: seen}, ignoreLoadingBar: true};
     nextPairing = $http.get(pairingUrl, params);
   };
 
@@ -51,7 +53,8 @@ nomenklatura.controller('PairingsReviewCtrl', ['$scope', '$routeParams', '$locat
     nextPairing.then(function(res) {
       nextPairing = null;
       $scope.pairing = res.data;
-      loadNext(res.data.pairing.id);
+      seen.push(res.data.pairing.id);
+      loadNext();
     })
   };
 
