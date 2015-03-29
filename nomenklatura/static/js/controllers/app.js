@@ -1,4 +1,6 @@
-function AppCtrl($scope, $window, $routeParams, $location, $modal, Session, Flash) {
+nomenklatura.controller('AppCtrl', ['$scope', '$window', '$routeParams', '$location', '$modal', 'Session', 'Flash',
+    function ($scope, $window, $routeParams, $location, $modal, Session, Flash) {
+
     $scope.session = {logged_in: false};
     $scope.flash = Flash;
 
@@ -12,6 +14,4 @@ function AppCtrl($scope, $window, $routeParams, $location, $modal, Session, Flas
             controller: 'UsersProfileCtrl'
         });
     };
-}
-
-AppCtrl.$inject = ['$scope', '$window', '$routeParams', '$location', '$modal', 'Session', 'Flash'];
+}]);

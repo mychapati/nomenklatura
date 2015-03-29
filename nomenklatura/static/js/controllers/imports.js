@@ -1,45 +1,35 @@
 
-var loadDatasetImports = ['$route', '$http', '$q', 'Session', function($route, $http, $q, Session) {
+var loadImports = ['$route', '$http', '$q', 'Session', function($route, $http, $q, Session) {
   var dfd = $q.defer();
       
   Session.get(function(s) {
-    var url = '/api/2/datasets/' + $route.current.params.dataset + '/contexts';
     var params = {params: {_uid: s.cbq, imports: true}};
-    $http.get(url, params).then(function(res) {
+    $http.get('/api/2/contexts', params).then(function(res) {
       dfd.resolve(res.data);
     });
   });
   return dfd.promise;
 }];
 
-nomenklatura.controller('ImportsIndexCtrl', ['$scope', '$routeParams', '$modal', '$location',
-                                             '$http', '$sce', 'dataset', 'imports',
-  function ($scope, $routeParams, $modal, $location, $http, $sce, dataset, imports) {
-  $scope.dataset = dataset;
+
+nomenklatura.controller('ImportsIndexCtrl', ['$scope', '$routeParams', '$modal', '$location', '$http', '$sce', 'imports',
+  function ($scope, $routeParams, $modal, $location, $http, $sce, imports) {
   $scope.imports = imports;
 
   $scope.upload = function(){
     var d = $modal.open({
       templateUrl: '/static/templates/imports/upload.html',
       controller: 'ImportsUploadCtrl',
-      resolve: {
-        dataset: function () { return dataset; }
-      }
+      resolve: {}
     });
   };
 
 }]);
 
-nomenklatura.controller('ImportsUploadCtrl', ['$scope', '$routeParams', '$modalInstance', '$location',
-                                       '$http', '$sce', 'dataset',
-  function ($scope, $routeParams, $modalInstance, $location, $http, $sce, dataset) {
-  $scope.dataset = dataset;
-  $scope.form_action = '/api/2';
-  $scope.upload = {};
 
-  $scope.$watch('dataset', function() {
-    $scope.form_action = $sce.trustAsResourceUrl('/api/2/datasets/' + $scope.dataset.slug + '/imports');
-  });
+nomenklatura.controller('ImportsUploadCtrl', ['$scope', '$routeParams', '$modalInstance', '$location', '$http',
+  function ($scope, $routeParams, $modalInstance, $location, $http) {
+  $scope.upload = {};
 
   $scope.cancel = function() {
     $modalInstance.dismiss('cancel');
@@ -48,7 +38,7 @@ nomenklatura.controller('ImportsUploadCtrl', ['$scope', '$routeParams', '$modalI
   $scope.results = function(content) {
     if (!content.parse_error) {
       $modalInstance.dismiss('cancel');
-      $location.path('/datasets/' + $scope.dataset.slug + '/imports/' + content.id);
+      $location.path('/imports/' + content.id);
     } else {
       $scope.upload = content;
     }
@@ -58,8 +48,7 @@ nomenklatura.controller('ImportsUploadCtrl', ['$scope', '$routeParams', '$modalI
 
 var loadUpload = ['$route', '$http', '$q', function($route, $http, $q) {
   var dfd = $q.defer(),
-      params = $route.current.params;
-  var url = '/api/2/datasets/' + params.dataset + '/imports/' + params.context;
+      url = '/api/2/imports/' + $route.current.params.context;
   $http.get(url).then(function(res) {
     res.data.api_url = url;
     dfd.resolve(res.data);
@@ -68,12 +57,11 @@ var loadUpload = ['$route', '$http', '$q', function($route, $http, $q) {
 }];
 
 
-nomenklatura.controller('ImportsMappingCtrl', ['$scope', '$routeParams', '$location', '$timeout', '$q', '$http', '$modal', 'Validation', 'dataset', 'upload', 'schema',
-  function ($scope, $routeParams, $location, $timeout, $q, $http, $modal, Validation, dataset, upload, schema) {
+nomenklatura.controller('ImportsMappingCtrl', ['$scope', '$routeParams', '$location', '$timeout', '$q', '$http', '$modal', 'Validation', 'upload', 'schema',
+  function ($scope, $routeParams, $location, $timeout, $q, $http, $modal, Validation, upload, schema) {
 
   var uploadCheck = null, importStarted = false;
   $scope.schema = schema;
-  $scope.dataset = dataset;
   $scope.upload = upload;
   $scope.context = upload.context;
   $scope.mapping = upload.mapping;
@@ -155,9 +143,7 @@ nomenklatura.controller('ImportsMappingCtrl', ['$scope', '$routeParams', '$locat
     var d = $modal.open({
       templateUrl: '/static/templates/imports/upload.html',
       controller: 'UploadCtrl',
-      resolve: {
-        dataset: function () { return dataset; }
-      }
+      resolve: {}
     });
   };
 

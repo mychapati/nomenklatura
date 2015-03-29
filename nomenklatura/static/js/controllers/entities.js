@@ -1,8 +1,7 @@
 
 var loadEntity = ['$route', '$http', '$q', function($route, $http, $q) {
   var dfd = $q.defer(),
-      pa = $route.current.params,
-      url = '/api/2/datasets/' + pa.dataset + '/entities/' + pa.id;
+      url = '/api/2/entities/' + $route.current.params.id;
   $http.get(url).then(function(res) {
     dfd.resolve(res.data);
   });
@@ -20,9 +19,8 @@ var loadSchema = ['$route', '$http', '$q', function($route, $http, $q) {
 
 
 nomenklatura.controller('EntitiesViewCtrl', ['$scope', '$routeParams', '$location',
-            '$http', '$modal', '$timeout', 'schema', 'dataset', 'entity',
-  function ($scope, $routeParams, $location, $http, $modal, $timeout, schema, dataset, entity) {
-  $scope.dataset = dataset;
+            '$http', '$modal', '$timeout', 'schema', 'entity',
+  function ($scope, $routeParams, $location, $http, $modal, $timeout, schema, entity) {
   $scope.entity = entity;
   $scope.schema = schema;
 

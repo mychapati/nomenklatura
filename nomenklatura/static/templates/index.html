@@ -1,0 +1,103 @@
+
+<div class="jumbotron">
+  <h1 class="text">nomenklatura</h1>
+  <p class="text">A data cleaning service that helps link and de-duplicate entities in raw data.</p>
+  <p>
+      <a ng-show="session.logged_in" class="btn btn-lg btn-default"
+        ng-click='newDataset()'><i class="fa fa-plus"></i> Create a dataset</a>
+      <a ng-hide="session.logged_in" class="btn btn-lg btn-default"
+         target="_self" href="/api/2/sessions/login">
+        <i class="fa fa-github"></i> Sign in with GitHub</a>
+      <a class="btn btn-lg btn-primary btn-default" href="/docs/introduction">
+        <i class="fa fa-question-circle"></i> Learn more...</a>
+      
+  </p>
+</div>
+
+
+<div class="row">
+  <div class="col-xs-12 col-md-7">
+    <p class="well well-sm">
+      Each dataset contains a set of entities, some of 
+      which are aliases for others.
+    </p>
+  </div>
+  <div class="col-xs-12 col-md-5">
+    <div class="btn-group pull-right">
+      <a nk-authz dataset="dataset" op="edit" class="btn btn-default" ng-href="/review">
+        <i class="fa fa-link"></i> De-duplicate
+      </a>
+      <a nk-authz dataset="dataset" op="manage" class="btn btn-default" ng-href="/settings">
+        <i class="fa fa-cog"></i> Settings
+      </a>
+      <a nk-authz dataset="dataset" op="manage" class="btn btn-default" ng-href="/imports">
+        <i class="fa fa-cloud-upload"></i> Import
+      </a>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-xs-12 col-md-12">
+    <table class="table table-hover table-condensed">
+        <tr>
+            <th width="95%" colspan="2">
+              <form class="" role="form">
+                <div class="input-group">
+                  <span class="input-group-addon"><i class="fa fa-search"></i></span>
+                  <input type="text" class="search-query form-control"
+                          ng-model="query" ng-keyup="updateFilter()" placeholder="Find an entity">
+                </div>
+              </form>
+            </th>
+        </tr>
+        <tr ng-repeat="entity in entities.results">
+            <td>
+              <a href="/entities/{{entity.id}}" class="structured">{{entity.label}}</a>
+            </td>
+            <td>
+              {{schema.types[entity.type].label}}
+            </td>
+        </tr>
+        <tr nk-authz op="edit">
+          <th>
+            <form name="newEntity" role="form">
+              <div class="form-group" ng-class="{'has-error': newEntity.label.$invalid}">
+                <input type="text" class="form-control" ng-model="new_entity.label"
+                  placeholder="Add an entity..." name="name">
+                <p class="help-block" ng-show="newEntity.label.$invalid"
+                  ng-bind="newEntity.label.$message"></p>
+              </div>
+            </form>
+          </th>
+          <th>
+            <button class="num btn btn-small btn-primary" ng-click="createEntity(newEntity)">
+              add
+            </button>
+          </th>
+        </tr>
+    </table>
+    <nk-pager class="pull-right" response="entities" load="loadEntities(url)"></odis-pager>
+  </div>
+</div>
+
+<br/><br/>
+<div class="row">
+    <div class="col-xs-12">
+      <p>
+        What can nomenklatura do for you? The service supports a set of useful tasks, such as:
+      </p>
+      <ul>
+        <li><strong>Clean up misspelled and duplicate names in source data.</strong> Individuals or organisations often have multiple names used to identify them, and sometimes they're just misspelled. Nomenklatura creates links between these different names for the same thing to help you treat them as a single entity.</li>
+
+        <li><strong>Integrate multiple datasets.</strong> Alternate names for entities in Nomenklatura can come from more than one data source, enabling you to make links between these sources based on partial overlaps of naming conventions.</li> 
+
+        <li><strong>Share your data cleaning work.</strong> Instead of making entity mappings ad-hoc while cleaning data, judgments are stored on the web so that they can be shared between people and re-used across different releases of a dataset.</li>
+
+        <li><strong>Generate URIs and store additional metadata.</strong> Along with names, Nomenklatura can store additional attributes, such as address information, company identifiers and external references with each entity.</li> 
+      </ul>
+      <p>
+        To get started, check you should sign in, create a dataset and upload information about 
+        entities to be cleaned and shared.
+      </p>
+    </div>
+</div>

@@ -6,10 +6,11 @@ nomenklatura.config(['$routeProvider', '$locationProvider', '$sceProvider', 'cfp
   cfpLoadingBarProvider.includeSpinner = false;
 
   $routeProvider.when('/', {
-    templateUrl: '/static/templates/home.html',
-    controller: 'HomeCtrl',
+    templateUrl: '/static/templates/index.html',
+    controller: 'IndexCtrl',
     resolve: {
-      'datasets': loadDatasets
+      'entities': loadEntities,
+      'schema': loadSchema
     }
   });
 
@@ -28,68 +29,52 @@ nomenklatura.config(['$routeProvider', '$locationProvider', '$sceProvider', 'cfp
     controller: 'UsersLoginCtrl'
   });
 
-  $routeProvider.when('/datasets/:dataset', {
-    templateUrl: '/static/templates/datasets/view.html',
-    controller: 'DatasetsViewCtrl',
+  $routeProvider.when('/settings', {
+    templateUrl: '/static/templates/settings.html',
+    controller: 'SettingsCtrl',
     resolve: {
-      'dataset': loadDataset,
-      'entities': loadDatasetEntities,
-      'schema': loadSchema
-    }
-  });
-
-  $routeProvider.when('/datasets/:dataset/settings', {
-    templateUrl: '/static/templates/datasets/settings.html',
-    controller: 'DatasetsSettingsCtrl',
-    resolve: {
-      'dataset': loadDataset,
       'users': loadRoleUsers
     }
   });
 
-  $routeProvider.when('/datasets/:dataset/imports', {
+  $routeProvider.when('/imports', {
     templateUrl: '/static/templates/imports/index.html',
     controller: 'ImportsIndexCtrl',
     resolve: {
-      'dataset': loadDataset,
-      'imports': loadDatasetImports,
+      'imports': loadImports,
       'schema': loadSchema
     }
   });
 
-  $routeProvider.when('/datasets/:dataset/imports/:context', {
+  $routeProvider.when('/imports/:context', {
     templateUrl: '/static/templates/imports/mapping.html',
     controller: 'ImportsMappingCtrl',
     resolve: {
-      'dataset': loadDataset,
       'upload': loadUpload,
       'schema': loadSchema
     }
   });
 
-  $routeProvider.when('/datasets/:dataset/imports/:context/status', {
+  $routeProvider.when('/imports/:context/status', {
     templateUrl: '/static/templates/imports/status.html',
     controller: 'ImportsStatusCtrl',
     resolve: {
-      'dataset': loadDataset,
       'upload': loadUpload
     }
   });
 
-  $routeProvider.when('/datasets/:dataset/review', {
+  $routeProvider.when('/review', {
     templateUrl: '/static/templates/review.html',
     controller: 'PairingsReviewCtrl',
     resolve: {
-      'dataset': loadDataset,
       'schema': loadSchema
     }
   });
 
-  $routeProvider.when('/datasets/:dataset/entities/:id', {
+  $routeProvider.when('/entities/:id', {
     templateUrl: '/static/templates/entities/view.html',
     controller: 'EntitiesViewCtrl',
     resolve: {
-      'dataset': loadDataset,
       'entity': loadEntity,
       'schema': loadSchema
     }

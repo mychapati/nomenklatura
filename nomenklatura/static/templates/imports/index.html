@@ -1,8 +1,5 @@
 <ul class="breadcrumb hidden-xs">
   <li>
-    <a href="/datasets/{{dataset.slug}}">{{dataset.label}}</a>
-  </li>
-  <li>
     Imports
   </li>
 </ul>
@@ -10,7 +7,7 @@
 <div class="row">
   <div class="col-xs-12">
     <div class="btn-group pull-right">
-      <a nk-authz dataset="dataset" op="manage" class="btn btn-default" ng-click="upload()">
+      <a nk-authz op="manage" class="btn btn-default" ng-click="upload()">
         <i class="fa fa-cloud-upload"></i> Upload</a>
     </div>
   </div>
@@ -29,7 +26,7 @@
       {{ctx.publisher || '-'}}
     </td>
     <td>
-      <a ng-href="/datasets/{{dataset.slug}}/imports/{{ctx.id}}">{{ctx.resource_name.split('/')[1]}}</a>
+      <a ng-href="/imports/{{ctx.id}}">{{ctx.resource_name.split('/')[1]}}</a>
     </td>
     <td am-time-ago="ctx.updated_at"></td>
   </tr>

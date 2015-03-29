@@ -1,15 +1,6 @@
-<ul class="breadcrumb hidden-xs">
+<ul class="breadcrumb">
   <li>
-    <a href="/datasets/{{dataset.slug}}">{{dataset.label}}</a>
-  </li>
-  <li>
-    <a href="/datasets/{{dataset.slug}}/entities/{{entity.id}}">{{entity.label}}</a>
-  </li>
-</ul>
-
-<ul class="breadcrumb visible-xs">
-  <li>
-    <a href="/datasets/{{dataset.slug}}">{{dataset.label}}</a>
+    <a href="/entities/{{entity.id}}">{{entity.label}}</a>
   </li>
 </ul>
 
@@ -24,7 +15,7 @@
 
 <div ng-show="entity.same_as" class="alert alert-info">
     <span class="structured">{{entity.label}}</span> is an alias name for 
-    <a ng-href="/datasets/{{dataset.slug}}/entities/{{entity.same_as.id}}"
+    <a ng-href="/entities/{{entity.same_as.id}}"
       class="structured">{{entity.same_as.label}}</a>.
 </div>
 
