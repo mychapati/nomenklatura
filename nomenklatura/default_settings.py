@@ -18,7 +18,12 @@ CELERY_ALWAYS_EAGER = False
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TIMEZONE = 'UTC'
-CELERY_IMPORTS = ('nomenklatura.model.importer', )
+CELERY_IMPORTS = (
+    'nomenklatura.processing',
+    'nomenklatura.processing.imports',
+    'nomenklatura.processing.inference',
+    'nomenklatura.processing.deduper',
+)
 
 MAIL_SERVER = 'localhost'
 MAIL_PORT = 25

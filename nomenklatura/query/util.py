@@ -1,5 +1,5 @@
 
-OP_EQ = ''
+OP_EQ = '=='
 OP_IN = '|='
 OP_NOT = '!='
 OP_NIN = '|!='

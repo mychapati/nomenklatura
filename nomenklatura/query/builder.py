@@ -93,6 +93,8 @@ class QueryBuilder(object):
         current_subject = subject
         next_subject = filter_stmt._value
 
+        # Query root isn't acting like a normal non-leaf object, as it doesn't
+        # join to the previous level via it's own attribute.
         if query_root:
             next_subject = filter_stmt.subject
         else:
