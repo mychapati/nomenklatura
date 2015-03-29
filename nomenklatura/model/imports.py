@@ -124,7 +124,7 @@ def load_entity(context, mapping, record):
         log.warning("No type defined for entity in mapping: %r", mapping)
         return
 
-    q = context.dataset.entities.filter_by(attributes.type, type_)
+    query = {'type': unicode(type_)}
     has_key = False
 
     data = [(attributes.type, type_)]
@@ -139,11 +139,13 @@ def load_entity(context, mapping, record):
 
         if attr_map.get('key'):
             has_key = True
-            q = q.filter_by(attr, value)
+            query[attr.anme] = value
 
         data.append((attr, value))
 
-    entity = q.first() if has_key else None
+    from nomenklatura.query import EntityQuery
+    query = EntityQuery(context.dataset, query)
+    entity = query.first() if has_key else None
     if entity is None:
         entity = Entity(context.dataset)
 

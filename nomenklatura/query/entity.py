@@ -63,7 +63,10 @@ class EntityQuery(object):
 
     @classmethod
     def by_id(cls, dataset, id):
-        for entity in cls(dataset, {'id': id, 'limit': 1}):
+        return cls(dataset, {'id': id, 'limit': 1}).first()
+
+    def first(self):
+        for entity in self:
             return entity
 
     def __len__(self):

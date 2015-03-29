@@ -6,6 +6,8 @@ from nomenklatura.core import db, celery
 from nomenklatura.schema import attributes
 from nomenklatura.model.dataset import Dataset
 from nomenklatura.model.pairing import Pairing
+from nomenklatura.query import EntityQuery
+
 
 log = logging.getLogger(__name__)
 
@@ -36,7 +38,7 @@ def query_pairings(dataset):
 
 def make_data(dataset, fields):
     data = {}
-    for e in dataset.entities:
+    for e in EntityQuery(dataset):
         ent = {}
         for field in fields:
             name = field.get('field')

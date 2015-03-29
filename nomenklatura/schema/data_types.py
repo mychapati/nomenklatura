@@ -139,9 +139,10 @@ class Entity(DataType):
 
     def deserialize(self, value):
         from nomenklatura.model.entity import Entity
+        from nomenklatura.query import EntityQuery
         if isinstance(value, Entity):
             return value
-        ent = self.dataset.entities.by_id(value)
+        ent = EntityQuery.by_id(self.dataset, value)
         if ent is None:
             raise TypeError("Entity does not exist: %r" % value)
         return ent

@@ -14,6 +14,14 @@ from nomenklatura.query.util import OP_EQ, OP_LIKE, OP_IN, OP_NOT, OP_SIM
 # TODO: split out the parts that affect graph filtering and
 # results processing / reconstruction.
 
+# TODO: optional/forbidden
+# same_as = aliased(Statement)
+# return q.filter(~exists().where(and_(
+#     same_as._attribute == attributes.same_as.name,
+#     same_as._value == stmt.subject,
+#     same_as.subject == self.other
+# )))
+
 class QueryBuilder(object):
 
     def __init__(self, dataset, parent, node):
