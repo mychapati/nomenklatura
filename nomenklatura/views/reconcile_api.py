@@ -2,7 +2,7 @@ import json
 import logging
 
 from flask import Blueprint, request
-from apikit import jsonify, get_limit, obj_or_404
+from apikit import jsonify, get_limit
 from werkzeug.exceptions import BadRequest
 
 from nomenklatura.core import url_for, app_title

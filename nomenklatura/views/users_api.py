@@ -5,7 +5,7 @@ from apikit import obj_or_404, request_data, jsonify
 from nomenklatura.model import User
 from nomenklatura.core import db, app
 from nomenklatura.notification import send_activation_link, send_reset_link
-from nomenklatura import authz
+from nomenklatura.views import authz
 
 
 blueprint = Blueprint('users', __name__)

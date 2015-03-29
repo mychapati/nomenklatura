@@ -21,9 +21,9 @@ def sync():
 
 
 @manager.command
-def dedupe(slug):
+def dedupe():
     from nomenklatura.processing.deduper import dedupe_generate_pairings
-    dedupe_generate_pairings(slug)
+    dedupe_generate_pairings()
 
 
 if __name__ == '__main__':

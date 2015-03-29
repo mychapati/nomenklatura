@@ -48,8 +48,7 @@ class Map(object):
 
 
 def load_schema():
-    """ Load types and attributes from a ``.yaml`` file specified into
-    the given dataset. """
+    """ Load types and attributes from a ``.yaml`` file specified. """
 
     types, attributes = Map(Type), Map(Attribute)
 

@@ -9,6 +9,7 @@ from flask.ext.login import LoginManager
 from flask.ext.assets import Environment
 from flask.ext.migrate import Migrate
 from archivekit import open_archive
+from normality import slugify
 from kombu import Exchange, Queue
 from celery import Celery
 
@@ -20,8 +21,9 @@ logging.getLogger('passlib').setLevel(logging.WARNING)
 app = Flask(__name__)
 app.config.from_object(default_settings)
 app.config.from_envvar('NOMENKLATURA_SETTINGS', silent=True)
-app_name = app.config.get('APP_NAME', 'nomenklatura')
 app_title = app.config.get('APP_TITLE', 'Nomenklatura')
+app_name = app.config.get('APP_NAME', slugify(app_title, sep='_'))
+
 
 db = SQLAlchemy(app)
 migrate = Migrate(app, db, directory=app.config.get('ALEMBIC_DIR'))
@@ -32,7 +34,7 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'index'
 
-celery = Celery('nomenklatura', broker=app.config['CELERY_BROKER_URL'])
+celery = Celery(app_name, broker=app.config['CELERY_BROKER_URL'])
 
 queue_name = app_name + '_q'
 app.config['CELERY_DEFAULT_QUEUE'] = queue_name

@@ -18,6 +18,8 @@ def angular_templates():
 
 @app.route('/entities')
 @app.route('/entities/<path:id>')
+@app.route('/imports')
+@app.route('/imports/<path:id>')
 @app.route('/settings')
 @app.route('/review')
 @app.route('/login')

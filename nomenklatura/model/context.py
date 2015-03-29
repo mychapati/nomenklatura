@@ -46,7 +46,7 @@ class Context(db.Model, CommonMixIn):
         return q.first()
 
     @classmethod
-    def all(cls, id):
+    def all(cls):
         return db.session.query(cls)
 
     @classmethod

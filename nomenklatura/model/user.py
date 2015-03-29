@@ -22,8 +22,6 @@ class User(db.Model, CommonMixIn):
     validation_token = db.Column(db.Unicode, default=make_key)
     api_key = db.Column(db.Unicode, default=make_key)
 
-    roles = db.relationship('Role', backref='user', lazy='dynamic')
-
     def to_dict(self):
         return {
             'id': self.id,

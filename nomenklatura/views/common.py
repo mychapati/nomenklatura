@@ -4,6 +4,8 @@ import csv
 
 from flask import Response
 
+from nomenklatura.core import app_name
+
 
 def csv_value(v):
     if v is None:
@@ -27,6 +29,6 @@ def csvify(iterable, status=200, headers=None):
                     status=status, mimetype='text/csv')
 
 
-def dataset_filename(dataset, format):
+def filename(format):
     ts = datetime.utcnow().strftime('%Y%m%d')
-    return '%s-%s.%s' % (dataset.slug, ts, format)
+    return '%s-%s.%s' % (app_name, ts, format)

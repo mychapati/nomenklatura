@@ -2,7 +2,7 @@ from flask import Blueprint, redirect, request
 from flask.ext.login import logout_user, current_user
 from apikit import jsonify
 
-from nomenklautea.core import url_for
+from nomenklatura.core import url_for
 from nomenklatura.views import authz
 from nomenklatura.schema import attributes, types
 from nomenklatura.model.constants import READ, EDIT, MANAGE
