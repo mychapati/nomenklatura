@@ -1,3 +1,5 @@
+import copy
+
 from nomenklatura.schema import attributes
 from nomenklatura.query.util import parse_name, is_list, OP_SIM
 
@@ -6,7 +8,7 @@ class QueryNode(object):
 
     def __init__(self, parent, name, data):
         self.parent = parent
-        self.data = value = data
+        self.data = value = copy.deepcopy(data)
 
         parts = parse_name(name)
         self.name, self.inverted, self._op = parts

@@ -127,15 +127,15 @@ class Pairing(db.Model, CommonMixIn):
         best_pair = None
         best_score = 0
         for i in range(num_rounds):
-            # TODO remove aliases (same_as).
-            query = {'label': None, 'sort': 'random'}
+            query = {'label': None, 'sort': 'random',
+                     'same_as': {'optional': 'forbidden'}}
             ent = execute_query(dataset, query).get('result')
             ent_id = ent.get('id')
             avoid = [ent_id] + list(cls.existing(dataset, ent_id))
             q = {'id|!=': avoid, 'label%=': ent.get('label')}
+            q['same_as'] = {'optional': 'forbidden'}
+            q['!same_as'] = {'optional': 'forbidden', 'id': ent_id}
 
-            # q = dataset.entities.not_subject(avoid).levenshtein(label)
-            # q = q.no_same_as().not_the_same_as(ent.id).limit(1)
             for res in execute_query(dataset, [q]).get('result'):
                 if res.get('score') >= cutoff:
                     return cls.update({

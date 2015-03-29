@@ -85,9 +85,9 @@ class QueryBuilder(object):
         if not self.node.filtered:
             return q
 
-        # outer_q = q
-        # if self.node.forbidden:
-        #     q = db.session.query()
+        outer_q = q
+        if self.node.forbidden:
+            q = db.session.query()
 
         filter_stmt, q = self._add_statement(q)
         current_subject = subject
@@ -113,8 +113,8 @@ class QueryBuilder(object):
                 else:
                     q = child.filter(q, next_subject)
 
-        # if self.node.forbidden:
-        #    q = outer_q.filter(~exists().where(q.whereclause))
+        if self.node.forbidden:
+            q = outer_q.filter(~exists().where(q.whereclause))
         return q
 
     def filter_query(self, parents=None):

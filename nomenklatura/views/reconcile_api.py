@@ -74,7 +74,8 @@ def reconcile_op(dataset, query):
     q = {
         'label%=': query.get('query', ''),
         'type': query_types([query.get('type')]),
-        'limit': get_limit(default=5)
+        'limit': get_limit(default=5),
+        'same_as': {'optional': 'forbidden'}
     }
 
     results = []
@@ -146,11 +147,11 @@ def suggest_entity(dataset):
     prefix = request.args.get('prefix', '')
     log.info("Suggesting entities in %s: %r", dataset.slug, prefix)
 
-    # TODO: optional/forbidden of same_as to avoid aliases.
     q = {
         'label~=': prefix,
         'type': query_types(request.args.getlist('type')),
-        'limit': get_limit(default=5)
+        'limit': get_limit(default=5),
+        'same_as': {'optional': 'forbidden'}
     }
 
     matches = []
