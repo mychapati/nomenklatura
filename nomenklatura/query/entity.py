@@ -4,8 +4,8 @@ from sqlalchemy.orm import aliased, joinedload
 
 from nomenklatura.core import db
 from nomenklatura.model.statement import Statement
-from nomenklatura.query.parser import QueryNode # noqa
-from nomenklatura.query.builder import QueryBuilder # noqa
+from nomenklatura.query.parser import QueryNode
+from nomenklatura.query.builder import QueryBuilder
 from nomenklatura.model.entity import Entity
 
 
@@ -26,10 +26,10 @@ class EntityQuery(object):
                            offset=kw.get('offset', self._offset))
 
     def limit(self, n):
-        return self.clone(limit=n)
+        return self.clone(self.query, limit=n)
 
     def offset(self, n):
-        return self.clone(offset=n)
+        return self.clone(self.query, offset=n)
 
     def _sub_query(self, query):
         qn = QueryNode(None, None, [query])

@@ -2,6 +2,7 @@ import time
 
 from nomenklatura.query.parser import QueryNode
 from nomenklatura.query.builder import QueryBuilder
+from nomenklatura.query.entity import EntityQuery
 
 
 def execute_query(dataset, q):

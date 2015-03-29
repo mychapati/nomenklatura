@@ -5,6 +5,7 @@ from apikit import jsonify, obj_or_404, request_data
 from nomenklatura import authz
 from nomenklatura.core import db
 from nomenklatura.model import Dataset, Pairing
+from nomenklatura.query import EntityQuery
 
 
 blueprint = Blueprint('pairing', __name__)
@@ -21,8 +22,8 @@ def load(dataset):
         return {'status': 'done'}
     return jsonify({
         'status': 'next',
-        'left': dataset.entities.by_id(next.left_id),
-        'right': dataset.entities.by_id(next.right_id),
+        'left': EntityQuery.by_id(dataset, next.left_id),
+        'right': EntityQuery.by_id(dataset, next.right_id),
         'pairing': next
     })
 

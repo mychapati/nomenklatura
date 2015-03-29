@@ -1,4 +1,3 @@
-import time
 import json
 
 from flask import Blueprint, request, url_for, redirect
@@ -8,7 +7,7 @@ from apikit import jsonify, Pager, request_data, obj_or_404
 from nomenklatura.core import db
 from nomenklatura import authz
 from nomenklatura.model import Entity, Dataset, Context
-from nomenklatura.query import execute_query
+from nomenklatura.query import execute_query, EntityQuery
 from nomenklatura.processing import process_updates
 
 blueprint = Blueprint('entities', __name__)
@@ -18,22 +17,11 @@ blueprint = Blueprint('entities', __name__)
 def index(dataset):
     authz.require(authz.dataset_read(dataset))
     dataset = obj_or_404(Dataset.by_slug(dataset))
-    q = dataset.entities.no_same_as()
+    q = {}
     prefix = request.args.get('prefix', '')
     if len(prefix):
-        q = q.filter_prefix(prefix)
-
-    # TODO, other filters.
-    # format = request.args.get('format', 'json').lower().strip()
-    # if format == 'csv':
-    #     res = csvify(q)
-    # else:
-    #     res = jsonify(Pager(q, dataset=dataset.slug))
-
-    # if arg_bool('download'):
-    #     fn = dataset_filename(dataset or 'all', format)
-    #     res.headers['Content-Disposition'] = 'attachment; filename=' + fn
-    # return res
+        q = {'label~=': prefix}
+    q = EntityQuery(dataset, q)
     return jsonify(Pager(q, dataset=dataset.slug))
 
 
@@ -68,7 +56,7 @@ def create(dataset):
 def view(dataset, id):
     authz.require(authz.dataset_read(dataset))
     dataset = obj_or_404(Dataset.by_slug(dataset))
-    entity = obj_or_404(dataset.entities.by_id(id))
+    entity = obj_or_404(EntityQuery.by_id(dataset, id))
     return jsonify(entity)
 
 
@@ -76,7 +64,7 @@ def view(dataset, id):
 def update(dataset, id):
     authz.require(authz.dataset_edit(dataset))
     dataset = obj_or_404(Dataset.by_slug(dataset))
-    entity = obj_or_404(dataset.entities.by_id(id))
+    entity = obj_or_404(EntityQuery.by_id(dataset, id))
     context = Context.create(dataset, current_user, {})
     entity.update(request_data(), context)
     db.session.commit()
