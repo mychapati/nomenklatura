@@ -44,8 +44,8 @@ def query(dataset):
     if request.method == 'GET':
         try:
             q = json.loads(request.args.get('q'))
-        except (TypeError, ValueError):
-            data = {'status': 'error', 'message': 'Invalid query'}
+        except (TypeError, ValueError) as e:
+            data = {'status': 'error', 'message': 'Invalid query: %s' % unicode(e)}
             return jsonify(data, status=400)
     else:
         q = request_data()

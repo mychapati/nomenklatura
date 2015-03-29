@@ -52,7 +52,7 @@ class QueryNode(object):
 
     @property
     def scored(self):
-        if self.lead:
+        if self.leaf:
             return self.op == OP_SIM
         if self.root:
             for child in self.children:

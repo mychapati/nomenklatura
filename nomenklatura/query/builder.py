@@ -1,11 +1,14 @@
+from collections import OrderedDict
+
 from normality import normalize
+from sqlalchemy import exists, and_, func
 from sqlalchemy.orm import aliased
 
 from nomenklatura.core import db, url_for
 from nomenklatura.schema import attributes
 from nomenklatura.model.statement import Statement
 from nomenklatura.model.context import Context
-from nomenklatura.query.util import OP_EQ, OP_LIKE, OP_IN, OP_NOT
+from nomenklatura.query.util import OP_EQ, OP_LIKE, OP_IN, OP_NOT, OP_SIM
 # from nomenklatura.model.type import Type
 
 
@@ -46,6 +49,20 @@ class QueryBuilder(object):
         elif self.node.op == OP_LIKE:
             value = '%%%s%%' % normalize(self.node.value)
             q = q.filter(filter_stmt.normalized.like(value))
+        elif self.node.op == OP_SIM:
+            value = normalize(self.node.value)[:254]
+            field = func.left(filter_stmt.normalized, 254)
+
+            # calculate the similarity percentage
+            rel = func.greatest(max(float(len(self.node.value)), 1.0),
+                                func.length(filter_stmt.normalized))
+            distance = func.levenshtein(field, value)
+            score = ((rel - distance) / rel) * 100.0
+            score = func.max(score).label('score')
+
+            q = q.add_column(score)
+            q = q.having(score >= 1)
+            q = q.order_by(score.desc())
         return q
 
     def filter_subject(self, q, filter_stmt):
@@ -67,19 +84,23 @@ class QueryBuilder(object):
             q = q.filter(filter_stmt._attribute == self.node.attribute.name)
 
         if self.node.leaf:
+            # The child will be value-filtered directly.
             q = q.filter(subject == filter_stmt.subject)
             return self.filter_value(q, filter_stmt)
 
         for child in self.children:
             if child.node.name == 'id':
+                # If the child is a query for an ID, don't recurse.
                 q = q.filter(subject == filter_stmt.subject)
                 q = child.filter_subject(q, filter_stmt)
             else:
+                # Inverted queries apply to non-leaf children only.
                 col_subj, col_val = filter_stmt.subject, filter_stmt._value
                 if self.node.inverted:
                     col_subj, col_val = col_val, col_subj
                 q = q.filter(subject == col_subj)
                 q = child.filter(q, col_val)
+
         return q
 
     def filter_query(self, parents=None):
@@ -134,6 +155,10 @@ class QueryBuilder(object):
                                id=data.get('id')),
             'parent_id': data.get('parent_id')
         }
+
+        if 'score' in data:
+            obj['score'] = data.get('score')
+
         for child in self.children:
             if self.node.blank:
                 obj[child.node.name] = child.node.data
@@ -163,6 +188,11 @@ class QueryBuilder(object):
         q = q.add_column(stmt._attribute.label('attribute'))
         q = q.add_column(stmt._value.label('value'))
 
+        if self.node.scored:
+            score = filter_sq.c.score.label('score')
+            q = q.add_column(score)
+            q = q.order_by(score.desc())
+
         if parents is not None and self.node.attribute:
             parent_stmt, q = self._add_statement(q)
             q = q.filter(stmt.subject == parent_stmt._value)
@@ -175,7 +205,7 @@ class QueryBuilder(object):
 
     def execute(self, parents=None):
         """ Run the data query and construct entities from it's results. """
-        results = {}
+        results = OrderedDict()
         for row in self.data_query(parents=parents):
             data = row._asdict()
             id = data.get('id')
