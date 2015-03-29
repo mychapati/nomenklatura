@@ -8,7 +8,8 @@ from nomenklatura.core import db, url_for
 from nomenklatura.schema import attributes
 from nomenklatura.model.statement import Statement
 from nomenklatura.model.context import Context
-from nomenklatura.query.util import OP_EQ, OP_LIKE, OP_IN, OP_NOT, OP_SIM, OP_NIN
+from nomenklatura.query.util import OP_EQ, OP_LIKE, OP_IN, OP_NOT, \
+    OP_SIM, OP_NIN
 
 
 # TODO: split out the parts that affect graph filtering and
@@ -220,12 +221,6 @@ class QueryBuilder(object):
 
         if parents is not None:
             q = q.add_column(filter_sq.c.parent_id.label('parent_id'))
-
-        # if parents is not None and self.node.attribute:
-        #     parent_stmt, q = self._add_statement(q)
-        #     q = q.filter(stmt.subject == parent_stmt._value)
-        #     q = q.filter(parent_stmt._attribute == self.node.attribute.name)
-        #     q = q.add_column(parent_stmt.subject.label('parent_id'))
 
         q = q.order_by(filter_sq.c.subject.desc())
         q = q.order_by(stmt.created_at.asc())
