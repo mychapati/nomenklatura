@@ -1,7 +1,7 @@
 import time
 
-from nomenklatura.query.parser import QueryNode # noqa
-from nomenklatura.query.builder import QueryBuilder # noqa
+from nomenklatura.query.parser import QueryNode
+from nomenklatura.query.builder import QueryBuilder
 
 
 def execute_query(dataset, q):

@@ -11,6 +11,9 @@ from nomenklatura.model.context import Context
 from nomenklatura.query.util import OP_EQ, OP_LIKE, OP_IN, OP_NOT, OP_SIM
 
 
+# TODO: split out the parts that affect graph filtering and
+# results processing / reconstruction.
+
 class QueryBuilder(object):
 
     def __init__(self, dataset, parent, node):
