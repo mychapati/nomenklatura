@@ -1,6 +1,6 @@
 from passlib.hash import sha256_crypt
 
-from nomenklatura.core import db, url_for, login_manager
+from nomenklatura.core import db, app, url_for, login_manager
 from nomenklatura.model.constants import ROLES
 from nomenklatura.model.forms import UserEditForm, UserCreateForm
 from nomenklatura.model.common import CommonMixIn, make_key
@@ -90,6 +90,7 @@ class User(db.Model, CommonMixIn):
         user = cls()
         user.display_name = data.get('display_name')
         user.email = data.get('email')
+        user.system_role = app.config.get('DEFAULT_USER_ROLE')
         user.password = sha256_crypt.encrypt(data.get('password'))
         db.session.add(user)
         return user
