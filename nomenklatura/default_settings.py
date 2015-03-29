@@ -5,6 +5,7 @@ SECRET_KEY = 'no'
 APP_NAME = 'nomenklatura'
 SQLALCHEMY_DATABASE_URI = 'sqlite:///master.sqlite3'
 CELERY_BROKER_URL = 'amqp://guest:guest@localhost:5672//'
+DEFAULT_ROLE = 'read'
 
 ARCHIVE_TYPE = 'file'
 ARCHIVE_CONFIG = {'path': '/Users/fl/Data/nk-uploads'}

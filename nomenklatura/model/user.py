@@ -1,6 +1,7 @@
 from passlib.hash import sha256_crypt
 
 from nomenklatura.core import db, url_for, login_manager
+from nomenklatura.model.constants import ROLES
 from nomenklatura.model.forms import UserEditForm, UserCreateForm
 from nomenklatura.model.common import CommonMixIn, make_key
 
@@ -16,6 +17,7 @@ class User(db.Model, CommonMixIn):
     display_name = db.Column(db.Unicode)
     email = db.Column(db.Unicode)
     password = db.Column(db.Unicode)
+    system_role = db.Column(db.Enum(*ROLES, name='roles'), nullable=False)
     validated = db.Column(db.Boolean, default=False)
     validation_token = db.Column(db.Unicode, default=make_key)
     api_key = db.Column(db.Unicode, default=make_key)
@@ -29,6 +31,7 @@ class User(db.Model, CommonMixIn):
         return {
             'id': self.id,
             'display_name': self.display_name,
+            'system_role': self.system_role,
             'email': self.email,
             'api_url': url_for('users.view', id=self.id),
             'created_at': self.created_at,

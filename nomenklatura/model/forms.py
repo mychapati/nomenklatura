@@ -2,6 +2,8 @@ import colander
 from normality import slugify
 from colander import Invalid # noqa
 
+from nomenklatura.model.constants import ROLES
+
 
 class Ref(object):
 
@@ -76,11 +78,13 @@ class UserEditForm(colander.MappingSchema):
     password = colander.SchemaNode(colander.String(),
         validator=colander.Length(min=3, max=500), # noqa
         missing=None, default=None) # noqa
+    system_role = colander.SchemaNode(colander.String(),
+        validator=colander.OneOf(ROLES)) # noqa
 
 
 class RoleForm(colander.MappingSchema):
     role = colander.SchemaNode(colander.String(),
-        validator=colander.OneOf(['none', 'read', 'edit', 'manage'])) # noqa
+        validator=colander.OneOf(ROLES)) # noqa
     user = colander.SchemaNode(UserRef())
 
 
