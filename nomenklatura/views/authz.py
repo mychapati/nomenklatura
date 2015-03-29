@@ -12,7 +12,7 @@ def logged_in():
 def role():
     if logged_in():
         return current_user.system_role
-    return app.config.get('DEFAULT_ROLE')
+    return app.config.get('DEFAULT_ANON_ROLE')
 
 
 def system_manage():

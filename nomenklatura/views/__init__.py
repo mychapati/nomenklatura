@@ -6,15 +6,13 @@ from nomenklatura.core import login_manager
 from nomenklatura.schema import DataException
 from nomenklatura.model import User
 from nomenklatura.views.ui import app
-from nomenklatura.views.sessions_api import blueprint as sessions_api
 from nomenklatura.views.users_api import blueprint as users_api
 from nomenklatura.views.imports_api import blueprint as imports_api
 from nomenklatura.views.datasets_api import blueprint as datasets_api
-from nomenklatura.views.roles_api import blueprint as roles_api
+from nomenklatura.views.core_api import blueprint as core_api
 from nomenklatura.views.entities_api import blueprint as entities_api
 from nomenklatura.views.contexts_api import blueprint as contexts_api
 from nomenklatura.views.pairings_api import blueprint as pairings_api
-from nomenklatura.views.schema_api import blueprint as schema_api
 from nomenklatura.views.reconcile_api import blueprint as reconcile_api
 
 
@@ -73,13 +71,11 @@ def handle_data_exception(exc):
     return jsonify(body, status=400)
 
 
-app.register_blueprint(sessions_api, url_prefix='/api/2')
 app.register_blueprint(users_api, url_prefix='/api/2')
 app.register_blueprint(datasets_api, url_prefix='/api/2')
-app.register_blueprint(roles_api, url_prefix='/api/2')
+app.register_blueprint(core_api, url_prefix='/api/2')
 app.register_blueprint(entities_api, url_prefix='/api/2')
 app.register_blueprint(contexts_api, url_prefix='/api/2')
 app.register_blueprint(pairings_api, url_prefix='/api/2')
-app.register_blueprint(schema_api, url_prefix='/api/2')
 app.register_blueprint(reconcile_api, url_prefix='/api/2')
 app.register_blueprint(imports_api, url_prefix='/api/2')
