@@ -17,10 +17,6 @@ class Dataset(db.Model, CommonMixIn):
     roles = db.relationship('Role', backref='dataset',
                             lazy='dynamic')
 
-    @property
-    def entities(self):
-        return EntityQuery(dataset=self)
-
     def to_dict(self):
         return {
             'id': self.id,
