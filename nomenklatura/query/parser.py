@@ -1,5 +1,5 @@
 from nomenklatura.schema import attributes
-from nomenklatura.query.util import parse_name, is_list
+from nomenklatura.query.util import parse_name, is_list, OP_SIM
 
 
 class QueryNode(object):
@@ -49,6 +49,16 @@ class QueryNode(object):
     @property
     def leaf(self):
         return not isinstance(self.value, dict)
+
+    @property
+    def scored(self):
+        if self.lead:
+            return self.op == OP_SIM
+        if self.root:
+            for child in self.children:
+                if child.scored:
+                    return True
+        return False
 
     @property
     def filtered(self):
