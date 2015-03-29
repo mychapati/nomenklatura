@@ -22,10 +22,6 @@ class Pairing(db.Model, CommonMixIn):
     decider = db.relationship('User', backref=db.backref('pairings',
                               lazy='dynamic', cascade='all, delete-orphan'))
 
-    dataset_id = db.Column(db.String(KEY_LENGTH), db.ForeignKey('dataset.id'))
-    dataset = db.relationship('Dataset', backref=db.backref('pairings',
-                              lazy='dynamic', cascade='all, delete-orphan'))
-
     def to_dict(self):
         return {
             'id': self.id,
@@ -47,7 +43,6 @@ class Pairing(db.Model, CommonMixIn):
         if not self.decided:
             return
         q = db.session.query(Statement)
-        q = q.filter(Statement.dataset == self.dataset)
         q = q.filter(Statement._attribute == attributes.same_as.name)
         q = q.filter(or_(
             and_(Statement.subject == self.left_id,
@@ -57,8 +52,8 @@ class Pairing(db.Model, CommonMixIn):
         ))
         stmt = q.first()
         if self.decision is True and stmt is None:
-            context = Context.create(self.dataset, self.decider, {})
-            stmt = Statement(self.dataset, self.left_id, attributes.same_as,
+            context = Context.create(self.decider, {})
+            stmt = Statement(self.left_id, attributes.same_as,
                              self.right_id, context)
             db.session.add(context)
             db.session.add(stmt)
@@ -67,19 +62,18 @@ class Pairing(db.Model, CommonMixIn):
 
         if stmt is not None:
             from nomenklatura.processing import process_updates
-            process_updates.delay(self.dataset.slug, statement_id=stmt.id)
+            process_updates.delay(statement_id=stmt.id)
 
     @classmethod
-    def update(cls, data, dataset, user, score=None):
+    def update(cls, data, user, score=None):
         data = PairingForm().deserialize(data)
         entities = data.get('left_id'), data.get('right_id')
         left_id, right_id = min(entities), max(entities)
-        q = cls.all().filter_by(dataset=dataset)
+        q = cls.all()
         q = q.filter_by(left_id=left_id).filter_by(right_id=right_id)
         pairing = q.first()
         if pairing is None:
             pairing = cls()
-            pairing.dataset = dataset
             pairing.left_id = left_id
             pairing.right_id = right_id
 
@@ -98,8 +92,8 @@ class Pairing(db.Model, CommonMixIn):
         return pairing
 
     @classmethod
-    def existing(cls, dataset, entity_id):
-        q = cls.all().filter_by(dataset=dataset)
+    def existing(cls, entity_id):
+        q = cls.all()
         q = q.filter(or_(cls.left_id == entity_id,
                          cls.right_id == entity_id))
         for pairing in q:

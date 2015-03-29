@@ -20,8 +20,7 @@ class DataException(Exception):
 
 class DataType(object):
 
-    def __init__(self, dataset, attribute):
-        self.dataset = dataset
+    def __init__(self, attribute):
         self.attribute = attribute
 
     def serialize(self, value):
@@ -142,7 +141,7 @@ class Entity(DataType):
         from nomenklatura.query import EntityQuery
         if isinstance(value, Entity):
             return value
-        ent = EntityQuery.by_id(self.dataset, value)
+        ent = EntityQuery.by_id(value)
         if ent is None:
             raise TypeError("Entity does not exist: %r" % value)
         return ent

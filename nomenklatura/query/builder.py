@@ -17,8 +17,7 @@ from nomenklatura.query.util import OP_EQ, OP_LIKE, OP_IN, OP_NOT, \
 
 class QueryBuilder(object):
 
-    def __init__(self, dataset, parent, node):
-        self.dataset = dataset
+    def __init__(self, parent, node):
         self.parent = parent
         self.node = node
         self.results = {}
@@ -28,7 +27,7 @@ class QueryBuilder(object):
         if not hasattr(self, '_children'):
             self._children = []
             for child_node in self.node.children:
-                qb = QueryBuilder(self.dataset, self, child_node)
+                qb = QueryBuilder(self, child_node)
                 self._children.append(qb)
         return self._children
 
@@ -38,7 +37,6 @@ class QueryBuilder(object):
         stmt = aliased(Statement)
         ctx = aliased(Context)
         q = q.filter(stmt.context_id == ctx.id)
-        q = q.filter(stmt.dataset_id == self.dataset.id)
         q = q.filter(ctx.active == True) # noqa
         return stmt, q
 
@@ -177,8 +175,7 @@ class QueryBuilder(object):
         for query results. """
         obj = {
             'id': data.get('id'),
-            'api_url': url_for('entities.view', dataset=self.dataset.slug,
-                               id=data.get('id')),
+            'api_url': url_for('entities.view', id=data.get('id')),
             'parent_id': data.get('parent_id')
         }
 
@@ -238,7 +235,7 @@ class QueryBuilder(object):
             value = data.get('value')
             attr = attributes[data.get('attribute')]
             if attr.data_type not in ['type', 'entity']:
-                conv = attr.converter(self.dataset, attr)
+                conv = attr.converter(attr)
                 value = conv.deserialize_safe(value)
 
             node = self.get_node(data.get('attribute'))

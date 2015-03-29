@@ -11,8 +11,7 @@ class Entity(object):
     All data associated to an entity is stored as statements, which
     all have the entity's ID as their subject. """
 
-    def __init__(self, dataset, id=None, statements=None):
-        self.dataset = dataset
+    def __init__(self, id=None, statements=None):
         self.id = id or make_key()
         self.statements = statements or []
 
@@ -31,7 +30,7 @@ class Entity(object):
         attribute = attributes.get(attribute)
         values = value if attribute.many else [value]
         for value in values:
-            stmt = Statement(self.dataset, self.id, attribute,
+            stmt = Statement(self.id, attribute,
                              value, context)
             db.session.add(stmt)
             self.statements.append(stmt)
@@ -85,18 +84,17 @@ class Entity(object):
         return data
 
     def to_index_dict(self):
-        url = url_for('entities.view', dataset=self.dataset.slug, id=self.id)
         return {
             'id': self.id,
-            'api_url': url,
+            'api_url': url_for('entities.view', id=self.id),
             'label': self.label,
             'type': unicode(self.type)
         }
 
     @classmethod
-    def create(cls, dataset, data, context):
+    def create(cls, data, context):
         # TODO: crutch. Replace with a better thing asap.
-        entity = Entity(dataset)
+        entity = Entity()
         entity.update(data, context)
         return entity
 

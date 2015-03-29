@@ -1,5 +1,4 @@
 import colander
-from normality import slugify
 from colander import Invalid # noqa
 
 from nomenklatura.model.constants import ROLES
@@ -31,28 +30,6 @@ class UserRef(Ref):
         if isinstance(cstruct, dict):
             return self.decode(cstruct.get('id'))
         return None
-
-
-def dataset_slug_available(value):
-    from nomenklatura.model.dataset import Dataset
-    existing = Dataset.by_slug(value)
-    return existing is None
-
-
-class DatasetCreateForm(colander.MappingSchema):
-    slug = colander.SchemaNode(colander.String(),
-        preparer=slugify,
-        validator=colander.All(
-            colander.Function(dataset_slug_available, 'Invalid slug'),
-            colander.Length(min=3, max=100))) # noqa
-    label = colander.SchemaNode(colander.String(),
-        validator=colander.Length(min=3, max=500)) # noqa
-
-
-class DatasetEditForm(colander.MappingSchema):
-    label = colander.SchemaNode(colander.String(),
-        validator=colander.Length(min=3, max=500)) # noqa
-    public = colander.SchemaNode(colander.Boolean())
 
 
 def email_available(value):

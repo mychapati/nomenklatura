@@ -19,13 +19,13 @@ def get_logger(package, context):
 
 
 def get_logs(context, limit, offset):
-    package = get_package(context.dataset)
+    package = get_package(context)
     return logger.load(package, context.id, limit=limit, offset=offset)
 
 
-def get_package(dataset):
+def get_package(context):
     coll = archive.get(COLLECTION)
-    return coll.get(dataset.slug)
+    return coll.get(context.id)
 
 
 def set_state(source, state):
@@ -34,23 +34,23 @@ def set_state(source, state):
 
 
 def get_table(context):
-    package = get_package(context.dataset)
+    package = get_package(context)
     source = package.get_resource(context.resource_name)
     target = Table(package, source.name + '.json')
     return source, target
 
 
-def store_upload(dataset, file, filename, user):
-    package = get_package(dataset)
+def store_upload(file, filename, user):
+    ctx = {'active': False}
+    context = Context.create(user, ctx)
+    db.session.add(context)
+    db.session.flush()
+    package = get_package(context)
     meta = {'source_file': filename}
     source = package.ingest(file, meta=meta, overwrite=False)
-    ctx = {
-        'active': False,
-        'resource_name': source.path,
-        'source_url': source.url
-    }
-    context = Context.create(dataset, user, ctx)
-    db.session.add(context)
+    context.resource_name = source.path
+    context.source_url = source.url
+    db.session.flush()
     return context
 
 
@@ -107,7 +107,7 @@ def load_upload(context_id):
         db.session.commit()
 
         from nomenklatura.processing import process_updates
-        process_updates.delay(context.dataset.slug)
+        process_updates.delay()
 
         log.info("Loading of %r has finished.",
                  context.resource_name)
@@ -141,10 +141,10 @@ def load_entity(context, mapping, record):
 
         data.append((attr, value))
 
-    query = EntityQuery(context.dataset, query)
+    query = EntityQuery(query)
     entity = query.first() if has_key else None
     if entity is None:
-        entity = Entity(context.dataset)
+        entity = Entity()
 
     for (attr, value) in data:
         entity.set(attr, value, context)

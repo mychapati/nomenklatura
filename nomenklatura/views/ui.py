@@ -18,8 +18,8 @@ def angular_templates():
 
 @app.route('/entities')
 @app.route('/entities/<path:id>')
-@app.route('/datasets')
-@app.route('/datasets/<path:id>')
+@app.route('/settings')
+@app.route('/review')
 @app.route('/login')
 @app.route('/docs/<path:id>')
 @app.route('/')

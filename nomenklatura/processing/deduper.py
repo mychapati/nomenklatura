@@ -4,7 +4,6 @@ import dedupe
 
 from nomenklatura.core import db, celery
 from nomenklatura.schema import attributes
-from nomenklatura.model.dataset import Dataset
 from nomenklatura.model.pairing import Pairing
 from nomenklatura.query import EntityQuery, execute_query
 
@@ -29,17 +28,16 @@ def make_fields():
     return fields
 
 
-def query_pairings(dataset, decided):
+def query_pairings(decided):
     q = db.session.query(Pairing)
-    q = q.filter(Pairing.dataset == dataset)
     q = q.filter(Pairing.decided == decided) # noqa
     return q
 
 
-def make_data(dataset, fields):
+def make_data(fields):
     data = {}
     q = {'limit': None}
-    for e in EntityQuery(dataset, q):
+    for e in EntityQuery(q):
         ent = {}
         for field in fields:
             name = field.get('field')
@@ -52,9 +50,9 @@ def make_data(dataset, fields):
     return data
 
 
-def make_pairs(dataset, data):
+def make_pairs(data):
     pairs = {'match': [], 'distinct': []}
-    for pairing in query_pairings(dataset, True):
+    for pairing in query_pairings(True):
         if pairing.left_id not in data or pairing.right_id not in data:
             continue
         pair = (data.get(pairing.left_id), data.get(pairing.right_id))
@@ -66,18 +64,17 @@ def make_pairs(dataset, data):
 
 
 @celery.task
-def dedupe_generate_pairings(slug, threshold=15):
-    dataset = Dataset.by_slug(slug)
-    num = query_pairings(dataset, True).count()
+def dedupe_generate_pairings(threshold=15):
+    num = query_pairings(True).count()
 
     # do this only on full moon.
     if num < threshold or num % threshold != 0:
         return
 
-    log.info("Dedupe to generate pairings candidates: %s", slug)
+    log.info("Dedupe to generate pairings candidates")
     fields = make_fields()
-    data = make_data(dataset, fields)
-    pairs = make_pairs(dataset, data)
+    data = make_data(fields)
+    pairs = make_pairs(data)
 
     deduper = dedupe.Dedupe(fields)
     deduper.sample(data)
@@ -96,51 +93,49 @@ def dedupe_generate_pairings(slug, threshold=15):
     matches = sorted(matches, key=lambda (e, a, s): s, reverse=True)
     for (left_id, right_id, score) in matches:
         Pairing.update({'left_id': left_id, 'right_id': right_id},
-                       dataset, None, score=score)
+                       None, score=score)
 
 
 @celery.task
-def generate_pairings(slug, threshold=30):
-    dataset = Dataset.by_slug(slug)
-
-    training_size = query_pairings(dataset, True).count()
+def generate_pairings(threshold=30):
+    training_size = query_pairings(True).count()
     if training_size > threshold and training_size % threshold != 0:
-        dedupe_generate_pairings.delay(slug)
+        dedupe_generate_pairings.delay()
 
-    while query_pairings(dataset, False).count() < KEEP_SIZE:
-        generate_best_random_pairing(dataset)
+    while query_pairings(False).count() < KEEP_SIZE:
+        generate_best_random_pairing()
 
 
-def generate_random_pairing(dataset):
+def generate_random_pairing():
     query = {
         'label': None,
         'sort': 'random',
         'same_as': {'optional': 'forbidden'}
     }
-    ent = execute_query(dataset, query).get('result')
+    ent = execute_query(query).get('result')
     ent_id = ent.get('id')
-    avoid = [ent_id] + list(Pairing.existing(dataset, ent_id))
+    avoid = [ent_id] + list(Pairing.existing(ent_id))
     q = {
         'id|!=': avoid,
         'label%=': ent.get('label'),
         'same_as': {'optional': 'forbidden'},
         '!same_as': {'optional': 'forbidden', 'id': ent_id}
     }
-    for res in execute_query(dataset, [q]).get('result'):
+    for res in execute_query([q]).get('result'):
         return (res.get('id'), ent_id, res.get('score'))
 
 
-def generate_best_random_pairing(dataset, num_rounds=10, cutoff=None):
+def generate_best_random_pairing(num_rounds=10, cutoff=None):
     best_pair = None
     best_score = 0
     pairing = None
     for i in range(num_rounds):
-        left_id, right_id, score = generate_random_pairing(dataset)
+        left_id, right_id, score = generate_random_pairing()
         if cutoff is not None and score >= cutoff:
             pairing = Pairing.update({
                 'left_id': left_id,
                 'right_id': right_id
-            }, dataset, None, score=score)
+            }, None, score=score)
             break
         if score > best_score:
             best_score = score
@@ -150,16 +145,16 @@ def generate_best_random_pairing(dataset, num_rounds=10, cutoff=None):
         pairing = Pairing.update({
             'left_id': best_pair[0],
             'right_id': best_pair[1]
-        }, dataset, None, score=best_score)
+        }, None, score=best_score)
 
     db.session.commit()
     return pairing
 
 
-def request_pairing(dataset, num_rounds=10, cutoff=95, exclude=None):
-    generate_pairings.delay(dataset.slug)
+def request_pairing(num_rounds=10, cutoff=95, exclude=None):
+    generate_pairings.delay()
 
-    q = Pairing.all().filter_by(dataset=dataset)
+    q = Pairing.all()
     q = q.filter_by(decided=False)
     if exclude is not None:
         q = q.filter(~Pairing.id.in_(exclude))
@@ -169,5 +164,5 @@ def request_pairing(dataset, num_rounds=10, cutoff=95, exclude=None):
     if next_ is not None:
         return next_
 
-    return generate_best_random_pairing(dataset, num_rounds=num_rounds,
+    return generate_best_random_pairing(num_rounds=num_rounds,
                                         cutoff=cutoff)

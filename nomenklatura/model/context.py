@@ -20,10 +20,6 @@ class Context(db.Model, CommonMixIn):
     resource_name = db.deferred(db.Column(db.Unicode))
     resource_mapping = db.deferred(db.Column(JSONType))
 
-    dataset_id = db.Column(db.String(KEY_LENGTH), db.ForeignKey('dataset.id'))
-    dataset = db.relationship('Dataset', backref=db.backref('contexts',
-                              lazy='dynamic', cascade='all, delete-orphan')) # noqa
-
     user_id = db.Column(db.String(KEY_LENGTH), db.ForeignKey('user.id'),
                         nullable=True)
     user = db.relationship('User', backref=db.backref('contexts',
@@ -32,7 +28,7 @@ class Context(db.Model, CommonMixIn):
     def to_dict(self):
         return {
             'id': self.id,
-            'api_url': url_for('contexts.view', dataset=self.dataset.slug, id=self.id),
+            'api_url': url_for('contexts.view', id=self.id),
             'created_at': self.created_at,
             'updated_at': self.updated_at,
             'source_url': self.source_url,
@@ -44,18 +40,19 @@ class Context(db.Model, CommonMixIn):
         }
 
     @classmethod
-    def by_id(cls, id, dataset=None):
+    def by_id(cls, id):
         q = db.session.query(cls)
         q = q.filter(cls.id == id)
-        if dataset is not None:
-            q = q.filter(cls.dataset == dataset)
         return q.first()
 
     @classmethod
-    def create(cls, dataset, user, data):
+    def all(cls, id):
+        return db.session.query(cls)
+
+    @classmethod
+    def create(cls, user, data):
         ctx = cls()
         ctx.user = user
-        ctx.dataset = dataset
         ctx.update(data)
         return ctx
 

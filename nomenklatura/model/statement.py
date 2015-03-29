@@ -19,16 +19,11 @@ class Statement(db.Model, CommonMixIn):
     normalized = db.deferred(db.Column(db.Unicode))
     inferred = db.Column('inferred', db.Boolean, default=False)
 
-    dataset_id = db.Column(db.String(KEY_LENGTH), db.ForeignKey('dataset.id'))
-    dataset = db.relationship('Dataset', backref=db.backref('statements',
-                              lazy='dynamic', cascade='all, delete-orphan')) # noqa
-
     context_id = db.Column(db.String(KEY_LENGTH), db.ForeignKey('context.id'))
     context = db.relationship('Context', backref=db.backref('statements',
                          lazy='dynamic', cascade='all, delete-orphan')) # noqa
 
-    def __init__(self, dataset, subject, attribute, value, context):
-        self.dataset = dataset
+    def __init__(self, subject, attribute, value, context):
         self.subject = subject
         self.attribute = attribute
         self.value = value
@@ -46,12 +41,12 @@ class Statement(db.Model, CommonMixIn):
 
     @hybrid_property
     def value(self):
-        conv = self.attribute.converter(self.dataset, self.attribute)
+        conv = self.attribute.converter(self.attribute)
         return conv.deserialize_safe(self._value)
 
     @value.setter
     def value(self, value):
-        conv = self.attribute.converter(self.dataset, self.attribute)
+        conv = self.attribute.converter(self.attribute)
         self._value = conv.serialize_safe(value)
         self.normalized = normalize(self._value)
 
@@ -69,7 +64,6 @@ class Statement(db.Model, CommonMixIn):
             'value': self.value,
             'inferred': self.inferred,
             'context_id': self.context_id,
-            'dataset_id': self.dataset_id,
             'created_at': self.created_at,
             'updated_at': self.updated_at
         }

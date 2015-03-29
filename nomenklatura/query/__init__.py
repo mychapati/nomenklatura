@@ -5,8 +5,8 @@ from nomenklatura.query.builder import QueryBuilder
 from nomenklatura.query.entity import EntityQuery  # noqa
 
 
-def execute_query(dataset, q):
-    qb = QueryBuilder(dataset, None, QueryNode(None, None, q))
+def execute_query(q):
+    qb = QueryBuilder(None, QueryNode(None, None, q))
     t = time.time()
     result = qb.query()
     duration = (time.time() - t) * 1000

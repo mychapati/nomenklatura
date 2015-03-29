@@ -11,8 +11,7 @@ from nomenklatura.model.entity import Entity
 
 class EntityQuery(object):
 
-    def __init__(self, dataset, query=None, limit=None, offset=None):
-        self.dataset = dataset
+    def __init__(self, query=None, limit=None, offset=None):
         self.query = query or {}
         self._limit = limit
         self._offset = offset
@@ -20,8 +19,7 @@ class EntityQuery(object):
 
     def clone(self, query, **kw):
         query = copy.deepcopy(query)
-        return EntityQuery(dataset=kw.get('dataset', self.dataset),
-                           query=query,
+        return EntityQuery(query=query,
                            limit=kw.get('limit', self._limit),
                            offset=kw.get('offset', self._offset))
 
@@ -33,7 +31,7 @@ class EntityQuery(object):
 
     def _sub_query(self, query):
         qn = QueryNode(None, None, [query])
-        qb = QueryBuilder(self.dataset, None, qn)
+        qb = QueryBuilder(None, qn)
         return qb.filter_query()
 
     def _main_query(self, query):
@@ -50,20 +48,16 @@ class EntityQuery(object):
         subject = None
         for stmt in self._main_query(query):
             if subject is not None and stmt.subject != subject:
-                yield Entity(self.dataset,
-                             id=subject,
-                             statements=statements)
+                yield Entity(id=subject, statements=statements)
                 statements = []
             subject = stmt.subject
             statements.append(stmt)
         if len(statements) and subject is not None:
-            yield Entity(self.dataset,
-                         id=subject,
-                         statements=statements)
+            yield Entity(id=subject, statements=statements)
 
     @classmethod
-    def by_id(cls, dataset, id):
-        return cls(dataset, {'id': id, 'limit': 1}).first()
+    def by_id(cls, id):
+        return cls({'id': id, 'limit': 1}).first()
 
     def first(self):
         for entity in self:

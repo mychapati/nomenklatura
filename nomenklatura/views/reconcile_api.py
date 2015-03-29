@@ -5,10 +5,9 @@ from flask import Blueprint, request
 from apikit import jsonify, get_limit, obj_or_404
 from werkzeug.exceptions import BadRequest
 
-from nomenklatura import authz
-from nomenklatura.core import url_for
+from nomenklatura.core import url_for, app_title
+from nomenklatura.views import authz
 from nomenklatura.schema import attributes, types
-from nomenklatura.model import Dataset
 from nomenklatura.query import execute_query
 
 
@@ -16,9 +15,9 @@ blueprint = Blueprint('reconcile_api', __name__)
 log = logging.getLogger(__name__)
 
 
-def entity_ui(dataset, id):
+def entity_ui(id):
     domain = url_for('index').strip('/')
-    return '%s/datasets/%s/entities/%s' % (domain, dataset.slug, id)
+    return '%s/entities/%s' % (domain, id)
 
 
 def query_types(types_):
@@ -32,22 +31,22 @@ def query_types(types_):
     return queried if len(queried) else None
 
 
-def reconcile_index(dataset):
+def reconcile_index():
     domain = url_for('index').strip('/')
     meta = {
-        'name': dataset.label,
+        'name': app_title,
         'identifierSpace': 'http://rdf.freebase.com/ns/type.object.id',
         'schemaSpace': 'http://rdf.freebase.com/ns/type.object.id',
-        'view': {'url': entity_ui(dataset, '{{id}}')},
+        'view': {'url': entity_ui('{{id}}')},
         'preview': {
-            'url': entity_ui(dataset, '{{id}}') + '?preview=true',
+            'url': entity_ui('{{id}}') + '?preview=true',
             'width': 600,
             'height': 300
         },
         'suggest': {
             'entity': {
                 'service_url': domain,
-                'service_path': '/api/2/datasets/' + dataset.slug + '/suggest'
+                'service_path': '/api/2/suggest'
             },
             'type': {
                 'service_url': domain,
@@ -63,8 +62,8 @@ def reconcile_index(dataset):
     return jsonify(meta)
 
 
-def reconcile_op(dataset, query):
-    log.info("Reconciling in %s: %r", dataset.slug, query)
+def reconcile_op(query):
+    log.info("Reconciling: %r", query)
 
     # properties = []
     # if 'properties' in query:
@@ -79,14 +78,14 @@ def reconcile_op(dataset, query):
     }
 
     results = []
-    for entity in execute_query(dataset, [q]).get('result'):
+    for entity in execute_query([q]).get('result'):
         type_ = types[entity.get('type')].to_freebase_type()
         results.append({
             'id': entity.get('id'),
             'name': entity.get('label'),
             'score': entity.get('score'),
             'type': [type_],
-            'uri': entity_ui(dataset, entity.get('id')),
+            'uri': entity_ui(entity.get('id')),
             'match': False
         })
 
@@ -96,16 +95,13 @@ def reconcile_op(dataset, query):
     }
 
 
-@blueprint.route('/datasets/<dataset>/reconcile', methods=['GET', 'POST'])
-def reconcile(dataset):
+@blueprint.route('/reconcile', methods=['GET', 'POST'])
+def reconcile():
     """
     Reconciliation API, emulates Google Refine API. See:
     http://code.google.com/p/google-refine/wiki/ReconciliationServiceApi
     """
-    authz.require(authz.dataset_read(dataset))
-    dataset = obj_or_404(Dataset.by_slug(dataset))
-
-    # TODO: Add proper support for types and namespacing.
+    authz.require(authz.system_read())
     data = request.args.copy()
     data.update(request.form.copy())
 
@@ -119,7 +115,7 @@ def reconcile(dataset):
                 raise BadRequest()
         else:
             q = data
-        return jsonify(reconcile_op(dataset, q))
+        return jsonify(reconcile_op(q))
     elif 'queries' in data:
         # multiple requests in one query
         qs = data.get('queries')
@@ -129,23 +125,21 @@ def reconcile(dataset):
             raise BadRequest()
         queries = {}
         for k, q in qs.items():
-            queries[k] = reconcile_op(dataset, q)
+            queries[k] = reconcile_op(q)
         return jsonify(queries)
     else:
-        return reconcile_index(dataset)
+        return reconcile_index()
 
 
-@blueprint.route('/datasets/<dataset>/suggest', methods=['GET', 'POST'])
-def suggest_entity(dataset):
+@blueprint.route('/suggest', methods=['GET', 'POST'])
+def suggest_entity():
     """
     Suggest API, emulates Google Refine API. See:
     https://github.com/OpenRefine/OpenRefine/wiki/Reconciliation-Service-API
     """
-    authz.require(authz.dataset_read(dataset))
-    dataset = obj_or_404(Dataset.by_slug(dataset))
-
+    authz.require(authz.system_read())
     prefix = request.args.get('prefix', '')
-    log.info("Suggesting entities in %s: %r", dataset.slug, prefix)
+    log.info("Suggesting entities: %r", prefix)
 
     q = {
         'label~=': prefix,
@@ -155,14 +149,14 @@ def suggest_entity(dataset):
     }
 
     matches = []
-    for entity in execute_query(dataset, [q]).get('result'):
+    for entity in execute_query([q]).get('result'):
         type_ = types[entity.get('type')].to_freebase_type()
         matches.append({
             'id': entity.get('id'),
             'name': entity.get('label'),
             'n:type': type_,
             'type': [type_],
-            'uri': entity_ui(dataset, entity.get('id'))
+            'uri': entity_ui(entity.get('id'))
         })
 
     return jsonify({
