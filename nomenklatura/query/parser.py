@@ -16,6 +16,7 @@ class QueryNode(object):
             value = None if not len(value) else value[0]
 
         if isinstance(value, dict):
+            self.sort = value.pop('sort', None)
             self.limit = value.pop('limit', 15)
             if not self.many:
                 self.limit = 1

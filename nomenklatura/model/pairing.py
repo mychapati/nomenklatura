@@ -123,23 +123,28 @@ class Pairing(db.Model, CommonMixIn):
 
     @classmethod
     def generate(cls, dataset, num_rounds=15, cutoff=90):
+        from nomenklatura.query import execute_query
         best_pair = None
         best_score = 0
         for i in range(num_rounds):
-            ent = dataset.entities.no_same_as().random()
-            avoid = [ent.id] + list(cls.existing(dataset, ent.id))
-            for label in [ent.label] + ent.get(attributes.alias):
-                q = dataset.entities.not_subject(avoid).levenshtein(label)
-                q = q.no_same_as().not_the_same_as(ent.id).limit(1)
-                for score, otr in q.scored():
-                    if score >= cutoff:
-                        return cls.update({
-                            'left_id': otr.id,
-                            'right_id': ent.id
-                        }, dataset, None, score=score)
-                    if score > best_score:
-                        best_score = score
-                        best_pair = (ent, otr)
+            # TODO remove aliases (same_as).
+            query = {'label': None, 'sort': 'random'}
+            ent = execute_query(dataset, query).get('result')
+            ent_id = ent.get('id')
+            avoid = [ent_id] + list(cls.existing(dataset, ent_id))
+            q = {'id|!=': avoid, 'label%=': ent.get('label')}
+
+            # q = dataset.entities.not_subject(avoid).levenshtein(label)
+            # q = q.no_same_as().not_the_same_as(ent.id).limit(1)
+            for res in execute_query(dataset, [q]).get('result'):
+                if res.get('score') >= cutoff:
+                    return cls.update({
+                        'left_id': res.get('id'),
+                        'right_id': ent_id
+                    }, dataset, None, score=res.get('score'))
+                if res.get('score') > best_score:
+                    best_score = res.get('score')
+                    best_pair = (ent_id, res.get('id'))
 
         if best_pair is not None:
             return cls.update({

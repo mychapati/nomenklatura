@@ -8,7 +8,7 @@ from nomenklatura.core import db, url_for
 from nomenklatura.schema import attributes
 from nomenklatura.model.statement import Statement
 from nomenklatura.model.context import Context
-from nomenklatura.query.util import OP_EQ, OP_LIKE, OP_IN, OP_NOT, OP_SIM
+from nomenklatura.query.util import OP_EQ, OP_LIKE, OP_IN, OP_NOT, OP_SIM, OP_NIN
 
 
 # TODO: split out the parts that affect graph filtering and
@@ -56,6 +56,8 @@ class QueryBuilder(object):
             q = q.filter(filter_stmt._value != self.node.value)
         elif self.node.op == OP_IN:
             q = q.filter(filter_stmt._value.in_(self.node.data))
+        elif self.node.op == OP_NIN:
+            q = q.filter(~filter_stmt._value.in_(self.node.data))
         elif self.node.op == OP_LIKE:
             value = '%%%s%%' % normalize(self.node.value)
             q = q.filter(filter_stmt.normalized.like(value))
@@ -82,6 +84,8 @@ class QueryBuilder(object):
             q = q.filter(filter_stmt.subject != self.node.value)
         elif self.node.op == OP_IN:
             q = q.filter(filter_stmt.subject.in_(self.node.data))
+        elif self.node.op == OP_NIN:
+            q = q.filter(~filter_stmt.subject.in_(self.node.data))
         return q
 
     def filter(self, q, subject):
@@ -128,7 +132,9 @@ class QueryBuilder(object):
 
         q = self.filter(q, stmt.subject)
         q = q.group_by(stmt.subject)
-        q = q.order_by(stmt.subject.asc())
+        # q = q.order_by(stmt.subject.asc())
+        if self.node.sort == 'random':
+            q = q.order_by(func.random())
 
         if self.node.root and self.node.limit is not None:
             q = q.limit(self.node.limit)
