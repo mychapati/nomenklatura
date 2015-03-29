@@ -9,7 +9,6 @@ from nomenklatura.schema import attributes
 from nomenklatura.model.statement import Statement
 from nomenklatura.model.context import Context
 from nomenklatura.query.util import OP_EQ, OP_LIKE, OP_IN, OP_NOT, OP_SIM
-# from nomenklatura.model.type import Type
 
 
 class QueryBuilder(object):
@@ -120,7 +119,7 @@ class QueryBuilder(object):
         q = q.group_by(stmt.subject)
         q = q.order_by(stmt.subject.asc())
 
-        if self.node.root:
+        if self.node.root and self.node.limit is not None:
             q = q.limit(self.node.limit)
             q = q.offset(self.node.offset)
 

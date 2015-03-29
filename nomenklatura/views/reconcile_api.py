@@ -9,6 +9,7 @@ from nomenklatura import authz
 from nomenklatura.core import url_for
 from nomenklatura.schema import attributes, types
 from nomenklatura.model import Dataset
+from nomenklatura.query import execute_query
 
 
 blueprint = Blueprint('reconcile_api', __name__)
@@ -18,6 +19,17 @@ log = logging.getLogger(__name__)
 def entity_ui(dataset, id):
     domain = url_for('index').strip('/')
     return '%s/datasets/%s/entities/%s' % (domain, dataset.slug, id)
+
+
+def query_types(types_):
+    queried = set()
+    for type_name in types_:
+        if type_name is None:
+            continue
+        if '/' in type_name:
+            _, type_name = type_name.rsplit('/', 1)
+        queried.add(type_name)
+    return queried if len(queried) else None
 
 
 def reconcile_index(dataset):
@@ -54,33 +66,28 @@ def reconcile_index(dataset):
 def reconcile_op(dataset, query):
     log.info("Reconciling in %s: %r", dataset.slug, query)
 
-    # schemata = []
-    # if 'type' in query:
-    #     schemata = query.get('type')
-    #     if isinstance(schemata, basestring):
-    #         schemata = [schemata]
-    #     schemata = [s.rsplit('/', 1)[-1] for s in schemata]
-
     # properties = []
     # if 'properties' in query:
     #     for p in query.get('properties'):
     #         properties.append((p.get('pid'), p.get('v')))
 
-    q = dataset.entities.no_same_as()
-    q = q.levenshtein(query.get('query', ''))
-    q = q.limit(get_limit(default=5))
+    q = {
+        'label%=': query.get('query', ''),
+        'type': query_types([query.get('type')]),
+        'limit': get_limit(default=5)
+    }
 
     results = []
-    for score, entity in q.scored():
-        data = {
-            'name': entity.label,
-            'score': score,
-            'id': entity.id,
-            'type': entity.type.to_freebase_type(),
-            'uri': entity_ui(dataset, entity.id),
-            'match': False  # match['score'] == 100
-        }
-        results.append(data)
+    for entity in execute_query(dataset, [q]).get('result'):
+        type_ = types[entity.get('type')].to_freebase_type()
+        results.append({
+            'id': entity.get('id'),
+            'name': entity.get('label'),
+            'score': entity.get('score'),
+            'type': [type_],
+            'uri': entity_ui(dataset, entity.get('id')),
+            'match': False
+        })
 
     return {
         'result': results,
@@ -139,27 +146,23 @@ def suggest_entity(dataset):
     prefix = request.args.get('prefix', '')
     log.info("Suggesting entities in %s: %r", dataset.slug, prefix)
 
-    q = dataset.entities.no_same_as()
-    q = q.filter_prefix(prefix)
-
-    if 'type' in request.args:
-        schema_name = request.args.get('type')
-        if '/' in schema_name:
-            _, schema_name = schema_name.rsplit('/', 1)
-        q = q.filter_by(attributes.type, schema_name)
-
-    q = q.limit(get_limit(default=5))
+    # TODO: optional/forbidden of same_as to avoid aliases.
+    q = {
+        'label~=': prefix,
+        'type': query_types(request.args.getlist('type')),
+        'limit': get_limit(default=5)
+    }
 
     matches = []
-    for entity in q:
-        data = {
-            'id': entity.id,
-            'name': entity.label,
-            'n:type': entity.type.to_freebase_type(),
-            'uri': entity_ui(dataset, entity.id)
-        }
-        data['type'] = [data['n:type']]
-        matches.append(data)
+    for entity in execute_query(dataset, [q]).get('result'):
+        type_ = types[entity.get('type')].to_freebase_type()
+        matches.append({
+            'id': entity.get('id'),
+            'name': entity.get('label'),
+            'n:type': type_,
+            'type': [type_],
+            'uri': entity_ui(dataset, entity.get('id'))
+        })
 
     return jsonify({
         "code": "/api/status/ok",
