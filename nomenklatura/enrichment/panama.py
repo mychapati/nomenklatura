@@ -3,10 +3,10 @@
 from lxml import html
 from urlparse import urljoin
 from urllib import quote
+
 import requests
 
-from loom.model import T, P
-from loom.services.util import Service
+from nomenklatura.enrichment.util import Service
 
 
 HOST_URL = 'http://ohuiginn.net/panama/'
@@ -38,8 +38,8 @@ def scrape(label, path, filter, field):
 
 
 class PanamaService(Service):
-    SOURCE_LABEL = 'Panama Companies'
-    SOURCE_URL = 'http://ohuiginn.net/panama/'
+    PUBLISHER_LABEL = 'Panama Companies'
+    PUBLISHER_URL = 'http://ohuiginn.net/panama/'
 
     def lookup_company(self, node, label):
         for title, url, items in scrape(label, 'search/company', '/company/',
@@ -65,7 +65,7 @@ class PanamaService(Service):
             ctx = self.scored_context(node, title, url)
             if ctx is None:
                 continue
-            
+
             for data in items:
                 corp = self.graph.node(context=ctx)
                 corp.add(P.label, data.get('label'))

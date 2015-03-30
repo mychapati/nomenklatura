@@ -1,12 +1,13 @@
 import logging
 
-from loom.model import db
-from loom.services.opencorp import OpenCorporatesService
-from loom.services.offshoreleaks import OffshoreLeaksService
-from loom.services.panama import PanamaService
-from loom.services.secedgar import SECEDGARService
+from nomenklatura.core import db
+from nomenklatura.enrichment.opencorp import OpenCorporatesService
+from nomenklatura.enrichment.offshoreleaks import OffshoreLeaksService
+from nomenklatura.enrichment.panama import PanamaService
+from nomenklatura.enrichment.secedgar import SECEDGARService
 
 log = logging.getLogger(__name__)
+
 
 SERVICES = {
     'opencorp': OpenCorporatesService,

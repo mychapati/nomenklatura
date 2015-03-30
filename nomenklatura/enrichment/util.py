@@ -1,6 +1,6 @@
 from Levenshtein import distance
 
-from loom.model import Context, P
+from nomenklatura.model import Context
 
 SCORE_CUTOFF = 50
 
@@ -26,16 +26,16 @@ def text_score(match, candidates):
 
 
 class Service(object):
-    SOURCE_LABEL = None
-    SOURCE_URL = None
+    PUBLISHER_LABEL = None
+    PUBLISHER_URL = None
 
     def __init__(self, graph):
         self.graph = graph
 
     def create_context(self, root=None, url=None, score=None):
         ctx = Context.create(self.graph)
-        ctx.source_label = self.SOURCE_LABEL
-        ctx.source_url = self.SOURCE_URL
+        ctx.source_label = self.PUBLISHER_LABEL
+        ctx.source_url = self.PUBLISHER_URL
         ctx.root = root
         ctx.url = url
         ctx.score = score
@@ -55,4 +55,3 @@ class Service(object):
 
     def lookup(self, node):
         pass
-        

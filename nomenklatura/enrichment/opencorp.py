@@ -2,12 +2,14 @@
 #
 # http://api.opencorporates.com/documentation/API-Reference
 #
-from itertools import count
-from loom.core import app
-from loom.model import T, P
-from loom.services.util import Service
 from urlparse import urljoin
+from itertools import count
+
 import requests
+
+from nomenklatura.core import app
+from nomenklatura.enrichment.util import Service
+
 
 API_HOST = 'https://api.opencorporates.com/'
 CORP_ID = 'https://opencorporates.com/companies/'
@@ -39,8 +41,8 @@ def opencorporates_paginate(path, collection_name, item_name, query):
 
 
 class OpenCorporatesService(Service):
-    SOURCE_LABEL = 'OpenCorporates'
-    SOURCE_URL = 'https://opencorporates.com'
+    PUBLISHER_LABEL = 'OpenCorporates'
+    PUBLISHER_URL = 'https://opencorporates.com'
 
     def make_api_url(self, url):
         if '://api.' not in url:

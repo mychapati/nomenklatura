@@ -5,8 +5,7 @@ from urlparse import urljoin
 from urllib import quote
 import requests
 
-from loom.model import T, P
-from loom.services.util import Service
+from nomenklatura.enrichment.util import Service
 
 QUERY_URL = 'http://offshoreleaks.icij.org/search'
 
@@ -37,8 +36,8 @@ def scrape(label, fld, cls):
 
 
 class OffshoreLeaksService(Service):
-    SOURCE_LABEL = 'ICIJ OffshoreLeaks'
-    SOURCE_URL = 'http://offshoreleaks.icij.org'
+    PUBLISHER_LABEL = 'ICIJ OffshoreLeaks'
+    PUBLISHER_URL = 'http://offshoreleaks.icij.org'
 
     def parse_graph(self, data):
         root_id = data.get('node', {}).get('id')
