@@ -17,7 +17,7 @@ nomenklatura.controller('SettingsCtrl', ['$scope', '$route', '$routeParams', '$l
   $scope.users = users;
 
   $scope.roleChange = function(user) {
-    $http.post(user.api_url + '/roles', user);
+    $http.post(user.api_url, user);
   };
 
   $scope.readonlyRole = function(user) {

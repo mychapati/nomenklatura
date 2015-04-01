@@ -13,28 +13,23 @@ blueprint = Blueprint('users', __name__)
 
 @blueprint.route('/users', methods=['GET'])
 def index():
-    authz.require(authz.logged_in())
-    users = []
-    for user in User.all():
-        data = user.to_dict()
-        del data['email']
-        users.append(data)
+    authz.require(authz.system_manage())
+    users = list(User.all())
     return jsonify({'results': users, 'total': len(users)})
 
 
 @blueprint.route('/users/<id>', methods=['GET'])
 def view(id):
+    authz.require(authz.system_read())
     user = obj_or_404(User.by_id(id))
     data = user.to_dict()
-    if user.id != current_user.id:
-        del data['email']
     return jsonify(data)
 
 
 @blueprint.route('/users/<id>', methods=['POST', 'PUT'])
 def update(id):
     user = obj_or_404(User.by_id(id))
-    authz.require(user.id == current_user.id)
+    authz.require(user.id == current_user.id or authz.system_manage())
     user.update(request_data())
     db.session.commit()
     return jsonify(user)

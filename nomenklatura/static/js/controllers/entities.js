@@ -9,11 +9,9 @@ var loadEntity = ['$route', '$http', '$q', function($route, $http, $q) {
 }];
 
 
-var loadSchema = ['$route', '$http', '$q', function($route, $http, $q) {
+var loadSchema = ['config', '$q', function(config, $q) {
   var dfd = $q.defer();
-  $http.get('/api/2/schema').then(function(res) {
-    dfd.resolve(res.data);
-  });
+  dfd.resolve(config.SCHEMA);
   return dfd.promise;
 }];
 
@@ -21,6 +19,7 @@ var loadSchema = ['$route', '$http', '$q', function($route, $http, $q) {
 nomenklatura.controller('EntitiesViewCtrl', ['$scope', '$routeParams', '$location',
             '$http', '$modal', '$timeout', 'schema', 'entity',
   function ($scope, $routeParams, $location, $http, $modal, $timeout, schema, entity) {
+
   $scope.entity = entity;
   $scope.schema = schema;
 

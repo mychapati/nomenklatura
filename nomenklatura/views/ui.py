@@ -1,8 +1,10 @@
 import os
 
+from apikit.jsonify import JSONEncoder
 from flask import render_template
 
-from nomenklatura.core import app
+from nomenklatura.core import app, app_name, app_title
+from nomenklatura.schema import attributes, types
 
 
 def angular_templates():
@@ -26,4 +28,14 @@ def angular_templates():
 @app.route('/docs/<path:id>')
 @app.route('/')
 def index(**kw):
-    return render_template('app.html', angular_templates=angular_templates())
+    config = JSONEncoder().encode({
+        'NAME': app_name,
+        'TITLE': app_title,
+        'SCHEMA': {
+            'attributes': attributes._items,
+            'types': types._items
+        }
+    })
+    return render_template('app.html', config=config,
+                           app_name=app_name, app_title=app_title,
+                           angular_templates=angular_templates())

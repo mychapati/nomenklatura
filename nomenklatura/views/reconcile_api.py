@@ -139,7 +139,6 @@ def suggest_entity():
     """
     authz.require(authz.system_read())
     prefix = request.args.get('prefix', '')
-    log.info("Suggesting entities: %r", prefix)
 
     q = {
         'label~=': prefix,
@@ -170,8 +169,6 @@ def suggest_entity():
 @blueprint.route('/reconcile/property', methods=['GET', 'POST'])
 def suggest_property():
     prefix = request.args.get('prefix', '')
-    log.info("Suggesting property names: %r", prefix)
-
     matches = []
     for attribute in list(attributes.suggest(prefix))[:5]:
         matches.append({
@@ -193,8 +190,6 @@ def suggest_property():
 @blueprint.route('/reconcile/type', methods=['GET', 'POST'])
 def suggest_type():
     prefix = request.args.get('prefix', '')
-    log.info("Suggesting types: %r", prefix)
-
     matches = []
     for type_ in list(types.suggest(prefix))[:5]:
         matches.append(type_.to_freebase_type())

@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>{{APP_TITLE}}</title>
+  <title>{{app_title}}</title>
   <meta name="description" content="nomenklatura is a data cleaning service. It helps data users to remove duplicate and near-duplicate entity references from their data by creating canonical entity lists with aliases.">
 
   <link href='http://fonts.googleapis.com/css?family=Lato:400,300,700|Droid+Sans+Mono'
@@ -28,7 +28,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="/">{{APP_TITLE}}</a>
+          <a class="navbar-brand" href="/">{{app_title}}</a>
         </div>
 
         <div class="collapse navbar-collapse navbar-ex1-collapse navbar-right">
@@ -65,7 +65,7 @@
   </div>
   <footer>
     <div class="container-fluid">
-      <p><strong>{{APP_TITLE}}.</strong>
+      <p><strong>{{app_title}}.</strong>
       A data cleaning service that helps link and de-duplicate entities in raw data.<br/>
       <a href="https://github.com/pudo/nomenklatura">
         <i class="icon-github"></i> GitHub
@@ -83,6 +83,8 @@
       </p>
     </div>
   </footer>
+
+  <script>var STATIC_CONFIG = {{ config | safe }};</script>
 
   {% assets "deps" %}
     <script src="{{ ASSET_URL }}"></script>

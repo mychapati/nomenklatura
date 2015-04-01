@@ -1,15 +1,14 @@
 import logging
 
+from archivekit import open_archive
+from normality import slugify
 from flask import Flask
 from flask import url_for as _url_for
 from flask.ext.sqlalchemy import SQLAlchemy
-from flask_oauthlib.client import OAuth
 from flask_mail import Mail
 from flask.ext.login import LoginManager
 from flask.ext.assets import Environment
 from flask.ext.migrate import Migrate
-from archivekit import open_archive
-from normality import slugify
 from kombu import Exchange, Queue
 from celery import Celery
 
@@ -21,9 +20,9 @@ logging.getLogger('passlib').setLevel(logging.WARNING)
 app = Flask(__name__)
 app.config.from_object(default_settings)
 app.config.from_envvar('NOMENKLATURA_SETTINGS', silent=True)
+
 app_title = app.config.get('APP_TITLE', 'Nomenklatura')
 app_name = app.config.get('APP_NAME', slugify(app_title, sep='_'))
-
 
 db = SQLAlchemy(app)
 migrate = Migrate(app, db, directory=app.config.get('ALEMBIC_DIR'))
@@ -47,9 +46,6 @@ celery.config_from_object(app.config)
 
 archive = open_archive(app.config.get('ARCHIVE_TYPE'),
                        **app.config.get('ARCHIVE_CONFIG'))
-
-
-oauth = OAuth()
 
 
 def url_for(*a, **kw):
