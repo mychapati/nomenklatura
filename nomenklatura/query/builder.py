@@ -38,6 +38,7 @@ class QueryBuilder(object):
         ctx = aliased(Context)
         q = q.filter(stmt.context_id == ctx.id)
         q = q.filter(ctx.active == True) # noqa
+        q = q.filter(stmt.deleted_at == None) # noqa
         return stmt, q
 
     def filter_value(self, q, filter_stmt):

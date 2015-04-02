@@ -17,7 +17,8 @@ class Statement(db.Model, CommonMixIn):
     _attribute = db.Column('attribute', db.String(1024), index=True)
     _value = db.Column('value', db.Unicode, index=True)
     normalized = db.deferred(db.Column(db.Unicode))
-    inferred = db.Column('inferred', db.Boolean, default=False)
+    inferred_via = db.Column(db.String(KEY_LENGTH * 4))
+    deleted_at = db.Column(db.DateTime, nullable=True)
 
     context_id = db.Column(db.String(KEY_LENGTH), db.ForeignKey('context.id'))
     context = db.relationship('Context', backref=db.backref('statements',
@@ -53,19 +54,22 @@ class Statement(db.Model, CommonMixIn):
     @property
     def active(self):
         if self.context is None:
-            return True
+            return False
+        if self.deleted_at:
+            return False
         return self.context.active
 
-    def to_dict(self):
+    def to_dict(self, raw=False):
         return {
             'id': self.id,
-            'subject': self.subject.id,
-            'attribute': self.attribute.name,
-            'value': self.value,
-            'inferred': self.inferred,
+            'subject': self.subject,
+            'attribute': self._attribute,
+            'value': self._value if raw else self.value,
+            'inferred_via': self.inferred_via,
             'context_id': self.context_id,
             'created_at': self.created_at,
-            'updated_at': self.updated_at
+            'updated_at': self.updated_at,
+            'deleted_at': self.deleted_at
         }
 
     def __cmp__(self, other):

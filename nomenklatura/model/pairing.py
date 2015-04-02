@@ -1,3 +1,4 @@
+from datetime import datetime
 from sqlalchemy import or_, and_
 
 from nomenklatura.core import db
@@ -58,11 +59,8 @@ class Pairing(db.Model, CommonMixIn):
             db.session.add(context)
             db.session.add(stmt)
 
-        # TODO: figure out how to delete a statement.
-
-        if stmt is not None:
-            from nomenklatura.processing import process_updates
-            process_updates.delay(statement_id=stmt.id)
+        if self.decision is False and stmt is not None:
+            stmt.deleted_at = datetime.utcnow()
 
     @classmethod
     def update(cls, data, user, score=None):
