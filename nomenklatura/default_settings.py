@@ -23,7 +23,6 @@ CELERY_TIMEZONE = 'UTC'
 CELERY_IMPORTS = (
     'nomenklatura.processing',
     'nomenklatura.processing.imports',
-    'nomenklatura.processing.inference',
     'nomenklatura.processing.deduper',
 )
 

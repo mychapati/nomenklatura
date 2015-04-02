@@ -5,7 +5,6 @@ from apikit import jsonify, Pager, request_data, obj_or_404, arg_bool
 from nomenklatura.core import db, url_for
 from nomenklatura.views import authz
 from nomenklatura.model import Context
-from nomenklatura.processing import process_updates
 
 blueprint = Blueprint('contexts', __name__)
 
@@ -41,5 +40,4 @@ def update(id):
     context = obj_or_404(Context.by_id(id))
     context.update(request_data())
     db.session.commit()
-    process_updates.delay()
     return redirect(url_for('.view', id=context.id))

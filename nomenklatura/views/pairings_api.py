@@ -6,7 +6,7 @@ from nomenklatura.views import authz
 from nomenklatura.core import db
 from nomenklatura.model import Pairing
 from nomenklatura.query import EntityQuery
-from nomenklatura.processing.deduper import request_pairing
+from nomenklatura.processing import request_pairing, generate_pairings
 
 
 blueprint = Blueprint('pairing', __name__)
@@ -32,6 +32,6 @@ def store():
     authz.require(authz.system_edit())
     pairing = Pairing.update(request_data(), current_user)
     pairing.apply()
-
     db.session.commit()
+    generate_pairings.delay()
     return jsonify(pairing)
