@@ -36,6 +36,7 @@ def enrich(spider, entity_id):
     assert cls is not None, "Spider was not found"
     print 'Spider:', cls
     cls().lookup(entity)
+    db.session.commit()
 
 
 def main():

@@ -11,6 +11,7 @@ from nomenklatura.views.imports_api import blueprint as imports_api
 from nomenklatura.views.core_api import blueprint as core_api
 from nomenklatura.views.entities_api import blueprint as entities_api
 from nomenklatura.views.contexts_api import blueprint as contexts_api
+from nomenklatura.views.enrichment_api import blueprint as enrichment_api
 from nomenklatura.views.pairings_api import blueprint as pairings_api
 from nomenklatura.views.reconcile_api import blueprint as reconcile_api
 
@@ -57,7 +58,7 @@ def handle_data_exception(exc):
         'status': 400,
         'name': exc.message,
         'errors': {
-            exc.attribute.name: exc.message
+            exc.data_type.attribute.name: exc.message
         },
         'data_type': unicode(exc.data_type),
         'value': exc.value
@@ -69,6 +70,7 @@ app.register_blueprint(users_api, url_prefix='/api/2')
 app.register_blueprint(core_api, url_prefix='/api/2')
 app.register_blueprint(entities_api, url_prefix='/api/2')
 app.register_blueprint(contexts_api, url_prefix='/api/2')
+app.register_blueprint(enrichment_api, url_prefix='/api/2')
 app.register_blueprint(pairings_api, url_prefix='/api/2')
 app.register_blueprint(reconcile_api, url_prefix='/api/2')
 app.register_blueprint(imports_api, url_prefix='/api/2')
