@@ -7,6 +7,7 @@ from nomenklatura.schema import attributes
 from nomenklatura.model import Statement
 
 log = logging.getLogger(__name__)
+SKIP_ATTRIBUTES = [attributes.same_as, attributes.type]
 
 
 def date_parse(text):
@@ -19,7 +20,7 @@ def date_parse(text):
 def sync_statement(stmt, same_as, op):
     attr = attributes[stmt['attribute']]
 
-    if attr == attributes.same_as:
+    if attr in SKIP_ATTRIBUTES:
         return
 
     via = '%s>>%s' % (same_as['id'], stmt['id'])
