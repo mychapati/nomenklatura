@@ -4,6 +4,7 @@ from Levenshtein import jaro_winkler
 from nomenklatura.core import db
 from nomenklatura.model import Context, Entity
 from nomenklatura.schema import types, attributes
+from nomenklatura.model.constants import PENDING
 
 SCORE_CUTOFF = 50
 
@@ -32,10 +33,11 @@ class Spider(object):
         ctx = Context.create(None, {
             'active': False,
             'source_url': url,
+            'enrich_root': root,
+            'enrich_status': PENDING,
             'publisher': self.PUBLISHER_LABEL,
             'publisher_url': self.PUBLISHER_URL
         })
-        # ctx.enrich_root = root
         ctx.score = score
         db.session.add(ctx)
         return ctx

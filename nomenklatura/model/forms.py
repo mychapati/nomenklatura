@@ -1,7 +1,7 @@
 import colander
 from colander import Invalid # noqa
 
-from nomenklatura.model.constants import ROLES
+from nomenklatura.model.constants import ROLES, STATES
 
 
 class Ref(object):
@@ -82,6 +82,11 @@ class ContextEditForm(colander.MappingSchema):
                                         missing=None, default=None)
     resource_mapping = colander.SchemaNode(colander.Mapping(unknown='preserve'),
                                            missing=None, default=None)
+    enrich_root = colander.SchemaNode(colander.String(),
+                                      missing=None, default=None)
+    enrich_status = colander.SchemaNode(colander.String(),
+                                        validator=colander.OneOf(STATES),
+                                        missing=None, default=None) # noqa
 
 
 class PairingForm(colander.MappingSchema):
