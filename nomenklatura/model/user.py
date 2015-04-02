@@ -64,14 +64,6 @@ class User(db.Model, CommonMixIn):
         return sha256_crypt.verify(password, self.password)
 
     @classmethod
-    def all(cls):
-        return cls.query
-
-    @classmethod
-    def by_id(cls, id):
-        return cls.query.filter_by(id=id).first()
-
-    @classmethod
     def by_email(cls, email):
         return cls.query.filter_by(email=email).first()
 

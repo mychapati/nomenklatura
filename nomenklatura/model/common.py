@@ -26,3 +26,13 @@ class CommonMixIn(object):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow,
                            onupdate=datetime.utcnow)
+
+    @classmethod
+    def by_id(cls, id):
+        q = db.session.query(cls)
+        q = q.filter(cls.id == id)
+        return q.first()
+
+    @classmethod
+    def all(cls):
+        return db.session.query(cls)

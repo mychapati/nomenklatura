@@ -40,16 +40,6 @@ class Context(db.Model, CommonMixIn):
         }
 
     @classmethod
-    def by_id(cls, id):
-        q = db.session.query(cls)
-        q = q.filter(cls.id == id)
-        return q.first()
-
-    @classmethod
-    def all(cls):
-        return db.session.query(cls)
-
-    @classmethod
     def create(cls, user, data):
         ctx = cls()
         ctx.user = user
