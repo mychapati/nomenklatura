@@ -1,7 +1,8 @@
 import copy
 
 from nomenklatura.schema import attributes
-from nomenklatura.query.util import parse_name, is_list, OP_SIM
+from nomenklatura.model.common import is_list
+from nomenklatura.query.util import parse_name, OP_SIM
 
 
 class QueryNode(object):

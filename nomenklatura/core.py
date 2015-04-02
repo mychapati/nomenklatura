@@ -16,6 +16,7 @@ from nomenklatura import default_settings
 
 logging.basicConfig(level=logging.DEBUG)
 logging.getLogger('passlib').setLevel(logging.WARNING)
+logging.getLogger('requests').setLevel(logging.WARNING)
 
 app = Flask(__name__)
 app.config.from_object(default_settings)

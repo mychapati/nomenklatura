@@ -1,8 +1,6 @@
 import logging
 from pkg_resources import iter_entry_points
 
-from nomenklatura.core import db
-
 log = logging.getLogger(__name__)
 
 

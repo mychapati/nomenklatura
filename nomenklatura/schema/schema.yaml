@@ -3,69 +3,151 @@ types:
         label: "Object"
         abstract: true
 
+    Node:
+        label: "Node"
+        abstract: "true"
+        parent: Object
+
+    Link:
+        label: "Link"
+        abstract: "true"
+        parent: Object
+
     Company:
         label: "Company"
         parent: Organization
 
     Organization:
         label: "Organization"
-        parent: Object
+        parent: Node
 
     Person:
         label: "Person"
-        parent: Object
+        parent: Node
+
+    Post:
+        label: "Post"
+        parent: Link
 
 attributes:
     label:
         label: "Label"
         data_type: string
         types:
-            - 'Object'
+            - Node
 
     type:
         label: "Type"
         data_type: type
         types:
-            - 'Object'
+            - Object
 
     identifier:
         label: "Identifier"
         many: true
         data_type: string
         types:
-            - 'Object'
+            - Object
 
     alias:
         label: "Alias"
         many: true
         data_type: string
         types:
-            - 'Object'
+            - Node
+
+    links:
+        label: "Links"
+        many: true
+        data_type: string
+        types:
+            - Object
 
     same_as:
         label: "Same as"
+        many: false
         data_type: entity
+        types:
+            - Object
 
+    # Basic person attributes:
     email:
         label: "E-Mail"
+        many: false
         data_type: string
         types:
-            - 'Person'
+            - Person
 
     gender:
         label: "Gender"
+        many: false
         data_type: string
         types:
             - 'Person'
 
     birth_date:
         label: "Birth date"
+        many: false
         data_type: date
         types:
             - 'Person'
 
     death_date:
         label: "Death date"
+        many: false
         data_type: date
         types:
             - 'Person'
+
+    # Attributes common to all link-style objects:
+    start_date:
+        label: "Start date"
+        many: false
+        data_type: date
+        types:
+            - 'Link'
+
+    end_date:
+        label: "End date"
+        many: false
+        data_type: date
+        types:
+            - 'Link'
+
+    # Attributes related to posts, and their linkage to people
+    # and organizations.
+    role:
+        label: "Role"
+        many: false
+        data_type: string
+        types:
+            - 'Post'
+
+    holder:
+        label: "Post holder"
+        many: false
+        data_type: entity
+        types:
+            - 'Post'
+
+    posts_held:
+        label: "Posts held"
+        many: true
+        data_type: entity
+        types:
+            - 'Person'
+            - 'Organization'
+
+    has_posts:
+        label: "Posts"
+        many: true
+        data_type: entity
+        types:
+            - 'Organization'
+
+    organization:
+        label: "Organization"
+        many: false
+        data_type: entity
+        types:
+            - 'Post'

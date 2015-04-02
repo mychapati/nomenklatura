@@ -2,7 +2,6 @@
 #
 from lxml import html
 from urlparse import urljoin
-from urllib import quote
 
 import requests
 
@@ -50,16 +49,19 @@ class PanamaSpider(Spider):
             except LowScoreException:
                 continue
 
-            for data in items:
-                off = self.graph.node(context=ctx)
-                off.add(P.label, data.get('label'))
-                off.add(P.is_a, T.Person)
-                off.add(P.url, data.get('url'))
-                off.add(P.identity, data.get('url'))
+            corp = self.create_entity(ctx, types.Company, label=title,
+                                      same_as=entity,
+                                      links=url)
 
-                link = self.graph.link(ctx, off, P.officer_of, node)
-                link.add(P.identity, url + '#' + quote(data.get('label')))
-                link.add(P.position, data.get('role'))
+            for data in items:
+                person = self.create_entity(ctx, types.Person,
+                                            label=data.get('label'),
+                                            links=data.get('url'))
+                self.create_entity(ctx, types.Post,
+                                   holder=person,
+                                   organization=corp,
+                                   role=data.get('role'),
+                                   links=(url, data.get('url')))
 
     def lookup_person(self, entity):
         for title, url, items in scrape(entity.label, 'personsearch',
@@ -69,16 +71,19 @@ class PanamaSpider(Spider):
             except LowScoreException:
                 continue
 
-            for data in items:
-                corp = self.graph.node(context=ctx)
-                corp.add(P.label, data.get('label'))
-                corp.add(P.is_a, T.Company)
-                corp.add(P.url, data.get('url'))
-                corp.add(P.identity, data.get('url'))
+            person = self.create_entity(ctx, types.Person, label=title,
+                                        same_as=entity,
+                                        links=url)
 
-                link = self.graph.link(ctx, node, P.officer_of, corp)
-                link.add(P.identity, data.get('url') + '#' + quote(title))
-                link.add(P.position, data.get('role'))
+            for data in items:
+                corp = self.create_entity(ctx, types.Company,
+                                          label=data.get('label'),
+                                          links=data.get('url'))
+                self.create_entity(ctx, types.Post,
+                                   holder=person,
+                                   organization=corp,
+                                   role=data.get('role'),
+                                   links=(url, data.get('url')))
 
     def lookup(self, entity):
         if entity.type == types.Company:

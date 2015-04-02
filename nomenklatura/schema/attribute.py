@@ -11,7 +11,7 @@ class Attribute(NamedMixIn):
         self.abstract = False
         self.label = data.get('label')
         self.data_type = data.get('data_type')
-        self._types = data.get('types', ['Thing'])
+        self._types = data.get('types', ['Object'])
         self.many = data.get('many', False)
 
     @property
@@ -20,7 +20,7 @@ class Attribute(NamedMixIn):
         types_ = []
         for t in types:
             for a in t.attributes:
-                if a.name == self.name:
+                if a == self:
                     types_.append(t)
         return types_
 

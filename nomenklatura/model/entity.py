@@ -1,6 +1,6 @@
 from nomenklatura.core import db, url_for
 from nomenklatura.schema import attributes, types
-from nomenklatura.model.common import make_key
+from nomenklatura.model.common import make_key, is_list
 from nomenklatura.model.statement import Statement
 
 
@@ -28,7 +28,7 @@ class Entity(object):
 
     def set(self, attribute, value, context):
         attribute = attributes.get(attribute)
-        values = value if attribute.many else [value]
+        values = value if is_list(value) else [value]
         for value in values:
             stmt = Statement(self.id, attribute,
                              value, context)
@@ -93,14 +93,15 @@ class Entity(object):
 
     @classmethod
     def create(cls, data, context):
-        # TODO: crutch. Replace with a better thing asap.
         entity = Entity()
         entity.update(data, context)
         return entity
 
     def update(self, data, context):
-        # TODO: crutch. Replace with a better thing asap.
-        for attribute in attributes:
+        if 'type' in data:
+            self.set(attributes.type, data.pop('type'), context)
+        print self.type.attributes
+        for attribute in self.type.attributes:
             if attribute.name in data:
                 self.set(attribute, data.get(attribute.name), context)
 
@@ -114,4 +115,4 @@ class Entity(object):
         return iter(self.statements)
 
     def __unicode__(self):
-        return self.label or self.id
+        return self.id

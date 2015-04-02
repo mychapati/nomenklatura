@@ -19,7 +19,3 @@ def parse_name(name):
             inverted = True
             name = name[1:]
     return name, inverted, op
-
-
-def is_list(obj):
-    return isinstance(obj, (list, tuple, set))

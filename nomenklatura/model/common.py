@@ -21,6 +21,10 @@ def make_key():
 KEY_LENGTH = len(make_key())
 
 
+def is_list(obj):
+    return isinstance(obj, (list, tuple, set))
+
+
 class CommonMixIn(object):
     id = db.Column(db.String(KEY_LENGTH), primary_key=True, default=make_key)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
