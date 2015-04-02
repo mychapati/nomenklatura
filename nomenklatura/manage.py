@@ -26,5 +26,15 @@ def dedupe():
     dedupe_generate_pairings()
 
 
-if __name__ == '__main__':
+@manager.command
+def enrich(spider, entity_id):
+    from nomenklatura.enrichment import get_spiders
+    print get_spiders()
+
+
+def main():
     manager.run()
+
+
+if __name__ == '__main__':
+    main()

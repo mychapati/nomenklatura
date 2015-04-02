@@ -6,7 +6,7 @@ from urllib import quote
 
 import requests
 
-from nomenklatura.enrichment.util import Service
+from nomenklatura.enrichment.util import Spider
 
 
 HOST_URL = 'http://ohuiginn.net/panama/'
@@ -37,7 +37,7 @@ def scrape(label, path, filter, field):
         yield pdoc.findtext('./h1'), href, items
 
 
-class PanamaService(Service):
+class PanamaSpider(Spider):
     PUBLISHER_LABEL = 'Panama Companies'
     PUBLISHER_URL = 'http://ohuiginn.net/panama/'
 

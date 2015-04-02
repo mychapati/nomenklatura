@@ -5,14 +5,15 @@ from urlparse import urljoin
 from urllib import quote
 import requests
 
-from nomenklatura.enrichment.util import Service
+from nomenklatura.schema import types, attributes
+from nomenklatura.enrichment.util import Spider
 
 QUERY_URL = 'http://offshoreleaks.icij.org/search'
 
 TYPES = {
-    'officer': T.Person,
-    'company': T.Company,
-    'entity': T.Company
+    'officer': types.Person,
+    'company': types.Company,
+    'entity': types.Company
 }
 
 
@@ -35,7 +36,7 @@ def scrape(label, fld, cls):
         yield res
 
 
-class OffshoreLeaksService(Service):
+class OffshoreLeaksSpider(Spider):
     PUBLISHER_LABEL = 'ICIJ OffshoreLeaks'
     PUBLISHER_URL = 'http://offshoreleaks.icij.org'
 

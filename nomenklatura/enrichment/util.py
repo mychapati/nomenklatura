@@ -25,7 +25,7 @@ def text_score(match, candidates):
     return best_score
 
 
-class Service(object):
+class Spider(object):
     PUBLISHER_LABEL = None
     PUBLISHER_URL = None
 

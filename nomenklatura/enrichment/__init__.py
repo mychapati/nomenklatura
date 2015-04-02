@@ -1,25 +1,21 @@
 import logging
+from pkg_resources import iter_entry_points
 
 from nomenklatura.core import db
-from nomenklatura.enrichment.opencorp import OpenCorporatesService
-from nomenklatura.enrichment.offshoreleaks import OffshoreLeaksService
-from nomenklatura.enrichment.panama import PanamaService
-from nomenklatura.enrichment.secedgar import SECEDGARService
 
 log = logging.getLogger(__name__)
 
 
-SERVICES = {
-    'opencorp': OpenCorporatesService,
-    'secedgar': SECEDGARService,
-    'panama': PanamaService,
-    'offshoreleaks': OffshoreLeaksService
-}
+def get_spiders():
+    spiders = {}
+    for ep in iter_entry_points('nomenklatura.spiders'):
+        spiders[ep.name] = ep.load()
+    return spiders
 
 
 def lookup(service, node, label):
     try:
-        svc = SERVICES.get(service)(node.graph)
+        svc = spiders.get(service)(node.graph)
         svc.lookup(node, label)
         db.session.commit()
     except Exception, e:

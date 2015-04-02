@@ -8,7 +8,7 @@ from itertools import count
 import requests
 
 from nomenklatura.core import app
-from nomenklatura.enrichment.util import Service
+from nomenklatura.enrichment.util import Spider
 
 
 API_HOST = 'https://api.opencorporates.com/'
@@ -40,7 +40,7 @@ def opencorporates_paginate(path, collection_name, item_name, query):
             yield data
 
 
-class OpenCorporatesService(Service):
+class OpenCorporatesSpider(Spider):
     PUBLISHER_LABEL = 'OpenCorporates'
     PUBLISHER_URL = 'https://opencorporates.com'
 

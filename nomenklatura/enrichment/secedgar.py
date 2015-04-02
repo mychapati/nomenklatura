@@ -1,14 +1,14 @@
 from urlparse import urljoin
-from lxml import html
 
 import requests
+from lxml import html
 
-from nomenklatura.enrichment.util import Service
+from nomenklatura.enrichment.util import Spider
 
 CIK_URL = 'http://www.sec.gov/cgi-bin/cik.pl.c'
 
 
-class SECEDGARService(Service):
+class SecEdgarSpider(Spider):
     PUBLISHER_LABEL = 'US Securities and Exchange Commission'
     PUBLISHER_URL = 'http://www.sec.gov/cgi-bin/cik.pl.c'
 
