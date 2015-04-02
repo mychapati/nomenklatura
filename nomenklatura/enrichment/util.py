@@ -1,57 +1,50 @@
-from Levenshtein import distance
+from normality import normalize
+from Levenshtein import jaro_winkler
 
+from nomenklatura.core import db
 from nomenklatura.model import Context
 
 SCORE_CUTOFF = 50
 
 
-def light_normalize(text):
-    text = unicode(text)
-    text = text.strip().lower()
-    return text
-
-
 def text_score(match, candidates):
     if isinstance(candidates, basestring):
         candidates = [candidates]
-    match_n = light_normalize(match)
+    match_n = normalize(match)
     best_score = 0
     for candidate in candidates:
-        cand_n = light_normalize(candidate)
-        dist = float(distance(match_n, cand_n))
-        l = float(max(len(match_n), len(cand_n)))
-        score = ((l - dist) / l) * 100
+        cand_n = normalize(candidate)
+        score = jaro_winkler(match_n, cand_n, 0.02) * 100
         best_score = max(int(score), best_score)
     return best_score
+
+
+class LowScoreException(Exception):
+    pass
 
 
 class Spider(object):
     PUBLISHER_LABEL = None
     PUBLISHER_URL = None
 
-    def __init__(self, graph):
-        self.graph = graph
-
     def create_context(self, root=None, url=None, score=None):
-        ctx = Context.create(self.graph)
-        ctx.source_label = self.PUBLISHER_LABEL
-        ctx.source_url = self.PUBLISHER_URL
-        ctx.root = root
-        ctx.url = url
+        ctx = Context.create(None, {
+            'active': False,
+            'source_url': url,
+            'publisher': self.PUBLISHER_LABEL,
+            'publisher_url': self.PUBLISHER_URL
+        })
+        # ctx.enrich_root = root
         ctx.score = score
+        db.session.add(ctx)
         return ctx
 
-    def scored_context(self, node, title, url):
-        score = text_score(title, node.label)
+    def scored_context(self, entity, title, url):
+        score = text_score(title, entity.label)
         if score < SCORE_CUTOFF:
             return
-        ctx = self.create_context(root=node, url=url, score=score)
-        if score < 99:
-            node.add(P.alias, title, ctx)
+        return self.create_context(root=entity.id, url=url,
+                                   score=score)
 
-        node.add(P.url, url, ctx)
-        node.add(P.identity, url, ctx)
-        return ctx
-
-    def lookup(self, node):
+    def lookup(self, entity):
         pass

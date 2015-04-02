@@ -29,7 +29,13 @@ def dedupe():
 @manager.command
 def enrich(spider, entity_id):
     from nomenklatura.enrichment import get_spiders
-    print get_spiders()
+    from nomenklatura.query import EntityQuery
+    entity = EntityQuery.by_id(entity_id)
+    assert entity is not None, "Entity was not found"
+    cls = get_spiders().get(spider)
+    assert cls is not None, "Spider was not found"
+    print 'Spider:', cls
+    cls().lookup(entity)
 
 
 def main():
