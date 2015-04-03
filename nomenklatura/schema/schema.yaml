@@ -5,12 +5,12 @@ types:
 
     Node:
         label: "Node"
-        abstract: "true"
+        abstract: true
         parent: Object
 
     Link:
         label: "Link"
-        abstract: "true"
+        abstract: true
         parent: Object
 
     Company:

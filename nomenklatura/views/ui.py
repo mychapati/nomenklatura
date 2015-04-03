@@ -4,7 +4,7 @@ from apikit.jsonify import JSONEncoder
 from flask import render_template
 
 from nomenklatura.core import app, app_name, app_title
-from nomenklatura.schema import attributes, types
+from nomenklatura.schema import types
 
 
 def angular_templates():
@@ -34,7 +34,6 @@ def index(**kw):
         'NAME': app_name,
         'TITLE': app_title,
         'SCHEMA': {
-            'attributes': attributes,
             'types': types
         }
     })

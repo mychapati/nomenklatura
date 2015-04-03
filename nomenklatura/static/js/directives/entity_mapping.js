@@ -56,8 +56,9 @@ nomenklatura.directive('entityMapping', ['RecursionHelper', function (RecursionH
 
             scope.getMapped = function() {
               var mapped = {};
+              var type = scope.schema.types[scope.mapping.type];
               angular.forEach(scope.mapping, function(spec, attr) {
-                if (attr != 'type' && scope.schema.attributes[attr]) {
+                if (attr != 'type' && type.attributes[attr]) {
                   mapped[attr] = spec;
                 }
               });

@@ -57,7 +57,7 @@ def reconcile_index():
                 'service_path': '/api/2/reconcile/property'
             }
         },
-        'defaultTypes': [t.to_freebase_type() for t in types]
+        'defaultTypes': [t.to_freebase_type() for t in types if not t.abstract]
     }
     return jsonify(meta)
 

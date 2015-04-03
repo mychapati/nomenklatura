@@ -1,7 +1,7 @@
 from collections import OrderedDict
 
 from normality import normalize
-from sqlalchemy import exists, and_, func
+from sqlalchemy import exists, func
 from sqlalchemy.orm import aliased
 
 from nomenklatura.core import db, url_for

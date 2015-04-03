@@ -1,6 +1,5 @@
 import copy
 
-from nomenklatura.schema import attributes
 from nomenklatura.model.common import is_list
 from nomenklatura.query.util import parse_name, OP_SIM
 
@@ -28,7 +27,6 @@ class QueryNode(object):
             self.offset = value.pop('offset', 0)
 
         self.value = value
-        self.attribute = attributes[self.name]
 
     @property
     def specific_attribute(self):
