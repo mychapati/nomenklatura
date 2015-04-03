@@ -40,7 +40,7 @@ def sync_statement(stmt, same_as, op):
     else:
         stmt_inf.deleted_at = None
 
-    stmt_inf._value = stmt['value']
+    stmt_inf.value = stmt['value']
     log.info('Inferred statement %s -> %s -> %s via same_as %s',
              same_as['value'], attr.name, stmt['value'], via)
     db.session.add(stmt_inf)
