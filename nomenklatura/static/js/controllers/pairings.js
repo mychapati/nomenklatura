@@ -53,6 +53,7 @@ nomenklatura.controller('PairingsReviewCtrl', ['$scope', '$routeParams', '$locat
       nextPairing = null;
       $scope.pairing = res.data;
       seen.push(res.data.pairing.id);
+      seen = seen.splice(seen.length - 6);
       loadNext();
     })
   };

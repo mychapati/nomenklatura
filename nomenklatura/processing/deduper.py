@@ -1,10 +1,14 @@
 import logging
+import time
+import random
 
 import dedupe
+from sqlalchemy import and_, or_
+from sqlalchemy.orm import aliased
 
 from nomenklatura.core import db, celery
 from nomenklatura.schema import attributes
-from nomenklatura.model import Pairing, Lock
+from nomenklatura.model import Statement, Context, Pairing, Lock
 from nomenklatura.query import EntityQuery, execute_query
 
 KEEP_SIZE = 20
@@ -38,7 +42,7 @@ def query_pairings(decided):
 
 def make_data(fields):
     data = {}
-    q = {'limit': None}
+    q = {'limit': None, 'same_as': {'optional': 'forbidden'}}
     for e in EntityQuery(q):
         ent = {}
         for field in fields:
@@ -65,16 +69,30 @@ def make_pairs(data):
     return pairs
 
 
+def same_as_exists(left_id, right_id):
+    stmt = aliased(Statement)
+    ctx = aliased(Context)
+    q = db.session.query(stmt.id)
+    q = q.filter(stmt.deleted_at == None) # noqa
+    q = q.filter(stmt.context_id == ctx.id)
+    q = q.filter(ctx.active == True) # noqa
+    q = q.filter(or_(
+        and_(stmt.subject == left_id, stmt._value == right_id),
+        and_(stmt.subject == right_id, stmt._value == left_id)
+    ))
+    return q.count() > 0
+
+
 @celery.task
-def dedupe_generate_pairings(threshold=15):
+def dedupe_generate_pairings(threshold=100):
+    # do this only on full moon.
+    num = query_pairings(True).count()
+    log.info('Triggered dedupe, with %s pairings of training data', num)
+    if num > threshold and num % threshold == 0:
+        return
+
     try:
         if not Lock.acquire(LOCK_DEDUPE):
-            return
-
-        num = query_pairings(True).count()
-
-        # do this only on full moon.
-        if num < threshold or num % threshold != 0:
             return
 
         log.info("Dedupe to generate pairings candidates")
@@ -98,24 +116,23 @@ def dedupe_generate_pairings(threshold=15):
 
         matches = sorted(matches, key=lambda (e, a, s): s, reverse=True)
         for (left_id, right_id, score) in matches:
-            Pairing.update({'left_id': left_id, 'right_id': right_id},
-                           None, score=score)
-        db.session.commit()
+            if not same_as_exists(left_id, right_id):
+                Pairing.update({'left_id': left_id, 'right_id': right_id},
+                               None, score=score)
+                db.session.commit()
     finally:
         Lock.release(LOCK_DEDUPE)
 
 
 @celery.task
-def generate_pairings(threshold=30):
+def generate_pairings(threshold=100):
+    time.sleep(random.uniform(0, 4))
+    dedupe_generate_pairings.delay(threshold=threshold)
     try:
         if not Lock.acquire(LOCK_GENERATE):
             return
 
-        training_size = query_pairings(True).count()
-        if training_size > threshold and training_size % threshold != 0:
-            dedupe_generate_pairings.delay()
-
-        while query_pairings(False).count() < KEEP_SIZE:
+        while query_pairings(False).count() <= KEEP_SIZE:
             generate_best_random_pairing()
     finally:
         Lock.release(LOCK_GENERATE)
@@ -159,19 +176,17 @@ def generate_best_random_pairing(num_rounds=10, cutoff=None):
             best_score = score
             best_pair = (left_id, right_id)
 
+    log.info('Generated best match, %r (score %s)', best_pair, best_score)
     if pairing is None and best_pair is not None:
         pairing = Pairing.update({
             'left_id': best_pair[0],
             'right_id': best_pair[1]
         }, None, score=best_score)
-
     db.session.commit()
     return pairing
 
 
 def request_pairing(num_rounds=10, cutoff=95, exclude=None):
-    generate_pairings.delay()
-
     q = Pairing.all()
     q = q.filter_by(decided=False)
     if exclude is not None:
@@ -182,5 +197,7 @@ def request_pairing(num_rounds=10, cutoff=95, exclude=None):
     if next_ is not None:
         return next_
 
-    return generate_best_random_pairing(num_rounds=num_rounds,
-                                        cutoff=cutoff)
+    next_ = generate_best_random_pairing(num_rounds=num_rounds,
+                                         cutoff=cutoff)
+    generate_pairings.delay()
+    return next_
