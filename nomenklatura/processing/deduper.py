@@ -4,10 +4,11 @@ import dedupe
 
 from nomenklatura.core import db, celery
 from nomenklatura.schema import attributes
-from nomenklatura.model.pairing import Pairing
+from nomenklatura.model import Pairing, Lock
 from nomenklatura.query import EntityQuery, execute_query
 
 KEEP_SIZE = 20
+LOCK_TOPIC = 'dedupe'
 log = logging.getLogger(__name__)
 
 
@@ -65,42 +66,52 @@ def make_pairs(data):
 
 @celery.task
 def dedupe_generate_pairings(threshold=15):
-    num = query_pairings(True).count()
+    try:
+        if not Lock.acquire(LOCK_TOPIC):
+            return
 
-    # do this only on full moon.
-    if num < threshold or num % threshold != 0:
-        return
+        num = query_pairings(True).count()
 
-    log.info("Dedupe to generate pairings candidates")
-    fields = make_fields()
-    data = make_data(fields)
-    pairs = make_pairs(data)
+        # do this only on full moon.
+        if num < threshold or num % threshold != 0:
+            return
 
-    deduper = dedupe.Dedupe(fields)
-    deduper.sample(data)
-    deduper.markPairs(pairs)
-    deduper.train()
+        log.info("Dedupe to generate pairings candidates")
+        fields = make_fields()
+        data = make_data(fields)
+        pairs = make_pairs(data)
 
-    matches = []
-    for match in deduper.match(data):
-        scored = sorted(zip(match[0], match[1]),
-                        key=lambda (id, s): s, reverse=True)
-        scored = list(scored)[:2]
-        (e1, s1), (e2, s2) = scored
-        score = ((s1 + s2) / 2.0) * 100.0
-        matches.append((e1, e2, score))
+        deduper = dedupe.Dedupe(fields)
+        deduper.sample(data)
+        deduper.markPairs(pairs)
+        deduper.train()
 
-    matches = sorted(matches, key=lambda (e, a, s): s, reverse=True)
-    for (left_id, right_id, score) in matches:
-        Pairing.update({'left_id': left_id, 'right_id': right_id},
-                       None, score=score)
+        matches = []
+        for match in deduper.match(data):
+            scored = sorted(zip(match[0], match[1]),
+                            key=lambda (id, s): s, reverse=True)
+            scored = list(scored)[:2]
+            (e1, s1), (e2, s2) = scored
+            score = ((s1 + s2) / 2.0) * 100.0
+            matches.append((e1, e2, score))
+
+        matches = sorted(matches, key=lambda (e, a, s): s, reverse=True)
+        for (left_id, right_id, score) in matches:
+            Pairing.update({'left_id': left_id, 'right_id': right_id},
+                           None, score=score)
+        db.session.commit()
+    finally:
+        Lock.release(LOCK_TOPIC)
 
 
 @celery.task
 def generate_pairings(threshold=30):
+    if not Lock.acquire(LOCK_TOPIC):
+        return
+
     training_size = query_pairings(True).count()
-    if training_size > threshold and training_size % threshold != 0:
-        dedupe_generate_pairings.delay()
+    # if training_size > threshold and training_size % threshold != 0:
+    #    dedupe_generate_pairings.delay()
 
     while query_pairings(False).count() < KEEP_SIZE:
         generate_best_random_pairing()
@@ -130,7 +141,10 @@ def generate_best_random_pairing(num_rounds=10, cutoff=None):
     best_score = 0
     pairing = None
     for i in range(num_rounds):
-        left_id, right_id, score = generate_random_pairing()
+        random_pairing = generate_random_pairing()
+        if random_pairing is None:
+            return
+        left_id, right_id, score = random_pairing
         if cutoff is not None and score >= cutoff:
             pairing = Pairing.update({
                 'left_id': left_id,
@@ -152,7 +166,7 @@ def generate_best_random_pairing(num_rounds=10, cutoff=None):
 
 
 def request_pairing(num_rounds=10, cutoff=95, exclude=None):
-    generate_pairings.delay()
+    # generate_pairings.delay()
 
     q = Pairing.all()
     q = q.filter_by(decided=False)

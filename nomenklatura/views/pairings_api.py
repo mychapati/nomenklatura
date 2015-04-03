@@ -33,5 +33,5 @@ def store():
     pairing = Pairing.update(request_data(), current_user)
     pairing.apply()
     db.session.commit()
-    generate_pairings.delay()
+    # generate_pairings.delay()
     return jsonify(pairing)
