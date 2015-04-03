@@ -3,13 +3,12 @@ import time
 import random
 
 import dedupe
-from sqlalchemy import and_, or_
-from sqlalchemy.orm import aliased
 
 from nomenklatura.core import db, celery
 from nomenklatura.schema import attributes
-from nomenklatura.model import Statement, Context, Pairing, Lock
+from nomenklatura.model import Pairing, Lock
 from nomenklatura.query import EntityQuery, execute_query
+from nomenklatura.query import same_as
 
 KEEP_SIZE = 20
 LOCK_DEDUPE = 'deduper:dedupe'
@@ -69,20 +68,6 @@ def make_pairs(data):
     return pairs
 
 
-def same_as_exists(left_id, right_id):
-    stmt = aliased(Statement)
-    ctx = aliased(Context)
-    q = db.session.query(stmt.id)
-    q = q.filter(stmt.deleted_at == None) # noqa
-    q = q.filter(stmt.context_id == ctx.id)
-    q = q.filter(ctx.active == True) # noqa
-    q = q.filter(or_(
-        and_(stmt.subject == left_id, stmt._value == right_id),
-        and_(stmt.subject == right_id, stmt._value == left_id)
-    ))
-    return q.count() > 0
-
-
 @celery.task
 def dedupe_generate_pairings(threshold=100):
     # do this only on full moon.
@@ -117,7 +102,9 @@ def dedupe_generate_pairings(threshold=100):
 
         matches = sorted(matches, key=lambda (e, a, s): s, reverse=True)
         for (left_id, right_id, score) in matches:
-            if not same_as_exists(left_id, right_id):
+            if score < 50:
+                continue
+            if not same_as.match(left_id, right_id):
                 Pairing.update({'left_id': left_id, 'right_id': right_id},
                                None, score=score)
                 db.session.commit()
@@ -147,12 +134,11 @@ def generate_random_pairing():
     }
     ent = execute_query(query).get('result')
     ent_id = ent.get('id')
-    avoid = [ent_id] + list(Pairing.existing(ent_id))
+    avoid = same_as.expand(ent_id)
+    avoid.update(Pairing.existing(ent_id))
     q = {
-        'id|!=': avoid,
-        'label%=': ent.get('label'),
-        'same_as': {'optional': 'forbidden'},
-        '!same_as': {'optional': 'forbidden', 'id': ent_id}
+        'id|!=': list(avoid),
+        'label%=': ent.get('label')
     }
     for res in execute_query([q]).get('result'):
         return (res.get('id'), ent_id, res.get('score'))
