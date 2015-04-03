@@ -5,7 +5,7 @@ from urlparse import urljoin
 from urllib import quote
 import requests
 
-from nomenklatura.schema import types, attributes
+from nomenklatura.schema import types
 from nomenklatura.enrichment.util import Spider
 
 QUERY_URL = 'http://offshoreleaks.icij.org/search'

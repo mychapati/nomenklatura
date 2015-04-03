@@ -1,7 +1,9 @@
-from nomenklatura.schema.util import NamedMixIn
+from nomenklatura.schema.util import SchemaObject
+from nomenklatura.schema.schema import Schema
+from nomenklatura.schema.attribute import Attribute
 
 
-class Type(NamedMixIn):
+class Type(SchemaObject):
     """ A type defines a node in the graph to be a member of a
     particular class of thing, e.g. a company or a person. """
 
@@ -9,24 +11,35 @@ class Type(NamedMixIn):
         self.name = name
         self.label = data.get('label')
         self.abstract = data.get('abstract', False)
-        self.parent = data.get('parent')
+        self._parent = data.get('parent')
+        self._attr_data = data.get('attributes', {})
+        self._attributes = None
 
     @property
     def root(self):
-        return self.parent is None
+        return self._parent is None
+
+    @property
+    def parent(self):
+        from nomenklatura.schema import types
+        return types[self._parent]
 
     @property
     def attributes(self):
-        from nomenklatura.schema import attributes, types
-        attrs = [] if self.root else types[self.parent].attributes
-        attrs.extend([a for a in attributes if self.name in a._types])
-        return attrs
+        if self._attributes is None:
+            self._attributes = Schema(Attribute)
+            if not self.root:
+                items = self.parent.attributes.items()
+                self._attributes._items.update(items)
+            for name, data in self._attr_data.items():
+                self._attributes._items[name] = Attribute(name, data)
+        return self._attributes
 
     def to_dict(self):
         data = {
             'name': self.name,
             'label': self.label,
-            'parent': self.parent,
+            'parent': self._parent,
             'abstract': self.abstract,
             'attributes': self.attributes
         }

@@ -5,7 +5,7 @@ from urlparse import urljoin
 
 import requests
 
-from nomenklatura.schema import types, attributes
+from nomenklatura.schema import types
 from nomenklatura.enrichment.util import Spider, LowScoreException
 
 

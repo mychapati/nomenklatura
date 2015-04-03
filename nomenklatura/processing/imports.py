@@ -5,7 +5,7 @@ from loadkit.types.table import Table
 from loadkit.operators.table import TableExtractOperator
 
 from nomenklatura.core import db, archive, celery
-from nomenklatura.schema import types, attributes, DataException
+from nomenklatura.schema import types, DataException
 from nomenklatura.model import Context, Entity
 from nomenklatura.query import EntityQuery
 
@@ -122,7 +122,7 @@ def load_entity(context, mapping, record):
     query = {'type': unicode(type_)}
     has_key = False
 
-    data = [(attributes.type, type_)]
+    data = [(types.Object.attributes.type, type_)]
     for attr in type_.attributes:
         if attr.name not in mapping or attr.name == 'type':
             continue

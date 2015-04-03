@@ -2,7 +2,6 @@ from normality import normalize
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from nomenklatura.core import db
-from nomenklatura.schema import attributes
 from nomenklatura.model.common import CommonMixIn, KEY_LENGTH
 
 
@@ -14,7 +13,7 @@ class Statement(db.Model, CommonMixIn):
     __tablename__ = 'statement'
 
     subject = db.Column(db.String(KEY_LENGTH), index=True)
-    _attribute = db.Column('attribute', db.String(1024), index=True)
+    attribute = db.Column(db.String(1024), index=True)
     _value = db.Column('value', db.Unicode, index=True)
     normalized = db.deferred(db.Column(db.Unicode))
     inferred_via = db.Column(db.String(KEY_LENGTH * 4))
@@ -29,16 +28,6 @@ class Statement(db.Model, CommonMixIn):
         self.attribute = attribute
         self.value = value
         self.context = context
-
-    @hybrid_property
-    def attribute(self):
-        return attributes[self._attribute]
-
-    @attribute.setter
-    def attribute(self, attr):
-        if hasattr(attr, 'name'):
-            attr = attr.name
-        self._attribute = attr
 
     @hybrid_property
     def value(self):
@@ -63,7 +52,7 @@ class Statement(db.Model, CommonMixIn):
         return {
             'id': self.id,
             'subject': self.subject,
-            'attribute': self._attribute,
+            'attribute': self.attribute,
             'value': self._value if raw else self.value,
             'inferred_via': self.inferred_via,
             'context_id': self.context_id,

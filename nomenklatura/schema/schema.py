@@ -1,7 +1,5 @@
 from collections import MutableMapping
 
-from normality import normalize
-
 
 class Schema(MutableMapping):
     """ A simple proxy object so you can request
@@ -25,18 +23,11 @@ class Schema(MutableMapping):
             return name
         return self[name]
 
-    def suggest(self, prefix):
-        prefix = normalize(prefix)
-        for cand in self:
-            if cand.abstract:
-                continue
-            if normalize(cand.name).startswith(prefix):
-                yield cand
-            elif normalize(cand.label).startswith(prefix):
-                yield cand
-
     def __iter__(self):
         return iter(self._items.values())
+
+    def items(self):
+        return self._items.items()
 
     def __len__(self):
         return len(self._items)

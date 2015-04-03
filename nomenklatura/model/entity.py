@@ -1,7 +1,9 @@
 from nomenklatura.core import db, url_for
-from nomenklatura.schema import attributes, types
+from nomenklatura.schema import types
 from nomenklatura.model.common import make_key, is_list
 from nomenklatura.model.statement import Statement
+
+base_attributes = types.Object.attributes
 
 
 class Entity(object):
@@ -27,7 +29,7 @@ class Entity(object):
         return attribute in self.attributes
 
     def set(self, attribute, value, context):
-        attribute = attributes.get(attribute)
+        attribute = self.type.attributes.get(attribute)
         values = value if is_list(value) else [value]
         for value in values:
             stmt = Statement(self.id, attribute,
@@ -36,7 +38,7 @@ class Entity(object):
             self.statements.append(stmt)
 
     def match(self, attribute):
-        attribute = attributes.get(attribute)
+        attribute = self.type.attributes.get(attribute)
         for stmt in self.statements:
             if stmt.attribute != attribute:
                 continue
@@ -45,7 +47,7 @@ class Entity(object):
             yield stmt
 
     def get(self, attribute):
-        attribute = attributes.get(attribute)
+        attribute = self.type.attributes.get(attribute)
         values = []
         for stmt in self.match(attribute):
             values.append(stmt.value)
@@ -55,19 +57,19 @@ class Entity(object):
 
     @property
     def type(self):
-        return self.get(attributes.type) or types.Object
+        return self.get(base_attributes.type) or types.Object
 
     @type.setter
     def type(self, type):
-        self.set(attributes.type, type)
+        self.set(base_attributes.type, type)
 
     @property
     def label(self):
-        return self.get(attributes.label)
+        return self.get(base_attributes.type.label)
 
     @label.setter
     def label(self, label):
-        self.set(attributes.label, label)
+        self.set(base_attributes.type.label, label)
 
     def to_dict(self):
         data = self.to_index_dict()
@@ -99,8 +101,7 @@ class Entity(object):
 
     def update(self, data, context):
         if 'type' in data:
-            self.set(attributes.type, data.pop('type'), context)
-        print self.type.attributes
+            self.set(types.Object.attributes.type, data.pop('type'), context)
         for attribute in self.type.attributes:
             if attribute.name in data:
                 self.set(attribute, data.get(attribute.name), context)

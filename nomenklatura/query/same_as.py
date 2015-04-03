@@ -2,7 +2,7 @@ from sqlalchemy import and_, or_
 from sqlalchemy.orm import aliased
 
 from nomenklatura.core import db
-from nomenklatura.schema import attributes
+from nomenklatura.schema import types
 from nomenklatura.model import Statement, Context
 
 
@@ -13,7 +13,7 @@ def expand(entity_id):
         ctx = aliased(Context)
         q = db.session.query(stmt.subject, stmt._value)
         q = q.filter(stmt.deleted_at == None) # noqa
-        q = q.filter(stmt._attribute == attributes.same_as.name) # noqa
+        q = q.filter(stmt.attribute == types.Object.attributes.same_as.name) # noqa
         q = q.filter(stmt.context_id == ctx.id)
         q = q.filter(ctx.active == True) # noqa
         q = q.filter(or_(

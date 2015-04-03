@@ -3,7 +3,7 @@ from Levenshtein import jaro_winkler
 
 from nomenklatura.core import db
 from nomenklatura.model import Context, Entity
-from nomenklatura.schema import types, attributes
+from nomenklatura.schema import types
 from nomenklatura.model.constants import PENDING
 
 SCORE_CUTOFF = 50
@@ -52,7 +52,7 @@ class Spider(object):
     def create_entity(self, ctx, type_, **kwargs):
         # TODO: should this do lookups first?
         entity = Entity()
-        entity.set(attributes.type, type_, ctx)
+        entity.set(types.Object.attributes.type, type_, ctx)
         for attr in type_.attributes:
             if attr.name in kwargs:
                 entity.set(attr, kwargs.get(attr.name), ctx)

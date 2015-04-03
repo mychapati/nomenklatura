@@ -7,7 +7,7 @@ from werkzeug.exceptions import BadRequest
 
 from nomenklatura.core import url_for, app_title
 from nomenklatura.views import authz
-from nomenklatura.schema import attributes, types
+from nomenklatura.schema import all_attributes, types
 from nomenklatura.query import execute_query
 
 
@@ -165,17 +165,20 @@ def suggest_entity():
 
 @blueprint.route('/reconcile/property', methods=['GET', 'POST'])
 def suggest_property():
+    authz.require(authz.system_read())
     prefix = request.args.get('prefix', '')
     matches = []
-    for attribute in list(attributes.suggest(prefix))[:5]:
-        matches.append({
-            'name': attribute.label,
-            'n:type': {
-                'id': '/properties/property',
-                'name': 'Property'
-            },
-            'id': attribute.name
-        })
+    for attribute in all_attributes():
+        print attribute
+        if attribute.match_prefix(prefix):
+            matches.append({
+                'name': attribute.label,
+                'n:type': {
+                    'id': '/properties/property',
+                    'name': 'Property'
+                },
+                'id': attribute.name
+            })
     return jsonify({
         "code": "/api/status/ok",
         "status": "200 OK",
@@ -186,10 +189,12 @@ def suggest_property():
 
 @blueprint.route('/reconcile/type', methods=['GET', 'POST'])
 def suggest_type():
+    authz.require(authz.system_read())
     prefix = request.args.get('prefix', '')
     matches = []
-    for type_ in list(types.suggest(prefix))[:5]:
-        matches.append(type_.to_freebase_type())
+    for type_ in types:
+        if type_.match_prefix(prefix):
+            matches.append(type_.to_freebase_type())
     return jsonify({
         "code": "/api/status/ok",
         "status": "200 OK",

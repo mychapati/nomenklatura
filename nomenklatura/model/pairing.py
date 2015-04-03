@@ -2,7 +2,7 @@ from datetime import datetime
 from sqlalchemy import or_, and_
 
 from nomenklatura.core import db
-from nomenklatura.schema import attributes
+from nomenklatura.schema import types
 from nomenklatura.model.common import CommonMixIn, KEY_LENGTH
 from nomenklatura.model.forms import PairingForm
 from nomenklatura.model.statement import Statement
@@ -44,7 +44,7 @@ class Pairing(db.Model, CommonMixIn):
         if not self.decided:
             return
         q = db.session.query(Statement)
-        q = q.filter(Statement._attribute == attributes.same_as.name)
+        q = q.filter(Statement.attribute == types.Object.same_as.name)
         q = q.filter(or_(
             and_(Statement.subject == self.left_id,
                  Statement._value == self.right_id),
@@ -54,7 +54,7 @@ class Pairing(db.Model, CommonMixIn):
         stmt = q.first()
         if self.decision is True and stmt is None:
             context = Context.create(self.decider, {})
-            stmt = Statement(self.left_id, attributes.same_as,
+            stmt = Statement(self.left_id, types.Object.same_as,
                              self.right_id, context)
             db.session.add(context)
             db.session.add(stmt)

@@ -1,8 +1,8 @@
 from nomenklatura.schema.data_types import DATA_TYPES
-from nomenklatura.schema.util import NamedMixIn
+from nomenklatura.schema.util import SchemaObject
 
 
-class Attribute(NamedMixIn):
+class Attribute(SchemaObject):
     """ An attribute is a named property that a node in the graph
     may have assinged to it. """
 
@@ -11,18 +11,7 @@ class Attribute(NamedMixIn):
         self.abstract = False
         self.label = data.get('label')
         self.data_type = data.get('data_type')
-        self._types = data.get('types', ['Object'])
         self.many = data.get('many', False)
-
-    @property
-    def types(self):
-        from nomenklatura.schema import types
-        types_ = []
-        for t in types:
-            for a in t.attributes:
-                if a == self:
-                    types_.append(t)
-        return types_
 
     @property
     def converter(self):

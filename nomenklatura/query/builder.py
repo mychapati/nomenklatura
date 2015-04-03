@@ -5,7 +5,7 @@ from sqlalchemy import exists, func
 from sqlalchemy.orm import aliased
 
 from nomenklatura.core import db, url_for
-from nomenklatura.schema import attributes
+from nomenklatura.schema import types
 from nomenklatura.model.statement import Statement
 from nomenklatura.model.context import Context
 from nomenklatura.query.util import OP_EQ, OP_LIKE, OP_IN, OP_NOT, \
@@ -98,7 +98,7 @@ class QueryBuilder(object):
         if query_root:
             next_subject = filter_stmt.subject
         elif self.node.specific_attribute:
-            q = q.filter(filter_stmt._attribute == self.node.name)
+            q = q.filter(filter_stmt.attribute == self.node.name)
 
         if self.node.inverted:
             next_subject, current_subject = current_subject, next_subject
@@ -130,7 +130,7 @@ class QueryBuilder(object):
         if parents is not None:
             parent_stmt, q = self._add_statement(q)
             q = q.filter(stmt.subject == parent_stmt._value)
-            q = q.filter(parent_stmt._attribute == self.node.name)
+            q = q.filter(parent_stmt.attribute == self.node.name)
             q = q.filter(parent_stmt.subject.in_(parents))
             parent_col = parent_stmt.subject.label('parent_id')
             q = q.add_column(parent_col)
@@ -210,10 +210,10 @@ class QueryBuilder(object):
 
         projected_attributes = self.project()
         if projected_attributes is not None:
-            q = q.filter(stmt._attribute.in_(projected_attributes))
+            q = q.filter(stmt.attribute.in_(projected_attributes))
 
         q = q.add_column(stmt.subject.label('id'))
-        q = q.add_column(stmt._attribute.label('attribute'))
+        q = q.add_column(stmt.attribute.label('attribute'))
         q = q.add_column(stmt._value.label('value'))
 
         if self.node.scored:
@@ -237,19 +237,19 @@ class QueryBuilder(object):
             if id not in results:
                 results[id] = self.base_object(data)
 
-            value = data.get('value')
-            attr = attributes[data.get('attribute')]
-            if attr.data_type not in ['type', 'entity']:
-                conv = attr.converter(attr)
-                value = conv.deserialize_safe(value)
-
-            node = self.get_node(data.get('attribute'))
-            if attr.many if node is None else node.many:
-                if attr.name not in results[id]:
-                    results[id][attr.name] = []
-                results[id][attr.name].append(value)
-            else:
-                results[id][attr.name] = value
+            # value = data.get('value')
+            # attr = attributes[data.get('attribute')]
+            # if attr.data_type not in ['type', 'entity']:
+            #     conv = attr.converter(attr)
+            #     value = conv.deserialize_safe(value)
+            #
+            # node = self.get_node(data.get('attribute'))
+            # if attr.many if node is None else node.many:
+            #     if attr.name not in results[id]:
+            #         results[id][attr.name] = []
+            #     results[id][attr.name].append(value)
+            # else:
+            #     results[id][attr.name] = value
         return results
 
     def collect(self, parents=None):
