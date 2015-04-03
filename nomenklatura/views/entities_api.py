@@ -6,10 +6,19 @@ from apikit import jsonify, Pager, request_data, obj_or_404
 
 from nomenklatura.core import db
 from nomenklatura.views import authz
+from nomenklatura.schema import attributes, types
 from nomenklatura.model import Entity, Context
 from nomenklatura.query import execute_query, EntityQuery
 
 blueprint = Blueprint('entities', __name__)
+
+
+@blueprint.route('/schema')
+def schema():
+    return jsonify({
+        'attributes': attributes._items,
+        'types': types._items
+    })
 
 
 @blueprint.route('/entities', methods=['GET'])

@@ -1,14 +1,36 @@
 from flask import Blueprint, request, redirect
-from flask.ext.login import login_user, current_user
+from flask.ext.login import login_user, current_user, logout_user
 from apikit import obj_or_404, request_data, jsonify
 
 from nomenklatura.model import User
-from nomenklatura.core import db, app
+from nomenklatura.core import db, app, url_for
 from nomenklatura.notification import send_activation_link, send_reset_link
+from nomenklatura.model.constants import READ, EDIT, MANAGE
 from nomenklatura.views import authz
 
 
 blueprint = Blueprint('users', __name__)
+
+
+@blueprint.route('/sessions')
+def status():
+    return jsonify({
+        'logged_in': authz.logged_in(),
+        'api_key': current_user.api_key if authz.logged_in() else None,
+        'user': current_user if authz.logged_in() else None,
+        'permissions': {
+            READ: authz.system_read(),
+            EDIT: authz.system_edit(),
+            MANAGE: authz.system_manage()
+        },
+        'logout': url_for('.logout')
+    })
+
+
+@blueprint.route('/sessions/logout')
+def logout():
+    logout_user()
+    return redirect(request.args.get('next_url', url_for('index')))
 
 
 @blueprint.route('/users', methods=['GET'])
