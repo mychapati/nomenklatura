@@ -8,7 +8,8 @@ from nomenklatura.model import Pairing, Lock
 from nomenklatura.query import EntityQuery, execute_query
 
 KEEP_SIZE = 20
-LOCK_TOPIC = 'dedupe'
+LOCK_DEDUPE = 'deduper:dedupe'
+LOCK_GENERATE = 'deduper:generate'
 log = logging.getLogger(__name__)
 
 
@@ -67,7 +68,7 @@ def make_pairs(data):
 @celery.task
 def dedupe_generate_pairings(threshold=15):
     try:
-        if not Lock.acquire(LOCK_TOPIC):
+        if not Lock.acquire(LOCK_DEDUPE):
             return
 
         num = query_pairings(True).count()
@@ -101,20 +102,23 @@ def dedupe_generate_pairings(threshold=15):
                            None, score=score)
         db.session.commit()
     finally:
-        Lock.release(LOCK_TOPIC)
+        Lock.release(LOCK_DEDUPE)
 
 
 @celery.task
 def generate_pairings(threshold=30):
-    if not Lock.acquire(LOCK_TOPIC):
-        return
+    try:
+        if not Lock.acquire(LOCK_GENERATE):
+            return
 
-    training_size = query_pairings(True).count()
-    # if training_size > threshold and training_size % threshold != 0:
-    #    dedupe_generate_pairings.delay()
+        training_size = query_pairings(True).count()
+        if training_size > threshold and training_size % threshold != 0:
+            dedupe_generate_pairings.delay()
 
-    while query_pairings(False).count() < KEEP_SIZE:
-        generate_best_random_pairing()
+        while query_pairings(False).count() < KEEP_SIZE:
+            generate_best_random_pairing()
+    finally:
+        Lock.release(LOCK_GENERATE)
 
 
 def generate_random_pairing():
@@ -166,7 +170,7 @@ def generate_best_random_pairing(num_rounds=10, cutoff=None):
 
 
 def request_pairing(num_rounds=10, cutoff=95, exclude=None):
-    # generate_pairings.delay()
+    generate_pairings.delay()
 
     q = Pairing.all()
     q = q.filter_by(decided=False)
