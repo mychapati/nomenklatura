@@ -1,9 +1,7 @@
 from nomenklatura.core import db, url_for
-from nomenklatura.schema import types
+from nomenklatura.schema import types, qualified, Attribute
 from nomenklatura.model.common import make_key, is_list
 from nomenklatura.model.statement import Statement
-
-base_attributes = types.Object.attributes
 
 
 class Entity(object):
@@ -20,16 +18,18 @@ class Entity(object):
     @property
     def attributes(self):
         attrs = set()
+        q = qualified()
         for stmt in self.statements:
-            if stmt.active:
-                attrs.add(stmt.attribute)
+            if stmt.active and stmt.attribute in q:
+                attrs.add(q[stmt.attribute])
         return attrs
 
     def has(self, attribute):
         return attribute in self.attributes
 
     def set(self, attribute, value, context):
-        attribute = self.type.attributes.get(attribute)
+        if not isinstance(attribute, Attribute):
+            attribute = self.type.attributes.get(attribute)
         values = value if is_list(value) else [value]
         for value in values:
             stmt = Statement(self.id, attribute.qname,
@@ -38,7 +38,8 @@ class Entity(object):
             self.statements.append(stmt)
 
     def match(self, attribute):
-        attribute = self.type.attributes.get(attribute)
+        if not isinstance(attribute, Attribute):
+            attribute = self.type.attributes.get(attribute)
         for stmt in self.statements:
             if stmt.attribute != attribute.qname:
                 continue
@@ -47,7 +48,8 @@ class Entity(object):
             yield stmt
 
     def get(self, attribute):
-        attribute = self.type.attributes.get(attribute)
+        if not isinstance(attribute, Attribute):
+            attribute = self.type.attributes.get(attribute)
         values = []
         for stmt in self.match(attribute):
             values.append(stmt.value)
@@ -57,19 +59,19 @@ class Entity(object):
 
     @property
     def type(self):
-        return self.get(base_attributes.type) or types.Object
+        return self.get(types.Object.attributes.type) or types.Object
 
     @type.setter
     def type(self, type):
-        self.set(base_attributes.type, type)
+        self.set(types.Object.attributes.type, type)
 
     @property
     def label(self):
-        return self.get(base_attributes.type.label)
+        return self.get(types.Node.attributes.label)
 
     @label.setter
     def label(self, label):
-        self.set(base_attributes.type.label, label)
+        self.set(types.Node.attributes.label, label)
 
     def to_dict(self):
         data = self.to_index_dict()

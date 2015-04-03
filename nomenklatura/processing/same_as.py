@@ -7,8 +7,8 @@ from nomenklatura.schema.util import date_parse
 from nomenklatura.model import Statement
 
 log = logging.getLogger(__name__)
-SKIP_ATTRIBUTES = [types.Object.attributes.same_as,
-                   types.Object.attributes.type]
+SKIP_ATTRIBUTES = [types.Node.attributes.same_as.qname,
+                   types.Object.attributes.type.qname]
 
 
 def sync_statement(stmt, same_as, op):
@@ -40,7 +40,7 @@ def sync_statement(stmt, same_as, op):
 
 
 def handle(data, op):
-    same_as_attr = types.Object.attributes.same_as.name
+    same_as_attr = types.Node.attributes.same_as.qname
     if data['attribute'] == same_as_attr:
         q = db.session.query(Statement)
         q = q.filter(Statement.subject == data['subject'])

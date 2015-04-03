@@ -3,24 +3,17 @@ types:
         label: "Object"
         abstract: true
         attributes:
-            label:
-                label: "Label"
-                data_type: string
             type:
                 label: "Type"
                 data_type: type
-            identifier:
-                label: "Identifier"
-                many: true
-                data_type: string
+            # identifier:
+            #     label: "Identifier"
+            #     many: true
+            #     data_type: string
             links:
                 label: "Links"
                 many: true
                 data_type: string
-            same_as:
-                label: "Same as"
-                many: false
-                data_type: entity
 
     Node:
         label: "Node"
@@ -30,6 +23,13 @@ types:
             alias:
                 label: "Alias"
                 many: true
+                data_type: string
+            same_as:
+                label: "Same as"
+                many: false
+                data_type: entity
+            label:
+                label: "Label"
                 data_type: string
 
     Link:

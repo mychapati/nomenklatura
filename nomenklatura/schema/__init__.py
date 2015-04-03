@@ -2,6 +2,7 @@ import os
 import yaml
 
 from nomenklatura.schema.type import Type
+from nomenklatura.schema.attribute import Attribute # noqa
 from nomenklatura.schema.schema import Schema
 from nomenklatura.schema.data_types import DataException # noqa
 

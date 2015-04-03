@@ -44,7 +44,7 @@ class Pairing(db.Model, CommonMixIn):
         if not self.decided:
             return
         q = db.session.query(Statement)
-        q = q.filter(Statement.attribute == types.Object.same_as.qname)
+        q = q.filter(Statement.attribute == types.Node.same_as.qname)
         q = q.filter(or_(
             and_(Statement.subject == self.left_id,
                  Statement._value == self.right_id),
@@ -54,7 +54,7 @@ class Pairing(db.Model, CommonMixIn):
         stmt = q.first()
         if self.decision is True and stmt is None:
             context = Context.create(self.decider, {})
-            stmt = Statement(self.left_id, types.Object.same_as,
+            stmt = Statement(self.left_id, types.Node.same_as,
                              self.right_id, context)
             db.session.add(context)
             db.session.add(stmt)

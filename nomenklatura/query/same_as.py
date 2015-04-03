@@ -13,7 +13,7 @@ def expand(entity_id):
         ctx = aliased(Context)
         q = db.session.query(stmt.subject, stmt._value)
         q = q.filter(stmt.deleted_at == None) # noqa
-        q = q.filter(stmt.attribute == types.Object.attributes.same_as.qname) # noqa
+        q = q.filter(stmt.attribute == types.Node.attributes.same_as.qname) # noqa
         q = q.filter(stmt.context_id == ctx.id)
         q = q.filter(ctx.active == True) # noqa
         q = q.filter(or_(
