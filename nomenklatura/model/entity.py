@@ -32,7 +32,7 @@ class Entity(object):
         attribute = self.type.attributes.get(attribute)
         values = value if is_list(value) else [value]
         for value in values:
-            stmt = Statement(self.id, attribute,
+            stmt = Statement(self.id, attribute.qname,
                              value, context)
             db.session.add(stmt)
             self.statements.append(stmt)
@@ -40,7 +40,7 @@ class Entity(object):
     def match(self, attribute):
         attribute = self.type.attributes.get(attribute)
         for stmt in self.statements:
-            if stmt.attribute != attribute:
+            if stmt.attribute != attribute.qname:
                 continue
             if not stmt.active:
                 continue

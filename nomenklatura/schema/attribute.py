@@ -6,10 +6,9 @@ class Attribute(SchemaObject):
     """ An attribute is a named property that a node in the graph
     may have assinged to it. """
 
-    def __init__(self, name, data):
-        self.name = name
-        self.abstract = False
-        self.label = data.get('label')
+    def __init__(self, type_, name, data):
+        super(Attribute, self).__init__(name, data.get('label'))
+        self.qname = '%s:%s' % (type_.name, name)
         self.data_type = data.get('data_type')
         self.many = data.get('many', False)
 

@@ -44,7 +44,7 @@ class Pairing(db.Model, CommonMixIn):
         if not self.decided:
             return
         q = db.session.query(Statement)
-        q = q.filter(Statement.attribute == types.Object.same_as.name)
+        q = q.filter(Statement.attribute == types.Object.same_as.qname)
         q = q.filter(or_(
             and_(Statement.subject == self.left_id,
                  Statement._value == self.right_id),

@@ -9,13 +9,12 @@ from nomenklatura.schema.data_types import DataException # noqa
 DEFAULT_SCHEMA = os.path.join(os.path.dirname(__file__), 'schema.yaml')
 
 
-def all_attributes():
-    seen = set()
+def qualified():
+    attributes = {}
     for type_ in types:
         for attr in type_.attributes:
-            if attr not in seen:
-                seen.add(attr)
-                yield attr
+            attributes[attr.qname] = attr
+    return attributes
 
 
 def load_schema():

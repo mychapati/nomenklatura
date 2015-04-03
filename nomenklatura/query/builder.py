@@ -5,15 +5,15 @@ from sqlalchemy import exists, func
 from sqlalchemy.orm import aliased
 
 from nomenklatura.core import db, url_for
-from nomenklatura.schema import types
+from nomenklatura.schema import types, qualified
 from nomenklatura.model.statement import Statement
 from nomenklatura.model.context import Context
 from nomenklatura.query.util import OP_EQ, OP_LIKE, OP_IN, OP_NOT, \
     OP_SIM, OP_NIN
 
-
 # TODO: split out the parts that affect graph filtering and
 # results processing / reconstruction.
+
 
 class QueryBuilder(object):
 
@@ -98,7 +98,7 @@ class QueryBuilder(object):
         if query_root:
             next_subject = filter_stmt.subject
         elif self.node.specific_attribute:
-            q = q.filter(filter_stmt.attribute == self.node.name)
+            q = q.filter(filter_stmt.attribute.in_(self.node.attributes))
 
         if self.node.inverted:
             next_subject, current_subject = current_subject, next_subject
@@ -165,13 +165,9 @@ class QueryBuilder(object):
         attrs = set()
         for child in self.children:
             if not child.node.nested:
-                if child.node.name == '*':
-                    return None
-                if not child.node.specific_attribute:
-                    continue
-                attrs.add(child.node.name)
+                attrs.update(child.node.attributes)
         if not len(attrs):
-            return None
+            attrs.update(qualified().keys())
         return list(attrs)
 
     def base_object(self, data):
@@ -208,9 +204,7 @@ class QueryBuilder(object):
         filter_sq = filter_q.subquery()
         q = q.filter(stmt.subject == filter_sq.c.subject)
 
-        projected_attributes = self.project()
-        if projected_attributes is not None:
-            q = q.filter(stmt.attribute.in_(projected_attributes))
+        q = q.filter(stmt.attribute.in_(self.project()))
 
         q = q.add_column(stmt.subject.label('id'))
         q = q.add_column(stmt.attribute.label('attribute'))
@@ -231,25 +225,26 @@ class QueryBuilder(object):
     def execute(self, parents=None):
         """ Run the data query and construct entities from it's results. """
         results = OrderedDict()
+        attributes = qualified()
         for row in self.data_query(parents=parents):
             data = row._asdict()
             id = data.get('id')
             if id not in results:
                 results[id] = self.base_object(data)
 
-            # value = data.get('value')
-            # attr = attributes[data.get('attribute')]
-            # if attr.data_type not in ['type', 'entity']:
-            #     conv = attr.converter(attr)
-            #     value = conv.deserialize_safe(value)
-            #
-            # node = self.get_node(data.get('attribute'))
-            # if attr.many if node is None else node.many:
-            #     if attr.name not in results[id]:
-            #         results[id][attr.name] = []
-            #     results[id][attr.name].append(value)
-            # else:
-            #     results[id][attr.name] = value
+            value = data.get('value')
+            attr = attributes[data.get('attribute')]
+            if attr.data_type not in ['type', 'entity']:
+                conv = attr.converter(attr)
+                value = conv.deserialize_safe(value)
+
+            node = self.get_node(data.get('attribute'))
+            if attr.many if node is None else node.many:
+                if attr.name not in results[id]:
+                    results[id][attr.name] = []
+                results[id][attr.name].append(value)
+            else:
+                results[id][attr.name] = value
         return results
 
     def collect(self, parents=None):

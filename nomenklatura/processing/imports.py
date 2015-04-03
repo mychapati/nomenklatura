@@ -124,7 +124,7 @@ def load_entity(context, mapping, record):
 
     data = [(types.Object.attributes.type, type_)]
     for attr in type_.attributes:
-        if attr.name not in mapping or attr.name == 'type':
+        if attr.name not in mapping or attr == types.Object.attributes.type:
             continue
         attr_map = mapping[attr.name]
         if attr.data_type == 'entity':
@@ -134,7 +134,7 @@ def load_entity(context, mapping, record):
 
         if attr_map.get('key'):
             has_key = True
-            query[attr.anme] = value
+            query[attr.name] = value
 
         data.append((attr, value))
 

@@ -1,6 +1,7 @@
 import copy
 
 from nomenklatura.model.common import is_list
+from nomenklatura.schema import qualified
 from nomenklatura.query.util import parse_name, OP_SIM
 
 
@@ -37,6 +38,16 @@ class QueryNode(object):
         if not self.specific_attribute:
             return False
         return isinstance(self.value, dict)
+
+    @property
+    def attributes(self):
+        if self.name == '*':
+            return qualified().keys()
+        attributes = []
+        for qname, attr in qualified().items():
+            if attr.name == self.name:
+                attributes.append(qname)
+        return attributes
 
     @property
     def root(self):

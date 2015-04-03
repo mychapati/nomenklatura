@@ -7,7 +7,7 @@ from werkzeug.exceptions import BadRequest
 
 from nomenklatura.core import url_for, app_title
 from nomenklatura.views import authz
-from nomenklatura.schema import all_attributes, types
+from nomenklatura.schema import qualified, types
 from nomenklatura.query import execute_query
 
 
@@ -168,8 +168,7 @@ def suggest_property():
     authz.require(authz.system_read())
     prefix = request.args.get('prefix', '')
     matches = []
-    for attribute in all_attributes():
-        print attribute
+    for qname, attribute in qualified().items():
         if attribute.match_prefix(prefix):
             matches.append({
                 'name': attribute.label,
@@ -177,7 +176,7 @@ def suggest_property():
                     'id': '/properties/property',
                     'name': 'Property'
                 },
-                'id': attribute.name
+                'id': qname
             })
     return jsonify({
         "code": "/api/status/ok",

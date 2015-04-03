@@ -8,9 +8,8 @@ class Type(SchemaObject):
     particular class of thing, e.g. a company or a person. """
 
     def __init__(self, name, data):
-        self.name = name
-        self.label = data.get('label')
-        self.abstract = data.get('abstract', False)
+        super(Type, self).__init__(name, data.get('label'),
+                                   abstract=data.get('abstract', False))
         self._parent = data.get('parent')
         self._attr_data = data.get('attributes', {})
         self._attributes = None
@@ -32,7 +31,7 @@ class Type(SchemaObject):
                 items = self.parent.attributes.items()
                 self._attributes._items.update(items)
             for name, data in self._attr_data.items():
-                self._attributes._items[name] = Attribute(name, data)
+                self._attributes._items[name] = Attribute(self, name, data)
         return self._attributes
 
     def to_dict(self):

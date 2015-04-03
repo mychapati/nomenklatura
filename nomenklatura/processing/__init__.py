@@ -4,7 +4,7 @@ from nomenklatura.core import celery as app
 from nomenklatura.model import Statement
 from nomenklatura.processing.deduper import generate_pairings # noqa
 from nomenklatura.processing.deduper import request_pairing # noqa
-from nomenklatura.processing import reason_same_as
+from nomenklatura.processing import same_as
 
 
 @models_committed.connect
@@ -20,4 +20,4 @@ def session_commit(signal, changes=None):
 
 @app.task
 def process_statement(data, op):
-    reason_same_as.handle(data, op)
+    same_as.handle(data, op)
