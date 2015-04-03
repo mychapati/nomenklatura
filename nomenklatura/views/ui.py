@@ -34,8 +34,8 @@ def index(**kw):
         'NAME': app_name,
         'TITLE': app_title,
         'SCHEMA': {
-            'attributes': attributes._items,
-            'types': types._items
+            'attributes': attributes,
+            'types': types
         }
     })
     return render_template('app.html', config=config,

@@ -16,8 +16,8 @@ blueprint = Blueprint('entities', __name__)
 @blueprint.route('/schema')
 def schema():
     return jsonify({
-        'attributes': attributes._items,
-        'types': types._items
+        'attributes': attributes,
+        'types': types
     })
 
 
