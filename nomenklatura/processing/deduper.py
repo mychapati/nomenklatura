@@ -42,7 +42,7 @@ def query_pairings(decided):
 
 def make_data(fields):
     data = {}
-    q = {'limit': None, 'same_as': {'optional': 'forbidden'}}
+    q = {'limit': None}
     for e in EntityQuery(q):
         ent = {}
         for field in fields:
@@ -90,6 +90,7 @@ def dedupe_generate_pairings(threshold=100):
     log.info('Triggered dedupe, with %s pairings of training data', num)
     if num > threshold and num % threshold == 0:
         return
+    time.sleep(random.uniform(0, 4))
 
     try:
         if not Lock.acquire(LOCK_DEDUPE):
@@ -176,7 +177,7 @@ def generate_best_random_pairing(num_rounds=10, cutoff=None):
             best_score = score
             best_pair = (left_id, right_id)
 
-    log.info('Generated best match, %r (score %s)', best_pair, best_score)
+    log.info('Generated best match, %r -> score %s', best_pair, best_score)
     if pairing is None and best_pair is not None:
         pairing = Pairing.update({
             'left_id': best_pair[0],
