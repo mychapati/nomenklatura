@@ -65,17 +65,14 @@ def reconcile_index():
 def reconcile_op(query):
     log.info("Reconciling: %r", query)
 
-    # properties = []
-    # if 'properties' in query:
-    #     for p in query.get('properties'):
-    #         properties.append((p.get('pid'), p.get('v')))
-
     q = {
         'label%=': query.get('query', ''),
         'type': query_types([query.get('type')]),
         'limit': get_limit(default=5),
         'same_as': {'optional': 'forbidden'}
     }
+    for p in query.get('properties', []):
+        q[p.get('pid')] = p.get('v')
 
     results = []
     for entity in execute_query([q]).get('result'):
