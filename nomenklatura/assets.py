@@ -30,7 +30,7 @@ app_assets = Bundle(
     'js/controllers/imports.js',
     'js/controllers/index.js',
     'js/controllers/docs.js',
-    'js/controllers/pairings.js',
+    'js/controllers/dedupe.js',
     'js/controllers/settings.js',
     'js/controllers/entities.js',
     'js/controllers/users.js',

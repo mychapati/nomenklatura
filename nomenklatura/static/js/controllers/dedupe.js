@@ -1,12 +1,12 @@
 
-nomenklatura.directive('nkPairingItem', ['$timeout', function ($timeout) {
+nomenklatura.directive('nkDedupeItem', ['$timeout', function ($timeout) {
     return {
         restrict: 'E',
         scope: {
             'entity': '=',
             'schema': '='
         },
-        templateUrl: '/static/templates/review_item.html',
+        templateUrl: '/static/templates/tools/dedupe_item.html',
         link: function (scope, element, attrs, model) {
           scope.type = {};
           scope.rows = [];
@@ -33,7 +33,7 @@ nomenklatura.directive('nkPairingItem', ['$timeout', function ($timeout) {
 }]);
 
 
-nomenklatura.controller('PairingsReviewCtrl', ['$scope', '$routeParams', '$location', '$document', '$timeout', '$http', 'schema',
+nomenklatura.controller('DedupeReviewCtrl', ['$scope', '$routeParams', '$location', '$document', '$timeout', '$http', 'schema',
   function ($scope, $routeParams, $location, $document, $timeout, $http, schema) {
   var pairingUrl = '/api/2/pairings',
       nextPairing = null,

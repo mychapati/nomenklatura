@@ -67,9 +67,9 @@ nomenklatura.config(['$routeProvider', '$locationProvider', '$sceProvider', 'cfp
     }
   });
 
-  $routeProvider.when('/review', {
-    templateUrl: '/static/templates/review.html',
-    controller: 'PairingsReviewCtrl',
+  $routeProvider.when('/manage/dedupe', {
+    templateUrl: '/static/templates/tools/dedupe.html',
+    controller: 'DedupeReviewCtrl',
     resolve: {
       'schema': loadSchema
     }
