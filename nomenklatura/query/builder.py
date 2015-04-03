@@ -97,8 +97,8 @@ class QueryBuilder(object):
         # join to the previous level via it's own attribute.
         if query_root:
             next_subject = filter_stmt.subject
-        else:
-            q = q.filter(filter_stmt._attribute == self.node.attribute.name)
+        elif self.node.specific_attribute:
+            q = q.filter(filter_stmt._attribute == self.node.name)
 
         if self.node.inverted:
             next_subject, current_subject = current_subject, next_subject
@@ -130,7 +130,7 @@ class QueryBuilder(object):
         if parents is not None:
             parent_stmt, q = self._add_statement(q)
             q = q.filter(stmt.subject == parent_stmt._value)
-            q = q.filter(parent_stmt._attribute == self.node.attribute.name)
+            q = q.filter(parent_stmt._attribute == self.node.name)
             q = q.filter(parent_stmt.subject.in_(parents))
             parent_col = parent_stmt.subject.label('parent_id')
             q = q.add_column(parent_col)
@@ -156,8 +156,7 @@ class QueryBuilder(object):
         """ A list of all sub-entities for which separate queries will
         be conducted. """
         for child in self.children:
-            if child.node.attribute and \
-                    child.node.attribute.data_type == 'entity':
+            if child.node.nested:
                 yield child
 
     def project(self):
@@ -165,11 +164,15 @@ class QueryBuilder(object):
         level of the query. """
         attrs = set()
         for child in self.children:
-            if child.node.leaf:
-                attrs.update(child.node.attributes)
-        attrs = attrs if len(attrs) else attributes
-        skip_nested = [n.node.attribute for n in self.nested()]
-        return [a.name for a in attrs if a not in skip_nested]
+            if not child.node.nested:
+                if child.node.name == '*':
+                    return None
+                if not child.node.specific_attribute:
+                    continue
+                attrs.add(child.node.name)
+        if not len(attrs):
+            return None
+        return list(attrs)
 
     def base_object(self, data):
         """ Make sure to return all the existing filter fields
@@ -206,7 +209,8 @@ class QueryBuilder(object):
         q = q.filter(stmt.subject == filter_sq.c.subject)
 
         projected_attributes = self.project()
-        q = q.filter(stmt._attribute.in_(projected_attributes))
+        if projected_attributes is not None:
+            q = q.filter(stmt._attribute.in_(projected_attributes))
 
         q = q.add_column(stmt.subject.label('id'))
         q = q.add_column(stmt._attribute.label('attribute'))
@@ -254,7 +258,7 @@ class QueryBuilder(object):
         results = self.execute(parents=parents)
         ids = results.keys()
         for child in self.nested():
-            attr = child.node.attribute.name
+            attr = child.node.name
             for child_data in child.collect(parents=ids).values():
                 parent_id = child_data.pop('parent_id')
                 if child.node.many:

@@ -31,13 +31,14 @@ class QueryNode(object):
         self.attribute = attributes[self.name]
 
     @property
-    def attributes(self):
-        if self.name == 'id':
-            return set()
-        if self.name == '*':
-            return set(attributes)
-        if self.attribute is not None:
-            return set([self.attribute])
+    def specific_attribute(self):
+        return self.name not in ['*', 'id']
+
+    @property
+    def nested(self):
+        if not self.specific_attribute:
+            return False
+        return isinstance(self.value, dict)
 
     @property
     def root(self):
