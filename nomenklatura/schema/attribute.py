@@ -1,5 +1,5 @@
 from nomenklatura.schema.data_types import DATA_TYPES
-from nomenklatura.schema.common import NamedMixIn
+from nomenklatura.schema.util import NamedMixIn
 
 
 class Attribute(NamedMixIn):

@@ -1,3 +1,12 @@
+import dateutil.parser
+
+
+def date_parse(text):
+    try:
+        return dateutil.parser.parse(text)
+    except (TypeError, ValueError):
+        return None
+
 
 class NamedMixIn(object):
 

@@ -1,4 +1,4 @@
-from nomenklatura.schema.common import NamedMixIn
+from nomenklatura.schema.util import NamedMixIn
 
 
 class Type(NamedMixIn):

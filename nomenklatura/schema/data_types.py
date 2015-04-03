@@ -1,7 +1,7 @@
 from datetime import datetime, date
+from nomenklatura.schema.util import date_parse
 
 from apikit.args import BOOL_TRUISH
-import dateutil.parser
 
 
 class DataException(Exception):
@@ -97,7 +97,9 @@ class Date(DataType):
             return value
         if isinstance(value, datetime):
             return value.date()
-        return dateutil.parser.parse(value).date()
+        dt = date_parse(value)
+        if dt is not None:
+            return dt.date()
 
 
 class DateTime(DataType):
@@ -108,7 +110,7 @@ class DateTime(DataType):
     def deserialize(self, value):
         if isinstance(value, (date, datetime)):
             return value
-        return dateutil.parser.parse(value)
+        return date_parse(value)
 
 
 class Type(DataType):

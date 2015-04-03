@@ -1,20 +1,13 @@
 from datetime import datetime
-import dateutil.parser
 import logging
 
 from nomenklatura.core import db
 from nomenklatura.schema import attributes
+from nomenklatura.schema.util import date_parse
 from nomenklatura.model import Statement
 
 log = logging.getLogger(__name__)
 SKIP_ATTRIBUTES = [attributes.same_as, attributes.type]
-
-
-def date_parse(text):
-    try:
-        return dateutil.parser.parse(text)
-    except (TypeError, ValueError):
-        return None
 
 
 def sync_statement(stmt, same_as, op):
