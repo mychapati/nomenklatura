@@ -1,5 +1,5 @@
-nomenklatura.controller('AppCtrl', ['$scope', '$window', '$routeParams', '$location', '$modal', 'Session', 'Flash',
-    function ($scope, $window, $routeParams, $location, $modal, Session, Flash) {
+nomenklatura.controller('AppCtrl', ['$scope', '$window', '$document', '$routeParams', '$location', '$modal', 'Session', 'Flash',
+    function ($scope, $window, $document, $routeParams, $location, $modal, Session, Flash) {
 
     $scope.session = {logged_in: false};
     $scope.flash = Flash;
@@ -14,4 +14,8 @@ nomenklatura.controller('AppCtrl', ['$scope', '$window', '$routeParams', '$locat
             controller: 'UsersProfileCtrl'
         });
     };
+
+    $document.bind("keypress", function (event) {
+        $scope.$broadcast("keypress", event.which);
+    });
 }]);

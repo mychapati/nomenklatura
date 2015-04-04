@@ -33,8 +33,8 @@ nomenklatura.directive('nkDedupeItem', ['$timeout', function ($timeout) {
 }]);
 
 
-nomenklatura.controller('DedupeReviewCtrl', ['$scope', '$routeParams', '$location', '$document', '$timeout', '$http', 'Flash', 'schema',
-  function ($scope, $routeParams, $location, $document, $timeout, $http, Flash, schema) {
+nomenklatura.controller('DedupeReviewCtrl', ['$scope', '$routeParams', '$location', '$timeout', '$http', 'Flash', 'schema',
+  function ($scope, $routeParams, $location, $timeout, $http, Flash, schema) {
   var url = '/api/2/pairings';
 
   $scope.schema = schema;
@@ -79,18 +79,14 @@ nomenklatura.controller('DedupeReviewCtrl', ['$scope', '$routeParams', '$locatio
   
   loadPairing();
 
-  $document.bind("keypress", function (event) {
-    //console.log(event.keyCode, event.which);
-    //if(event.which === 105) { // i
-    //  $scope.decide(null)
-    //}
-    if(event.which === 120) { // x
+  $scope.$on("keypress", function (event, which) {
+    if(which === 120) { // x
       $scope.decide(true)
     }
-    if(event.which === 121) { // x
+    if(which === 121) { // x
       $scope.decide(true)
     }
-    if(event.which === 110) { // n
+    if(which === 110) { // n
       $scope.decide(false)
     }
   });
