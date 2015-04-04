@@ -33,11 +33,11 @@ nomenklatura.directive('nkDedupeItem', ['$timeout', function ($timeout) {
 }]);
 
 
-nomenklatura.controller('DedupeReviewCtrl', ['$scope', '$routeParams', '$location', '$timeout', '$http', 'Flash', 'schema',
-  function ($scope, $routeParams, $location, $timeout, $http, Flash, schema) {
+nomenklatura.controller('DedupeReviewCtrl', ['$scope', '$routeParams', '$location', '$timeout', '$http', 'Flash', 'Meta',
+  function ($scope, $routeParams, $location, $timeout, $http, Flash, Meta) {
   var url = '/api/2/pairings';
 
-  $scope.schema = schema;
+  $scope.schema = Meta.schema;
   $scope.pairing = {};
 
 

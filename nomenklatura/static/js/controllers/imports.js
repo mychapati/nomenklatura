@@ -57,11 +57,11 @@ var loadUpload = ['$route', '$http', '$q', function($route, $http, $q) {
 }];
 
 
-nomenklatura.controller('ImportsMappingCtrl', ['$scope', '$routeParams', '$location', '$timeout', '$q', '$http', '$modal', 'Validation', 'upload', 'schema',
-  function ($scope, $routeParams, $location, $timeout, $q, $http, $modal, Validation, upload, schema) {
+nomenklatura.controller('ImportsMappingCtrl', ['$scope', '$routeParams', '$location', '$timeout', '$q', '$http', '$modal', 'Validation', 'upload', 'Meta',
+  function ($scope, $routeParams, $location, $timeout, $q, $http, $modal, Validation, upload, Meta) {
 
   var uploadCheck = null, importStarted = false;
-  $scope.schema = schema;
+  $scope.schema = Meta.schema;
   $scope.upload = upload;
   $scope.context = upload.context;
   $scope.mapping = upload.mapping;

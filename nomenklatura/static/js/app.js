@@ -13,8 +13,7 @@ nomenklatura.config(['$routeProvider', '$locationProvider', '$sceProvider', 'cfp
     templateUrl: '/static/templates/index.html',
     controller: 'IndexCtrl',
     resolve: {
-      'entities': loadEntities,
-      'schema': loadSchema
+      'entities': loadEntities
     }
   });
 
@@ -45,8 +44,7 @@ nomenklatura.config(['$routeProvider', '$locationProvider', '$sceProvider', 'cfp
     templateUrl: '/static/templates/imports/index.html',
     controller: 'ImportsIndexCtrl',
     resolve: {
-      'imports': loadImports,
-      'schema': loadSchema
+      'imports': loadImports
     }
   });
 
@@ -54,49 +52,35 @@ nomenklatura.config(['$routeProvider', '$locationProvider', '$sceProvider', 'cfp
     templateUrl: '/static/templates/imports/mapping.html',
     controller: 'ImportsMappingCtrl',
     resolve: {
-      'upload': loadUpload,
-      'schema': loadSchema
-    }
-  });
-
-  $routeProvider.when('/imports/:context/status', {
-    templateUrl: '/static/templates/imports/status.html',
-    controller: 'ImportsStatusCtrl',
-    resolve: {
       'upload': loadUpload
     }
   });
 
   $routeProvider.when('/manage/dedupe', {
     templateUrl: '/static/templates/tools/dedupe.html',
-    controller: 'DedupeReviewCtrl',
-    resolve: {'schema': loadSchema}
+    controller: 'DedupeReviewCtrl'
   });
 
   $routeProvider.when('/manage/dedupe/:id', {
     templateUrl: '/static/templates/tools/dedupe.html',
-    controller: 'DedupeReviewCtrl',
-    resolve: {'schema': loadSchema}
+    controller: 'DedupeReviewCtrl'
   });
 
   $routeProvider.when('/manage/enrichment/:root', {
     templateUrl: '/static/templates/tools/enrich.html',
-    controller: 'EnrichmentReviewCtrl',
-    resolve: {'schema': loadSchema}
+    controller: 'EnrichmentReviewCtrl'
   });
 
   $routeProvider.when('/manage/enrichment/:root/:id', {
     templateUrl: '/static/templates/tools/enrich.html',
-    controller: 'EnrichmentReviewCtrl',
-    resolve: {'schema': loadSchema}
+    controller: 'EnrichmentReviewCtrl'
   });
 
   $routeProvider.when('/entities/:id', {
     templateUrl: '/static/templates/entities/view.html',
     controller: 'EntitiesViewCtrl',
     resolve: {
-      'entity': loadEntity,
-      'schema': loadSchema
+      'entity': loadEntity
     }
   });
 

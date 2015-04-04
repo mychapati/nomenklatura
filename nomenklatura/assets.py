@@ -19,6 +19,7 @@ deps_assets = Bundle(
 
 app_assets = Bundle(
     'js/app.js',
+    'js/services/meta.js',
     'js/services/session.js',
     'js/services/validation.js',
     'js/services/flash.js',

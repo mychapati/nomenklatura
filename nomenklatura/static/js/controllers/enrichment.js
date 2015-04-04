@@ -1,10 +1,10 @@
 
-nomenklatura.controller('EnrichmentReviewCtrl', ['$scope', '$routeParams', '$location', '$timeout', '$http', 'Flash', 'schema',
-  function ($scope, $routeParams, $location, $timeout, $http, Flash, schema) {
+nomenklatura.controller('EnrichmentReviewCtrl', ['$scope', '$routeParams', '$location', '$timeout', '$http', 'Flash', 'Meta',
+  function ($scope, $routeParams, $location, $timeout, $http, Flash, Meta) {
   var url = '/api/2/enrichment/' + $routeParams.root,
       waitTimeout = null;
 
-  $scope.schema = schema;
+  $scope.schema = Meta.schema;
   $scope.candidate = {};
 
   var loadContext = function() {
@@ -49,7 +49,7 @@ nomenklatura.controller('EnrichmentReviewCtrl', ['$scope', '$routeParams', '$loc
   $scope.getStatements = function() {
     var statements = [];
     angular.forEach($scope.candidate.statements, function(s) {
-      s.attr = schema.qualified[s.attribute];
+      s.attr = Meta.schema.qualified[s.attribute];
       if (['label', 'links', 'type'].indexOf(s.attr.name) != -1) {
         return;
       }

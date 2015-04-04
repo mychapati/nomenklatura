@@ -14,11 +14,11 @@ var loadEntities = ['$route', '$http', '$q', 'Session', function($route, $http, 
 }];
 
 
-nomenklatura.controller('IndexCtrl', ['$scope', '$location', '$http', '$modal', 'Flash', 'schema', 'entities',
-  function ($scope, $location, $http, $modal, Flash, schema, entities) {
+nomenklatura.controller('IndexCtrl', ['$scope', '$location', '$http', '$modal', 'Flash', 'Meta', 'entities',
+  function ($scope, $location, $http, $modal, Flash, Meta, entities) {
   var filterTimeout = null;
 
-  $scope.schema = schema;
+  $scope.schema = Meta.schema;
   $scope.entities = entities;
   $scope.new_entity = {'type': 'Person'};
   $scope.query = '';
