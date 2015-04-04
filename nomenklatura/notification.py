@@ -37,7 +37,9 @@ def send_validation_link(user, subject, message):
     url = url_for('validate_account', id=user.id,
                   token=user.validation_token)
     log.debug('Activation URL: %s', url)
-    msg = Message(subject, recipients=[user.email])
-    msg.body = message % url
-    # print 'URL', url
-    mail.send(msg)
+    try:
+        msg = Message(subject, recipients=[user.email])
+        msg.body = message % url
+        mail.send(msg)
+    except Exception, e:
+        log.exception(e)
