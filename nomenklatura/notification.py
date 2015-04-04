@@ -1,6 +1,10 @@
+import logging
 from flask_mail import Message
 
-from nomenklatura.core import mail, url_for
+from nomenklatura.core import app, mail, url_for
+
+log = logging.getLogger(__name__)
+
 
 RESET_MESSAGE = """
 Someone (possibly you) has requested a password reset for your
@@ -32,6 +36,7 @@ def send_activation_link(user):
 def send_validation_link(user, subject, message):
     url = url_for('validate_account', id=user.id,
                   token=user.validation_token)
+    log.debug('Activation URL: %s', url)
     msg = Message(subject, recipients=[user.email])
     msg.body = message % url
     # print 'URL', url
