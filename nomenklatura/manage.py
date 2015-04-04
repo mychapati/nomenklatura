@@ -17,7 +17,7 @@ def sync():
     db.engine.execute("CREATE EXTENSION IF NOT EXISTS hstore;")
     db.engine.execute("CREATE EXTENSION IF NOT EXISTS fuzzystrmatch;")
     upgrade()
-    db.create_all()
+    # db.create_all()
 
 
 @manager.command
