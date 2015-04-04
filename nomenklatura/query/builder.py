@@ -140,7 +140,7 @@ class QueryBuilder(object):
         if parents is not None:
             parent_stmt, q = self._add_statement(q)
             q = q.filter(stmt.subject == parent_stmt._value)
-            q = q.filter(parent_stmt.attribute == self.node.name)
+            q = q.filter(parent_stmt.attribute.in_(self.node.attributes))
             q = q.filter(parent_stmt.subject.in_(parents))
             parent_col = parent_stmt.subject.label('parent_id')
             q = q.add_column(parent_col)
@@ -207,11 +207,10 @@ class QueryBuilder(object):
     def data_query(self, parents=None):
         """ Generate a query for any statement which matches the criteria
         specified through the filter query. """
-        filter_q = self.filter_query(parents=parents)
         q = db.session.query()
         stmt, q = self._add_statement(q)
 
-        filter_sq = filter_q.subquery()
+        filter_sq = self.filter_query(parents=parents).subquery()
         q = q.filter(stmt.subject == filter_sq.c.subject)
 
         q = q.filter(stmt.attribute.in_(self.project()))
@@ -229,7 +228,7 @@ class QueryBuilder(object):
             q = q.add_column(filter_sq.c.parent_id.label('parent_id'))
 
         q = q.order_by(filter_sq.c.subject.desc())
-        q = q.order_by(stmt.created_at.asc())
+        # q = q.order_by(stmt.created_at.asc())
         return q
 
     def execute(self, parents=None):
@@ -247,7 +246,7 @@ class QueryBuilder(object):
                 conv = attr.converter(attr)
                 value = conv.deserialize_safe(value)
 
-            node = self.get_node(data.get('attribute'))
+            node = self.get_node(attr.name)
             if attr.many if node is None else node.many:
                 if attr.name not in results[id]:
                     results[id][attr.name] = []
