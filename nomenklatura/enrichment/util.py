@@ -34,6 +34,7 @@ class Spider(object):
             'active': False,
             'source_url': url,
             'enrich_root': root,
+            'enrich_score': score,
             'enrich_status': PENDING,
             'publisher': self.PUBLISHER_LABEL,
             'publisher_url': self.PUBLISHER_URL

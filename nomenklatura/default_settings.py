@@ -24,6 +24,7 @@ CELERY_IMPORTS = (
     'nomenklatura.processing',
     'nomenklatura.processing.imports',
     'nomenklatura.processing.deduper',
+    'nomenklatura.enrichment',
 )
 
 MAIL_SERVER = 'localhost'

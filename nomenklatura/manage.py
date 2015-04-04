@@ -21,22 +21,9 @@ def sync():
 
 
 @manager.command
-def dedupe():
-    from nomenklatura.processing.deduper import dedupe_generate_pairings
-    dedupe_generate_pairings()
-
-
-@manager.command
-def enrich(spider, entity_id):
-    from nomenklatura.enrichment import get_spiders
-    from nomenklatura.query import EntityQuery
-    entity = EntityQuery.by_id(entity_id)
-    assert entity is not None, "Entity was not found"
-    cls = get_spiders().get(spider)
-    assert cls is not None, "Spider was not found"
-    print 'Spider:', cls
-    cls().lookup(entity)
-    db.session.commit()
+def enrich(entity_id, spider=None):
+    from nomenklatura.enrichment import enrich_entity
+    enrich_entity(entity_id, spider=spider)
 
 
 def main():
