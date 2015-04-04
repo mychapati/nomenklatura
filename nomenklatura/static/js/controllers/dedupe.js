@@ -33,28 +33,34 @@ nomenklatura.directive('nkDedupeItem', ['$timeout', function ($timeout) {
 }]);
 
 
-nomenklatura.controller('DedupeReviewCtrl', ['$scope', '$routeParams', '$location', '$document', '$timeout', '$http', 'schema',
-  function ($scope, $routeParams, $location, $document, $timeout, $http, schema) {
-  var pairingUrl = '/api/2/pairings',
-      nextPairing = null,
-      seen = [];
+nomenklatura.controller('DedupeReviewCtrl', ['$scope', '$routeParams', '$location', '$document', '$timeout', '$http', 'Flash', 'schema',
+  function ($scope, $routeParams, $location, $document, $timeout, $http, Flash, schema) {
+  var url = '/api/2/pairings';
 
   $scope.schema = schema;
   $scope.pairing = {};
 
 
-  var loadNext = function(exclude) {
-    var params = {params: {exclude: seen}, ignoreLoadingBar: true};
-    nextPairing = $http.get(pairingUrl, params);
+  var loadPairing = function() {
+    if(angular.isDefined($routeParams.id)) {
+      $http.get(url + '/' + $routeParams.id).then(function(res) {
+        $scope.pairing = res.data;
+      });
+    } else {
+      getNext();
+    }
   };
 
   var getNext = function() {
-    nextPairing.then(function(res) {
-      nextPairing = null;
-      $scope.pairing = res.data;
-      seen.push(res.data.pairing.id);
-      seen = seen.splice(seen.length - 6);
-      loadNext();
+    var params = {params: {exclude: $routeParams.id}, ignoreLoadingBar: true};
+    $http.get(url + '/next', params).then(function(res) {
+      if (res.data.status == 'next') {
+        $location.path('/manage/dedupe/' + res.data.next);
+      }
+      if (res.data.status == 'done') {
+        Flash.message('All done!', 'success');
+        $location.path('/manage');
+      }
     })
   };
 
@@ -64,15 +70,13 @@ nomenklatura.controller('DedupeReviewCtrl', ['$scope', '$routeParams', '$locatio
 
   $scope.decide = function(decision) {
     var pairing = angular.copy($scope.pairing.pairing);
-    $scope.pairing = {};
     pairing.decision = decision;
     pairing.decided = true;
-    $http.post(pairingUrl, pairing);
+    $http.post(url, pairing);
     getNext();
   };
   
-  loadNext();
-  getNext();
+  loadPairing();
 
   $document.bind("keypress", function (event) {
     //console.log(event.keyCode, event.which);

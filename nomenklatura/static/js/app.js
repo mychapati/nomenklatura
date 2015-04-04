@@ -75,6 +75,14 @@ nomenklatura.config(['$routeProvider', '$locationProvider', '$sceProvider', 'cfp
     }
   });
 
+  $routeProvider.when('/manage/dedupe/:id', {
+    templateUrl: '/static/templates/tools/dedupe.html',
+    controller: 'DedupeReviewCtrl',
+    resolve: {
+      'schema': loadSchema
+    }
+  });
+
   $routeProvider.when('/entities/:id', {
     templateUrl: '/static/templates/entities/view.html',
     controller: 'EntitiesViewCtrl',
