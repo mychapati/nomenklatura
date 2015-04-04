@@ -18,10 +18,9 @@ class Entity(object):
     @property
     def attributes(self):
         attrs = set()
-        q = qualified()
         for stmt in self.statements:
-            if stmt.active and stmt.attribute in q:
-                attrs.add(q[stmt.attribute])
+            if stmt.active and stmt.attribute in qualified:
+                attrs.add(qualified[stmt.attribute])
         return attrs
 
     def has(self, attribute):

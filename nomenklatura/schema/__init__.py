@@ -10,7 +10,7 @@ from nomenklatura.schema.data_types import DataException # noqa
 DEFAULT_SCHEMA = os.path.join(os.path.dirname(__file__), 'schema.yaml')
 
 
-def qualified():
+def generate_qualified():
     attributes = {}
     for type_ in types:
         for attr in type_.attributes:
@@ -29,3 +29,4 @@ def load_schema():
 
 
 types = load_schema()
+qualified = generate_qualified()

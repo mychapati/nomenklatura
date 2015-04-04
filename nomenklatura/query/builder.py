@@ -167,7 +167,7 @@ class QueryBuilder(object):
             if not child.node.nested:
                 attrs.update(child.node.attributes)
         if not len(attrs):
-            attrs.update(qualified().keys())
+            attrs.update(qualified.keys())
         return list(attrs)
 
     def base_object(self, data):
@@ -225,7 +225,6 @@ class QueryBuilder(object):
     def execute(self, parents=None):
         """ Run the data query and construct entities from it's results. """
         results = OrderedDict()
-        attributes = qualified()
         for row in self.data_query(parents=parents):
             data = row._asdict()
             id = data.get('id')
@@ -233,7 +232,7 @@ class QueryBuilder(object):
                 results[id] = self.base_object(data)
 
             value = data.get('value')
-            attr = attributes[data.get('attribute')]
+            attr = qualified[data.get('attribute')]
             if attr.data_type not in ['type', 'entity']:
                 conv = attr.converter(attr)
                 value = conv.deserialize_safe(value)

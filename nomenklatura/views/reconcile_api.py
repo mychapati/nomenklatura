@@ -168,7 +168,7 @@ def suggest_property():
     authz.require(authz.system_read())
     prefix = request.args.get('prefix', '')
     matches = []
-    for qname, attribute in qualified().items():
+    for qname, attribute in qualified.items():
         if attribute.match_prefix(prefix):
             matches.append({
                 'name': attribute.label,

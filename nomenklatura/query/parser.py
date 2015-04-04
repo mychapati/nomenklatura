@@ -42,9 +42,9 @@ class QueryNode(object):
     @property
     def attributes(self):
         if self.name == '*':
-            return qualified().keys()
+            return qualified.keys()
         attributes = []
-        for qname, attr in qualified().items():
+        for qname, attr in qualified.items():
             if attr.name == self.name:
                 attributes.append(qname)
         return attributes

@@ -18,7 +18,7 @@ log = logging.getLogger(__name__)
 
 def make_fields():
     fields = []
-    for qname, attr in qualified().items():
+    for qname, attr in qualified.items():
         if attr.data_type in ['string', 'text']:
             fields.append({
                 'field': attr.name,
