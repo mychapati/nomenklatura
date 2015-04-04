@@ -20,7 +20,7 @@ nomenklatura.controller('IndexCtrl', ['$scope', '$location', '$http', '$modal', 
 
   $scope.schema = schema;
   $scope.entities = entities;
-  $scope.new_entity = {};
+  $scope.new_entity = {'type': 'Person'};
   $scope.query = '';
 
   $scope.loadEntities = function(url, params) {

@@ -31,6 +31,7 @@ app_assets = Bundle(
     'js/controllers/index.js',
     'js/controllers/docs.js',
     'js/controllers/dedupe.js',
+    'js/controllers/enrichment.js',
     'js/controllers/settings.js',
     'js/controllers/entities.js',
     'js/controllers/users.js',

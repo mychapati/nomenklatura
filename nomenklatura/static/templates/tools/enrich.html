@@ -1,0 +1,35 @@
+
+<ul class="breadcrumb">
+  <li>
+    Enhance your data
+  </li>
+</ul>
+
+<div ng-hide="hasContext()">
+  <div class="wait-screen">
+    <div class="spinner">
+      <i class="fa fa-refresh fa-spin"></i>
+    </div>
+    <p>Please wait, finding related data...</p>
+  </div>
+</div>
+
+<div ng-show="hasContext()">
+  <h3 class="page-header">
+    Include this data extension?
+    <small ng-show="pairing.pairing.score">{{pairing.pairing.score}}% match</small>
+  </h3>
+
+  <div class="row">
+    <div class="col-sm-12">
+      
+    </div>
+  </div>
+
+  <div class="action-box">
+    <button type="submit" class="btn btn-success btn-lg" ng-click="decide('accepted')">
+        <i class="fa fa-check"></i> Include <small>(press x)</small></button>
+    <button type="submit" class="btn btn-danger btn-lg" ng-click="decide('rejected')">
+        <i class="fa fa-times"></i> Leave out <small>(press n)</small></button>
+  </div>
+</div>

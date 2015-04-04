@@ -84,6 +84,8 @@ class ContextEditForm(colander.MappingSchema):
                                            missing=None, default=None)
     enrich_root = colander.SchemaNode(colander.String(),
                                       missing=None, default=None)
+    enrich_score = colander.SchemaNode(colander.Integer(),
+                                       missing=None, default=None)
     enrich_status = colander.SchemaNode(colander.String(),
                                         validator=colander.OneOf(STATES),
                                         missing=None, default=None) # noqa

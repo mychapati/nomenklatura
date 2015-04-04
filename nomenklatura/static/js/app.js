@@ -70,17 +70,25 @@ nomenklatura.config(['$routeProvider', '$locationProvider', '$sceProvider', 'cfp
   $routeProvider.when('/manage/dedupe', {
     templateUrl: '/static/templates/tools/dedupe.html',
     controller: 'DedupeReviewCtrl',
-    resolve: {
-      'schema': loadSchema
-    }
+    resolve: {'schema': loadSchema}
   });
 
   $routeProvider.when('/manage/dedupe/:id', {
     templateUrl: '/static/templates/tools/dedupe.html',
     controller: 'DedupeReviewCtrl',
-    resolve: {
-      'schema': loadSchema
-    }
+    resolve: {'schema': loadSchema}
+  });
+
+  $routeProvider.when('/manage/enrichment/:root', {
+    templateUrl: '/static/templates/tools/enrich.html',
+    controller: 'EnrichmentReviewCtrl',
+    resolve: {'schema': loadSchema}
+  });
+
+  $routeProvider.when('/manage/enrichment/:root/:id', {
+    templateUrl: '/static/templates/tools/enrich.html',
+    controller: 'EnrichmentReviewCtrl',
+    resolve: {'schema': loadSchema}
   });
 
   $routeProvider.when('/entities/:id', {
