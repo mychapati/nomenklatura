@@ -10,7 +10,14 @@ var loadEntity = ['$route', '$http', '$q', function($route, $http, $q) {
 
 
 var loadSchema = ['config', '$q', function(config, $q) {
-  var dfd = $q.defer();
+  var dfd = $q.defer(),
+      qualified = {};
+  angular.forEach(config.SCHEMA.types, function(t) {
+    angular.forEach(t.attributes, function(a) {
+      qualified[a.qname] = a;
+    });
+  });
+  config.SCHEMA.qualified = qualified;
   dfd.resolve(config.SCHEMA);
   return dfd.promise;
 }];

@@ -144,8 +144,8 @@ class Entity(DataType):
         if isinstance(value, Entity):
             return value
         ent = EntityQuery.by_id(value)
-        if ent is None:
-            raise TypeError("Entity does not exist: %r" % value)
+        # if ent is None:
+        #    raise TypeError("Entity does not exist: %r" % value)
         return ent
 
 

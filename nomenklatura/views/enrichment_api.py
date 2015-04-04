@@ -5,7 +5,9 @@ from apikit import jsonify, request_data, obj_or_404
 from nomenklatura.views import authz
 from nomenklatura.core import db
 from nomenklatura.model import Context
+from nomenklatura.schema import qualified
 from nomenklatura.model.constants import PENDING, ACCEPTED
+from nomenklatura.query import execute_query
 from nomenklatura.enrichment import get_spiders, enrich_entity
 
 
@@ -61,10 +63,25 @@ def view(root, id):
     q = Context.by_root(root)
     q = q.filter(Context.id == id)
     context = obj_or_404(q.first())
+    statements = []
+    entities = set()
+    for stmt in context.statements:
+        entities.add(stmt.subject)
+        if qualified[stmt.attribute].data_type == 'entity':
+            entities.add(stmt._value)
+        statements.append(stmt.to_dict(raw=True))
+    q = [{
+        'assume': [context.id],
+        'id|=': list(entities),
+        'label': None,
+        'type': None
+    }]
+    entities = {e.get('id'): e for e in execute_query(q).get('result')}
     return jsonify({
         'status': 'ok',
+        'entities': entities,
         'context': context.to_dict(enrich=True),
-        'statements': [s.to_dict(raw=True) for s in context.statements]
+        'statements': statements
     })
 
 

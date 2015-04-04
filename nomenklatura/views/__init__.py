@@ -1,3 +1,4 @@
+import logging
 from flask import request
 from colander import Invalid
 from apikit import jsonify
@@ -13,6 +14,8 @@ from nomenklatura.views.contexts_api import blueprint as contexts_api
 from nomenklatura.views.enrichment_api import blueprint as enrichment_api
 from nomenklatura.views.pairings_api import blueprint as pairings_api
 from nomenklatura.views.reconcile_api import blueprint as reconcile_api
+
+log = logging.getLogger(__name__)
 
 
 @login_manager.request_loader
@@ -53,6 +56,7 @@ def handle_invalid(exc):
 
 @app.errorhandler(DataException)
 def handle_data_exception(exc):
+    log.exception(exc)
     body = {
         'status': 400,
         'name': exc.message,

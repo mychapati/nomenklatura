@@ -40,10 +40,32 @@ nomenklatura.controller('EnrichmentReviewCtrl', ['$scope', '$routeParams', '$loc
   $scope.decide = function(status) {
     var context = angular.copy($scope.candidate.context);
     $scope.candidate = {};
-    pairing.enrich_status = status;
-    $http.post(url, pairing).then(function() {
+    context.enrich_status = status;
+    $http.post(url, context).then(function() {
       getNext();
     });
+  };
+
+  $scope.getStatements = function() {
+    var statements = [];
+    angular.forEach($scope.candidate.statements, function(s) {
+      s.attr = schema.qualified[s.attribute];
+      if (['label', 'links', 'type'].indexOf(s.attr.name) != -1) {
+        return;
+      }
+      s.subject_entity = $scope.candidate.entities[s.subject];
+      s.value_entity = $scope.candidate.entities[s.value];
+      statements.push(s);
+    });
+    statements.sort(function(a, b) {
+      if (a.attr.name == 'same_as') return -1;
+      if (b.attr.name == 'same_as') return 1;
+      if (!a.value_entity && b.value_entity) return 1;
+      if (a.value_entity && !b.value_entity) return -1;
+      if (!a.value_entity && b.value_entity) return 1;
+      return 0;
+    });
+    return statements;
   };
   
   loadContext();

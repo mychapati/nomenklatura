@@ -6,31 +6,32 @@ types:
             type:
                 label: "Type"
                 data_type: type
-            # identifier:
-            #     label: "Identifier"
-            #     many: true
-            #     data_type: string
+                phrase: "is a"
             links:
                 label: "Links"
                 many: true
                 data_type: string
+                phrase: "is explained at"
+            alias:
+                label: "Alias"
+                many: true
+                data_type: string
+                phrase: "also known as"
+            same_as:
+                label: "Same as"
+                many: false
+                data_type: entity
+                phrase: "is the same as"
+            label:
+                label: "Label"
+                data_type: string
+                phrase: "is called"
 
     Node:
         label: "Node"
         abstract: true
         parent: Object
-        attributes:
-            alias:
-                label: "Alias"
-                many: true
-                data_type: string
-            same_as:
-                label: "Same as"
-                many: false
-                data_type: entity
-            label:
-                label: "Label"
-                data_type: string
+        # attributes:
 
     Link:
         label: "Link"
@@ -41,10 +42,12 @@ types:
                 label: "Start date"
                 many: false
                 data_type: date
+                phrase: 'started on'
             end_date:
                 label: "End date"
                 many: false
                 data_type: date
+                phrase: 'ended on'
 
     Actor:
         label: "Actor"
@@ -98,11 +101,14 @@ types:
                 label: "Role"
                 many: false
                 data_type: string
+                phrase: 'with the role'
             holder:
                 label: "Post holder"
                 many: false
                 data_type: entity
+                phrase: 'held by'
             organization:
-                    label: "Organization"
-                    many: false
-                    data_type: entity
+                label: "Organization"
+                many: false
+                data_type: entity
+                phrase: 'at'

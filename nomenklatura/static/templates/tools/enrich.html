@@ -17,12 +17,33 @@
 <div ng-show="hasContext()">
   <h3 class="page-header">
     Include this data extension?
-    <small ng-show="pairing.pairing.score">{{pairing.pairing.score}}% match</small>
+    <small ng-show="candidate.context.enrich_score">{{candidate.context.enrich_score}}% match</small>
   </h3>
 
   <div class="row">
     <div class="col-sm-12">
-      
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <a ng-href="{{candidate.context.publisher_url}}">
+            {{candidate.context.publisher}}
+          </a>
+          makes the following assertions:
+        </div>
+        <table class="table table-striped">
+          <tr ng-repeat="stmt in getStatements()">
+            <td width="40%" class="right-align">
+              <strong>{{stmt.subject_entity.label || stmt.subject_entity.type}}</strong>
+            </td>
+            <td width="20%">{{stmt.attr.phrase}}</td>
+            <td width="40%">
+              <strong ng-show="stmt.value_entity">
+                {{stmt.value_entity.label || stmt.value_entity.type}}
+              </strong>
+              <span ng-hide="stmt.value_entity">{{stmt.value}}</span>
+            </td>
+          </tr>
+        </table>       
+      </div>
     </div>
   </div>
 

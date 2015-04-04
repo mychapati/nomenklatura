@@ -10,6 +10,7 @@ class Attribute(SchemaObject):
         super(Attribute, self).__init__(name, data.get('label'))
         self.qname = '%s:%s' % (type_.name, name)
         self.data_type = data.get('data_type')
+        self.phrase = data.get('phrase', self.label)
         self.many = data.get('many', False)
 
     @property
@@ -23,7 +24,9 @@ class Attribute(SchemaObject):
     def to_dict(self):
         return {
             'name': self.name,
+            'qname': self.qname,
             'label': self.label,
+            'phrase': self.phrase,
             'many': self.many,
             'data_type': self.data_type
         }
