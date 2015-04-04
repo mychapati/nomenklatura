@@ -15,6 +15,8 @@ def session_commit(signal, changes=None):
         data = obj.to_dict(raw=True)
         data['created_at'] = data['created_at'].isoformat()
         data['updated_at'] = data['updated_at'].isoformat()
+        if data['deleted_at']:
+            data['deleted_at'] = data['deleted_at'].isoformat()
         process_statement.delay(data, op)
 
 

@@ -51,7 +51,7 @@ class Spider(object):
 
     def create_entity(self, ctx, type_, **kwargs):
         # TODO: should this do lookups first?
-        entity = Entity()
+        entity = Entity(assume_contexts=[ctx.id])
         entity.set(types.Object.attributes.type, type_, ctx)
         for attr in type_.attributes:
             if attr.name in kwargs:

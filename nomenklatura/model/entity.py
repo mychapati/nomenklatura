@@ -11,9 +11,10 @@ class Entity(object):
     All data associated to an entity is stored as statements, which
     all have the entity's ID as their subject. """
 
-    def __init__(self, id=None, statements=None):
+    def __init__(self, id=None, statements=None, assume_contexts=None):
         self.id = id or make_key()
         self.statements = statements or []
+        self.assume_contexts = assume_contexts or []
 
     @property
     def attributes(self):
@@ -26,19 +27,32 @@ class Entity(object):
     def has(self, attribute):
         return attribute in self.attributes
 
+    def exists(self, attribute, value, context):
+        for stmt in self.statements:
+            if stmt.attribute == attribute and \
+                    stmt.value == value and \
+                    stmt.context_id == context.id:
+                return True
+        return False
+
     def set(self, attribute, value, context):
         if not isinstance(attribute, Attribute):
             attribute = self.type.attributes.get(attribute)
+        if attribute is None:
+            return
         values = value if is_list(value) else [value]
         for value in values:
-            stmt = Statement(self.id, attribute.qname,
-                             value, context)
-            db.session.add(stmt)
-            self.statements.append(stmt)
+            if not self.exists(attribute.qname, value, context):
+                stmt = Statement(self.id, attribute.qname, value, context,
+                                 assume_contexts=self.assume_contexts)
+                db.session.add(stmt)
+                self.statements.append(stmt)
 
     def match(self, attribute):
         if not isinstance(attribute, Attribute):
             attribute = self.type.attributes.get(attribute)
+        if attribute is None:
+            return
         for stmt in self.statements:
             if stmt.attribute != attribute.qname:
                 continue
@@ -49,6 +63,8 @@ class Entity(object):
     def get(self, attribute):
         if not isinstance(attribute, Attribute):
             attribute = self.type.attributes.get(attribute)
+        if attribute is None:
+            return
         values = []
         for stmt in self.match(attribute):
             values.append(stmt.value)

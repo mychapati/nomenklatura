@@ -73,7 +73,7 @@ def dedupe_generate_pairings(threshold=100):
     # do this only on full moon.
     num = query_pairings(True).count()
     log.info('Triggered dedupe, with %s pairings of training data', num)
-    if num > threshold and num % threshold == 0:
+    if num < threshold or num % threshold != 0:
         return
     time.sleep(random.uniform(0, 4))
 

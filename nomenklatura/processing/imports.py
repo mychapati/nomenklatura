@@ -119,7 +119,7 @@ def load_entity(context, mapping, record):
         log.warning("No type defined for entity in mapping: %r", mapping)
         return
 
-    query = {'type': unicode(type_)}
+    query = {'assume': [context.id], 'type': unicode(type_)}
     has_key = False
 
     data = [(types.Object.attributes.type, type_)]

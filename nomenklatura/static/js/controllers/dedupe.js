@@ -72,8 +72,9 @@ nomenklatura.controller('DedupeReviewCtrl', ['$scope', '$routeParams', '$locatio
     var pairing = angular.copy($scope.pairing.pairing);
     pairing.decision = decision;
     pairing.decided = true;
-    $http.post(url, pairing);
-    getNext();
+    $http.post(url, pairing).then(function() {
+      getNext();
+    });
   };
   
   loadPairing();

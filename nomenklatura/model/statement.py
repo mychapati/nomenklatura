@@ -24,28 +24,35 @@ class Statement(db.Model, CommonMixIn):
     context = db.relationship('Context', backref=db.backref('statements',
                          lazy='dynamic', cascade='all, delete-orphan')) # noqa
 
-    def __init__(self, subject, attribute, value, context):
+    def __init__(self, subject, attribute, value, context,
+                 assume_contexts=None):
         self.subject = subject
         self.attribute = attribute
         self.value = value
         self.context = context
+        self.assume_contexts = assume_contexts or []
 
     @hybrid_property
     def value(self):
-        conv = qualified[self.attribute].converter(self.attribute)
+        attr = qualified[self.attribute]
+        conv = attr.converter(attr)
         return conv.deserialize_safe(self._value)
 
     @value.setter
     def value(self, value):
-        conv = qualified[self.attribute].converter(self.attribute)
+        attr = qualified[self.attribute]
+        conv = attr.converter(attr)
         self._value = conv.serialize_safe(value)
         self.normalized = normalize(self._value)
 
     @property
     def active(self):
-        if self.context is None:
-            return False
         if self.deleted_at:
+            return False
+        if hasattr(self, 'assume_contexts') and \
+                self.context_id in self.assume_contexts:
+            return True
+        if self.context is None:
             return False
         return self.context.active
 
@@ -65,12 +72,6 @@ class Statement(db.Model, CommonMixIn):
     def __cmp__(self, other):
         if other is None:
             return 1
-
-        if self.inferred and not other.inferred:
-            return -1
-        if not self.inferred and other.inferred:
-            return 1
-
         return cmp(self.updated_at, other.updated_at)
 
     def __repr__(self):

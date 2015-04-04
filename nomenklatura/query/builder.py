@@ -1,7 +1,7 @@
 from collections import OrderedDict
 
 from normality import normalize
-from sqlalchemy import exists, func
+from sqlalchemy import exists, or_, func
 from sqlalchemy.orm import aliased
 
 from nomenklatura.core import db, url_for
@@ -37,7 +37,13 @@ class QueryBuilder(object):
         stmt = aliased(Statement)
         ctx = aliased(Context)
         q = q.filter(stmt.context_id == ctx.id)
-        q = q.filter(ctx.active == True) # noqa
+        if len(self.node.assumed):
+            q = q.filter(or_(
+                ctx.active == True,
+                stmt.context_id.in_(self.node.assumed)
+            )) # noqa
+        else:
+            q = q.filter(ctx.active == True) # noqa
         q = q.filter(stmt.deleted_at == None) # noqa
         return stmt, q
 
@@ -98,7 +104,11 @@ class QueryBuilder(object):
         if query_root:
             next_subject = filter_stmt.subject
         elif self.node.specific_attribute:
-            q = q.filter(filter_stmt.attribute.in_(self.node.attributes))
+            attributes = self.node.attributes
+            if len(attributes) == 1:
+                q = q.filter(filter_stmt.attribute == attributes[0])
+            else:
+                q = q.filter(filter_stmt.attribute.in_(attributes))
 
         if self.node.inverted:
             next_subject, current_subject = current_subject, next_subject

@@ -32,28 +32,34 @@ class EntityQuery(object):
     def _sub_query(self, query):
         qn = QueryNode(None, None, [query])
         qb = QueryBuilder(None, qn)
-        return qb.filter_query()
+        return qn, qb.filter_query()
 
     def _main_query(self, query):
         stmt = aliased(Statement)
-        ssq = self._sub_query(query).subquery()
+        qn, sq = self._sub_query(query)
+        ssq = sq.subquery()
         q = db.session.query(stmt)
         q = q.options(joinedload(stmt.context))
         q = q.filter(stmt.subject == ssq.c.subject)
         q = q.order_by(ssq.c.subject)
-        return q
+        q = q.order_by(stmt.created_at.desc())
+        return qn, q
 
     def _entities(self, query):
         statements = []
         subject = None
-        for stmt in self._main_query(query):
+        qn, results = self._main_query(query)
+        for stmt in results:
+            stmt.assume_contexts = qn.assumed
             if subject is not None and stmt.subject != subject:
-                yield Entity(id=subject, statements=statements)
+                yield Entity(id=subject, statements=statements,
+                             assume_contexts=qn.assumed)
                 statements = []
             subject = stmt.subject
             statements.append(stmt)
         if len(statements) and subject is not None:
-            yield Entity(id=subject, statements=statements)
+            yield Entity(id=subject, statements=statements,
+                         assume_contexts=qn.assumed)
 
     @classmethod
     def by_id(cls, id):
@@ -67,7 +73,8 @@ class EntityQuery(object):
         if self._count is None:
             query = copy.deepcopy(self.query)
             query['limit'] = None
-            self._count = self._sub_query(query).count()
+            _, q = self._sub_query(query)
+            self._count = q.count()
         return self._count
 
     def __iter__(self):

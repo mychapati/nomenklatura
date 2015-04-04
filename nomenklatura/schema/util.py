@@ -5,7 +5,7 @@ from normality import normalize
 def date_parse(text):
     try:
         return dateutil.parser.parse(text)
-    except (TypeError, ValueError):
+    except (TypeError, ValueError, AttributeError):
         return None
 
 

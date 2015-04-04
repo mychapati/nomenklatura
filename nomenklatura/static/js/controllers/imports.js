@@ -95,7 +95,7 @@ nomenklatura.controller('ImportsMappingCtrl', ['$scope', '$routeParams', '$locat
 
   var updateState = function() {
     if ($scope.isAnalyzing() || $scope.isLoading()) {
-      uploadCheck = $timeout(refreshData, 1000);
+      uploadCheck = $timeout(refreshData, 2000);
     }
   };
 
