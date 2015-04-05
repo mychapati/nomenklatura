@@ -2,6 +2,27 @@
 
 Nomenklatura is an entity database for information about companies, people and their relationships. It provides a comprehensive interface and API to query, de-duplicate and integrate different entities - people, organisations or public bodies. It helps clean imported source data to turn it into domain-specific intelligence.
 
+## Implementation
+
+``nomenklatura`` uses an RDF-inspired, specialised graph representation.
+It is focussed on storing and integrating data about entities such as
+people, companies and other organisations.
+
+Key features include:
+
+* Information about entities is stored as a set of statements, i.e. 
+  properties with additional information attached to them.
+* Data is stored in a SQL database internally to make it easy to query.
+* Statements (and hence entities) are associated with contexts, which
+  store comprehensive provenance information (data source, trust level,
+  etc.)
+* Data can be exported to flat files and re-imported easily.
+
+The underlying ontology for the data is static, and stored in a YAML 
+file located at: ``nomenklatura/fixtures/schema.yaml``. Core types like 
+``Object``, ``Node`` and ``Link`` should not be changed, while
+higher-level types and attributes can be extended and changed at will.
+
 ## Installation
 
 Before you can install ``storyweb``, the following dependencies are required:
