@@ -5,7 +5,7 @@ from nomenklatura.core import db
 from nomenklatura.model import Context, Entity
 from nomenklatura.schema import types
 from nomenklatura.query import EntityQuery
-from nomenklatura.model.constants import PENDING
+from nomenklatura.model.constants import PENDING, REJECTED, ACCEPTED
 
 SCORE_CUTOFF = 50
 
@@ -39,15 +39,25 @@ class Spider(object):
     PUBLISHER_URL = None
 
     def create_context(self, root=None, url=None, score=None):
-        ctx = Context.create(None, {
-            'active': False,
-            'source_url': url,
-            'enrich_root': root,
-            'enrich_score': score,
-            'enrich_status': PENDING,
-            'publisher': self.PUBLISHER_LABEL,
-            'publisher_url': self.PUBLISHER_URL
-        })
+        q = db.session.query(Context)
+        q = q.filter(Context.enrich_root == root)
+        q = q.filter(Context.source_url == url)
+        ctx = q.first()
+        if ctx is not None:
+            if ctx.enrich_score == score or ctx.enrich_status == ACCEPTED:
+                raise ContextExistsException()
+            if ctx.enrich_status == REJECTED:
+                ctx.enrich_status = PENDING
+        else:
+            ctx = Context.create(None, {
+                'active': False,
+                'source_url': url,
+                'enrich_root': root,
+                'enrich_score': score,
+                'enrich_status': PENDING,
+                'publisher': self.PUBLISHER_LABEL,
+                'publisher_url': self.PUBLISHER_URL
+            })
         ctx.score = score
         db.session.add(ctx)
         return ctx
