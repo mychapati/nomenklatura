@@ -4,6 +4,7 @@ from Levenshtein import jaro_winkler
 from nomenklatura.core import db
 from nomenklatura.model import Context, Entity
 from nomenklatura.schema import types
+from nomenklatura.query import EntityQuery
 from nomenklatura.model.constants import PENDING
 
 SCORE_CUTOFF = 50
@@ -64,6 +65,16 @@ class Spider(object):
             if attr.name in kwargs:
                 entity.set(attr, kwargs.get(attr.name), ctx)
         return entity
+
+    def get_country(self, iso2=None, iso3=None):
+        if not iso2 and not iso3:
+            return None
+        q = {'type': types.Country.name}
+        if iso2:
+            q['iso2'] = iso2.upper()
+        if iso3:
+            q['iso3'] = iso3.upper()
+        return EntityQuery(q).first()
 
     def lookup(self, root, entity):
         pass

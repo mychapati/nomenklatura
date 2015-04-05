@@ -59,6 +59,19 @@ types:
                 many: true
                 data_type: entity
 
+    Organization:
+        label: "Organization"
+        parent: Actor
+        attributes:
+            has_posts:
+                label: "Posts"
+                many: true
+                data_type: entity
+            jurisdiction:
+                label: "Jurisdiction"
+                many: false
+                data_type: entity
+
     Company:
         label: "Company"
         parent: Organization
@@ -68,15 +81,26 @@ types:
                 many: false
                 phrase: 'identified by CIK'
                 data_type: 'string'
-
-    Organization:
-        label: "Organization"
-        parent: Actor
-        attributes:
-            has_posts:
-                label: "Posts"
-                many: true
-                data_type: entity
+            opencorporates_url:
+                label: "OpenCorporates URL"
+                many: false
+                phrase: "at OpenCorporates URL"
+                data_type: 'string'
+            company_type:
+                label: "Company type"
+                many: false
+                phrase: "of type"
+                data_type: 'string'
+            company_number:
+                label: "Company number"
+                many: false
+                phrase: "with registration number"
+                data_type: 'string'
+            current_status:
+                label: "Current status"
+                many: false
+                phrase: "with status"
+                data_type: 'string'
 
     Person:
         label: "Person"
