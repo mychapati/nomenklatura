@@ -15,7 +15,7 @@ def get_spiders():
 
 
 @celery.task
-def enrich_entity(entity_id, spider=None):
+def enrich_entity(root, entity_id, spider=None):
     entity = EntityQuery.by_id(entity_id)
     if entity is None:
         log.error('Entity does not exist: %s', entity_id)
@@ -27,7 +27,7 @@ def enrich_entity(entity_id, spider=None):
 
         try:
             inst = cls()
-            inst.lookup(entity)
+            inst.lookup(root, entity)
             db.session.commit()
         except Exception, e:
             log.exception(e)

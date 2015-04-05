@@ -23,7 +23,7 @@ def sync():
 @manager.command
 def enrich(entity_id, spider=None):
     from nomenklatura.enrichment import enrich_entity
-    enrich_entity(entity_id, spider=spider)
+    enrich_entity(entity_id, entity_id, spider=spider)
 
 
 def main():

@@ -6,7 +6,7 @@ from urlparse import urljoin
 import requests
 
 from nomenklatura.schema import types
-from nomenklatura.enrichment.util import Spider, LowScoreException
+from nomenklatura.enrichment.util import Spider, ContextException
 
 
 HOST_URL = 'http://ohuiginn.net/panama/'
@@ -41,12 +41,12 @@ class PanamaSpider(Spider):
     PUBLISHER_LABEL = 'Panama Companies'
     PUBLISHER_URL = 'http://ohuiginn.net/panama/'
 
-    def lookup_company(self, entity):
+    def lookup_company(self, root, entity):
         for title, url, items in scrape(entity.label, 'search/company',
                                         '/company/', 'persons'):
             try:
-                ctx = self.scored_context(entity, title, url)
-            except LowScoreException:
+                ctx = self.scored_context(root, entity, title, url)
+            except ContextException:
                 continue
 
             corp = self.create_entity(ctx, types.Company, label=title,
@@ -63,12 +63,12 @@ class PanamaSpider(Spider):
                                    role=data.get('role'),
                                    links=(url, data.get('url')))
 
-    def lookup_person(self, entity):
+    def lookup_person(self, root, entity):
         for title, url, items in scrape(entity.label, 'personsearch',
                                         '/person/', 'companies'):
             try:
-                ctx = self.scored_context(entity, title, url)
-            except LowScoreException:
+                ctx = self.scored_context(root, entity, title, url)
+            except ContextException:
                 continue
 
             person = self.create_entity(ctx, types.Person, label=title,
@@ -85,8 +85,8 @@ class PanamaSpider(Spider):
                                    role=data.get('role'),
                                    links=(url, data.get('url')))
 
-    def lookup(self, entity):
+    def lookup(self, root, entity):
         if entity.type == types.Company:
-            self.lookup_company(entity)
+            self.lookup_company(root, entity)
         if entity.type == types.Person:
-            self.lookup_person(entity)
+            self.lookup_person(root, entity)

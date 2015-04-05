@@ -21,7 +21,15 @@ def text_score(match, candidates):
     return best_score
 
 
-class LowScoreException(Exception):
+class ContextException(Exception):
+    pass
+
+
+class LowScoreException(ContextException):
+    pass
+
+
+class ContextExistsException(ContextException):
     pass
 
 
@@ -43,15 +51,13 @@ class Spider(object):
         db.session.add(ctx)
         return ctx
 
-    def scored_context(self, entity, title, url):
+    def scored_context(self, root, entity, title, url):
         score = text_score(title, entity.label)
         if score < SCORE_CUTOFF:
             return
-        return self.create_context(root=entity.id, url=url,
-                                   score=score)
+        return self.create_context(root=root, url=url, score=score)
 
     def create_entity(self, ctx, type_, **kwargs):
-        # TODO: should this do lookups first?
         entity = Entity(assume_contexts=[ctx.id])
         entity.set(types.Object.attributes.type, type_, ctx)
         for attr in type_.attributes:
@@ -59,5 +65,5 @@ class Spider(object):
                 entity.set(attr, kwargs.get(attr.name), ctx)
         return entity
 
-    def lookup(self, entity):
+    def lookup(self, root, entity):
         pass

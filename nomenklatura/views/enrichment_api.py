@@ -37,7 +37,7 @@ def initiate():
             'status': 'error',
             'message': 'No root entity provided.'},
             status=400)
-    enrich_entity.delay(root, request_data().get('spider'))
+    enrich_entity.delay(root, root, request_data().get('spider'))
     return jsonify({'status': 'ok', 'root': root})
 
 
@@ -98,4 +98,5 @@ def store(root):
     context.active = context.enrich_status == ACCEPTED
     context.user = current_user
     db.session.commit()
+    # TODO: task newly activated entities.
     return jsonify({'status': 'ok'})
