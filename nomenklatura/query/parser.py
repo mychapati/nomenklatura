@@ -93,10 +93,11 @@ class QueryNode(object):
             return True
         if self.leaf:
             return self.value is not None
-        for child in self.children:
-            if child.filtered:
-                return True
-        return False
+        # for child in self.children:
+        #     if child.filtered:
+        #         return True
+        # return False
+        return True
 
     @property
     def children(self):
