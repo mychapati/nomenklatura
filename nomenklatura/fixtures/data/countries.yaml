@@ -1,0 +1,12 @@
+publisher: "OKFN Frictionless Data"
+publisher_url: "http://data.okfn.org/data/core/country-codes"
+source_url: "https://raw.githubusercontent.com/datasets/country-codes/master/data/country-codes.csv"
+resource_mapping:
+    type: Country
+    label:
+        field: name
+    iso2:
+        field: iso3166_1_alpha_2
+    iso3:
+        field: iso3166_1_alpha_3
+        key: true

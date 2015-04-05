@@ -118,3 +118,18 @@ types:
                 many: false
                 data_type: entity
                 phrase: 'at'
+
+    Country:
+        label: "Country"
+        parent: Node
+        attributes:
+            iso2:
+                label: "ISO3166 Alpha-2"
+                many: false
+                data_type: string
+                phrase: "has two-digit country code"
+            iso3:
+                label: "ISO3166 Alpha-3"
+                many: false
+                data_type: string
+                phrase: "has three-digit country code"

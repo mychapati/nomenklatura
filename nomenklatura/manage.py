@@ -5,6 +5,7 @@ from flask.ext.migrate import MigrateCommand, upgrade
 from nomenklatura.core import db
 from nomenklatura.views import app
 from nomenklatura.assets import assets
+from nomenklatura.fixtures import import_fixtures
 
 manager = Manager(app)
 manager.add_command('assets', ManageAssets(assets))
@@ -24,6 +25,12 @@ def sync():
 def enrich(entity_id, spider=None):
     from nomenklatura.enrichment import enrich_entity
     enrich_entity(entity_id, entity_id, spider=spider)
+
+
+@manager.command
+def fixtures():
+    """ Import fixture objects, such as countries. """
+    import_fixtures()
 
 
 def main():
