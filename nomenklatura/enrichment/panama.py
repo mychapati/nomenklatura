@@ -86,7 +86,7 @@ class PanamaSpider(Spider):
                                    links=(url, data.get('url')))
 
     def lookup(self, root, entity):
-        if entity.type == types.Company:
+        if types.Company.matches(entity.type):
             self.lookup_company(root, entity)
-        if entity.type == types.Person:
+        if types.Person.matches(entity.type):
             self.lookup_person(root, entity)

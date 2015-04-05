@@ -14,7 +14,7 @@ class SecEdgarSpider(Spider):
     PUBLISHER_URL = 'http://www.sec.gov/'
 
     def lookup(self, root, entity):
-        if entity.type != types.Company:
+        if types.Company.matches(entity.type):
             return
 
         q = {'company': entity.label}

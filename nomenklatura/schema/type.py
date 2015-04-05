@@ -24,6 +24,29 @@ class Type(SchemaObject):
         return types[self._parent]
 
     @property
+    def parents(self):
+        """ This includes the type itself. """
+        from nomenklatura.schema import types
+        if self.root:
+            return set([self])
+        return types[self._parent].parents.union([self])
+
+    @property
+    def subtypes(self):
+        """ This includes the type itself. """
+        from nomenklatura.schema import types
+        subtypes = set([self])
+        for subtype in types:
+            if subtype._parent == self.name:
+                subtypes.update(subtype.subtypes)
+        return subtypes
+
+    def matches(self, other):
+        if isinstance(other, Type):
+            other = other.name
+        return other in [s.name for s in self.subtypes]
+
+    @property
     def attributes(self):
         if self._attributes is None:
             self._attributes = Schema(Attribute)
