@@ -1,5 +1,6 @@
 import logging
 
+import yaml
 from loadkit import logger
 from loadkit.types.table import Table
 from loadkit.operators.table import TableExtractOperator
@@ -38,6 +39,20 @@ def get_table(context):
     source = package.get_resource(context.resource_name)
     target = Table(package, source.name + '.json')
     return source, target
+
+
+def import_file_sync(model_file, data_file, user=None):
+    """ Manual imports. """
+    with open(data_file, 'rb') as dfh:
+        context = store_upload(dfh, data_file, user)
+
+    analyze_upload(context.id)
+
+    with open(model_file, 'rb') as fh:
+        model = yaml.load(fh)
+        context.update(model)
+    db.session.commit()
+    load_upload(context.id)
 
 
 def store_upload(file, filename, user):

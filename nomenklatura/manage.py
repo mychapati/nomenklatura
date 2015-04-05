@@ -6,6 +6,8 @@ from nomenklatura.core import db
 from nomenklatura.views import app
 from nomenklatura.assets import assets
 from nomenklatura.fixtures import import_fixtures
+from nomenklatura.processing.imports import import_file_sync
+
 
 manager = Manager(app)
 manager.add_command('assets', ManageAssets(assets))
@@ -25,6 +27,12 @@ def sync():
 def enrich(entity_id, spider=None):
     from nomenklatura.enrichment import enrich_entity
     enrich_entity(entity_id, entity_id, spider=spider)
+
+
+@manager.command
+def load(model_file, data_file):
+    """ Import a data file with properties specified in the model file. """
+    import_file_sync(model_file, data_file)
 
 
 @manager.command
