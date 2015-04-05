@@ -3,7 +3,8 @@
 @import "../vendor/bootstrap/less/mixins.less";
 
 // Style tiles, Colours
-@main-color: #c0392b;
+// @main-color: #c0392b; // nomenklatura color. 
+@main-color: #ed1c24; // grano logo color
 
 @white: #ffffff;
 @border-color: #d7d7d7;
@@ -66,6 +67,8 @@
 html { height: 100%; }
 body { min-height: 100%; }
 .modal-backdrop { bottom: 0; }
+body.modal-open { margin-right: 0px; }
+
 
 // Angular ugliness fix 
 [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
@@ -80,12 +83,13 @@ body {
 
 h1, h2, h3, h4, h5, h6 {
   font-family: @font-default;
-  font-weight: 300;
+  font-weight: 700;
 }
 
+@import "docs.less";
+@import "review.less";
 
 // Flash messages
-
 .flashes {
     position: relative;
 
@@ -96,14 +100,11 @@ h1, h2, h3, h4, h5, h6 {
     }
 }
 
-#page {}
-
 .hidden {
   display: none;
 }
 
 a, a:hover {
-  color: @brand-primary;
   cursor: pointer;
 }
 
@@ -123,26 +124,6 @@ th .form-group, td .form-group {
 
 th {
   vertical-align: middle;
-}
-
-.structured {
-  color: lighten(black, 20%);
-  font-family: monospace;
-  font-size: 0.8em;
-  background-color: darken(white, 3%);
-  padding: 0 2px 0 2px;
-  white-space: pre-wrap;
-}
-
-.btn.btn-default {
-  background-color: @main-color;
-  border: 1px solid white;
-  color: white;
-  font-weight: 300;
-}
-
-.btn.btn-default:hover {
-  background-color: lighten(@main-color, 10%);
 }
 
 .jumbotron {
@@ -167,18 +148,10 @@ th {
   }
 }
 
-.breadcrumb > li + li:before {
-    content: "> ";
-}
-
 .nav-pills > li.active > a,
 .nav-pills > li.active > a:hover,
 .nav-pills > li.active > a:focus {
   background-color: @main-color;
-}
-
-body.modal-open {
-  margin-right: 0px;
 }
 
 #menu {
@@ -187,8 +160,7 @@ body.modal-open {
 
   .navbar-brand {
     font-size: 1.5em;
-    font-weight: 300;
-    color: lighten(@main-color, 20%);
+    font-weight: 700;
     color: @main-color;
   }
 }
@@ -212,62 +184,4 @@ table td.num {
 
 .pagination.pagination-cursors a {
     cursor: pointer;
-}
-
-table .pager {
-    margin-bottom: 0;
-}
-
-table .pager ul {
-    margin-left: 0;
-}
-
-table input[type="text"] {
-    margin-bottom: 0px;
-}
-
-ul.api-list li {
-  margin-bottom: 0.5em;
-}
-
-code {
-  font-size: 10px;
-}
-
-.docs {
-  font-size: 1.2em;
-
-  pre {
-    background-color: #555;
-    color: #ddd;
-  }
-
-  code {
-    font-size: 0.8em;
-    color: #555;
-  }
-
-  h1, h2, h3, h4 {
-    font-weight: 700;
-  }
-}
-
-.wait-screen {
-    text-align: center;
-    .spinner {
-        font-size: 10em;
-        color: #555;
-        margin-top: 0.5em;
-        margin-bottom: 0.5em;
-    }
-}
-
-.action-box {
-  text-align: center;
-  margin-top: 1em;
-  margin-bottom: 3em;
-}
-
-.right-align {
-  text-align: right;
 }

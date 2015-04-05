@@ -7,21 +7,13 @@
 <h2 class="page-header">
   {{entity.label}}
   <div class="btn-group pull-right">
-    <!--a nk-authz dataset="dataset" op="edit" class="btn btn-default" ng-href="/datasets/{{dataset.slug}}/review/{{entity.id}}">
-      <i class="fa fa-link"></i> Review
-    </a-->
+    <!-- TODO: enrich -->
   </div>
 </h2>
 
 <div ng-show="entity.same_as" class="alert alert-info">
-    <span class="structured">{{entity.label}}</span> is an alias name for 
-    <a ng-href="/entities/{{entity.same_as.id}}"
-      class="structured">{{entity.same_as.label}}</a>.
-</div>
-
-<div ng-show="entity.invalid" class="alert alert-danger">
-    This entity has been marked as invalid. It will not be considered for matching, 
-    clustering or other cleaning tasks. 
+    <span>{{entity.label}}</span> is an alias name for 
+    <a ng-href="/entities/{{entity.same_as.id}}">{{entity.same_as.label}}</a>.
 </div>
 
 <div class="row">
@@ -29,13 +21,6 @@
     <table class="table table-condensed">
       <tr>
         <th colspan="2">Attributes <span class="explainer">additional data</span></th>
-      </tr>
-      <tr ng-hide="has_attributes">
-        <td colspan="2">
-          <div class="alert alert-info">
-            There are no additional attributes defined for this entity.
-          </div>
-        </td>
       </tr>
       <tr ng-repeat="(key, value) in entity" ng-show="value">
         <th>{{schema.attributes[key].label || key}}</th>
