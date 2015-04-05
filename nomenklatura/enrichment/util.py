@@ -55,7 +55,7 @@ class Spider(object):
     def scored_context(self, root, entity, title, url):
         score = text_score(title, entity.label)
         if score < SCORE_CUTOFF:
-            return
+            raise LowScoreException()
         return self.create_context(root=root, url=url, score=score)
 
     def create_entity(self, ctx, type_, **kwargs):

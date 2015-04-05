@@ -8,6 +8,8 @@ CELERY_BROKER_URL = 'amqp://guest:guest@localhost:5672//'
 DEFAULT_USER_ROLE = 'read'
 DEFAULT_ANON_ROLE = 'none'
 
+OPENCORPORATES_TOKEN = None
+
 ARCHIVE_TYPE = 'file'
 ARCHIVE_CONFIG = {'path': '/Users/fl/Data/nk-uploads'}
 

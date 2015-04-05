@@ -91,10 +91,10 @@ class OpenCorporatesSpider(Spider):
                                       links=off_url)
 
             if officer.get('start_date'):
-                post.set(types.Company.attribute.start_date,
+                post.set(types.Company.attributes.start_date,
                          officer.get('start_date'), ctx)
             if officer.get('end_date'):
-                post.set(types.Company.attribute.start_date,
+                post.set(types.Company.attributes.start_date,
                          officer.get('start_date'), ctx)
 
     def lookup_companies(self, root, entity):
@@ -115,7 +115,7 @@ class OpenCorporatesSpider(Spider):
                 ctx = self.scored_context(root, entity, company.get('name'),
                                           url)
             except ContextException:
-                continue
+                return
 
             corp = self.create_entity(ctx, types.Company,
                                       label=company.get('name'),
@@ -132,7 +132,7 @@ class OpenCorporatesSpider(Spider):
                 ctx = self.scored_context(root, entity, officer.get('name'),
                                           url)
             except ContextException:
-                continue
+                return
 
             off = self.create_entity(ctx, types.Actor,
                                      label=officer.get('name'),
@@ -152,16 +152,17 @@ class OpenCorporatesSpider(Spider):
                                       links=url)
 
             if officer.get('start_date'):
-                post.set(types.Company.attribute.start_date,
+                post.set(types.Company.attributes.start_date,
                          officer.get('start_date'), ctx)
             if officer.get('end_date'):
-                post.set(types.Company.attribute.start_date,
+                post.set(types.Company.attributes.start_date,
                          officer.get('start_date'), ctx)
 
             self.expand_company(corp, ctx, corp_url,
                                 skip_officer=officer.get('name'))
 
     def lookup(self, root, entity):
+        log.info("OC Lookup: %r", entity)
         if types.Company.matches(entity.type):
             self.lookup_companies(root, entity)
         self.lookup_officer(root, entity)
