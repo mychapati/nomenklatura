@@ -11,8 +11,8 @@ nomenklatura.factory('Meta', ['config', function(config) {
   config.SCHEMA.qualified = qualified;
 
   return {
-    'app_name': config.NAME,
-    'app_title': config.TITLE,
+    'name': config.NAME,
+    'title': config.TITLE,
     'schema': config.SCHEMA,
   }
 }]);
