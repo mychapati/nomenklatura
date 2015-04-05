@@ -1,0 +1,120 @@
+types:
+    Object:
+        label: "Object"
+        abstract: true
+        attributes:
+            type:
+                label: "Type"
+                data_type: type
+                phrase: "is a"
+            links:
+                label: "Links"
+                many: true
+                data_type: string
+                phrase: "is explained at"
+            alias:
+                label: "Alias"
+                many: true
+                data_type: string
+                phrase: "also known as"
+            same_as:
+                label: "Same as"
+                many: false
+                data_type: entity
+                phrase: "is the same as"
+            label:
+                label: "Label"
+                data_type: string
+                phrase: "is called"
+
+    Node:
+        label: "Node"
+        abstract: true
+        parent: Object
+        # attributes:
+
+    Link:
+        label: "Link"
+        abstract: true
+        parent: Object
+        attributes:
+            start_date:
+                label: "Start date"
+                many: false
+                data_type: date
+                phrase: 'started on'
+            end_date:
+                label: "End date"
+                many: false
+                data_type: date
+                phrase: 'ended on'
+
+    Actor:
+        label: "Actor"
+        abstract: true
+        parent: Node
+        attributes:
+            posts_held:
+                label: "Posts held"
+                many: true
+                data_type: entity
+
+    Company:
+        label: "Company"
+        parent: Organization
+        attributes:
+            cik:
+                label: "SEC Central Index Key"
+                many: false
+                phrase: 'identified by CIK'
+                data_type: 'string'
+
+    Organization:
+        label: "Organization"
+        parent: Actor
+        attributes:
+            has_posts:
+                label: "Posts"
+                many: true
+                data_type: entity
+
+    Person:
+        label: "Person"
+        parent: Actor
+        attributes:
+            email:
+                label: "E-Mail"
+                many: false
+                data_type: string
+            gender:
+                label: "Gender"
+                many: false
+                data_type: string
+            birth_date:
+                label: "Birth date"
+                many: false
+                data_type: date
+            death_date:
+                label: "Death date"
+                many: false
+                data_type: date
+
+    Post:
+        label: "Post"
+        parent: Link
+        attributes:
+            role:
+                label: "Role"
+                many: false
+                data_type: string
+                phrase: 'with the role'
+            holder:
+                label: "Post holder"
+                many: false
+                data_type: entity
+                phrase: 'held by'
+            organization:
+                label: "Organization"
+                many: false
+                data_type: entity
+                phrase: 'at'
