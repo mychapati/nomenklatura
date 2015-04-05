@@ -4,6 +4,7 @@
 *.egg-info
 _store/*
 .env
+env/*
 settings.py
 nomenklatura/static/vendor/*
 nomenklatura/static/assets/*

@@ -1,0 +1,27 @@
+DEBUG = ASSETS_DEBUG = True
+
+# Set a secure key
+SECRET_KEY = 'no'
+
+# Used for system stuff, no spaces and special characters!
+APP_NAME = 'nomenklatura'
+
+# Used in the user interface.
+APP_TITLE = 'nomenklatura'
+
+# Make sure this database exists and is UTF-8
+SQLALCHEMY_DATABASE_URI = 'postgresql://localhost/nk3'
+CELERY_BROKER_URL = 'amqp://guest:guest@localhost:5672//'
+
+# get one via: http://opencorporates.com
+OPENCORPORATES_TOKEN = None
+
+# Can also be S3, see: https://github.com/pudo/archivekit
+ARCHIVE_TYPE = 'file'
+ARCHIVE_CONFIG = {'path': '/Users/fl/Data/nk-uploads'}
+
+# see also: https://pythonhosted.org/Flask-Mail/
+MAIL_SERVER = 'smtp.gmail.com'
+MAIL_PORT = 25
+MAIL_DEBUG = True
+MAIL_DEFAULT_SENDER = 'nomenklatura@grano.cc'
