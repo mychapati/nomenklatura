@@ -3,25 +3,33 @@ from urlparse import urljoin
 import requests
 from lxml import html
 
-from nomenklatura.enrichment.util import Spider
+from nomenklatura.schema import types
+from nomenklatura.enrichment.util import Spider, ContextException
 
 CIK_URL = 'http://www.sec.gov/cgi-bin/cik.pl.c'
 
 
 class SecEdgarSpider(Spider):
     PUBLISHER_LABEL = 'US Securities and Exchange Commission'
-    PUBLISHER_URL = 'http://www.sec.gov/cgi-bin/cik.pl.c'
+    PUBLISHER_URL = 'http://www.sec.gov/'
 
-    def lookup(self, node, label):
-        if not node.is_a(T.Company):
+    def lookup(self, root, entity):
+        if entity.type != types.Company:
             return
 
-        q = {'company': label}
+        q = {'company': entity.label}
         res = requests.post(CIK_URL, data=q)
         doc = html.fromstring(res.content)
         for link in doc.findall('.//pre/a'):
             href = urljoin(CIK_URL, link.get('href'))
             title = link.tail.strip()
 
-            ctx = self.scored_context(node, title, href)
-            node.add(P.company_number, link.text, ctx)
+            try:
+                ctx = self.scored_context(root, entity, title, href)
+                self.create_entity(ctx, types.Company,
+                                   label=title,
+                                   links=href,
+                                   same_as=entity,
+                                   cik=link.text)
+            except ContextException:
+                continue
