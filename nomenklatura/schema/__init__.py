@@ -1,13 +1,14 @@
 import os
 import yaml
 
+from nomenklatura.core import FIXTURES
 from nomenklatura.schema.type import Type
 from nomenklatura.schema.attribute import Attribute # noqa
 from nomenklatura.schema.schema import Schema
 from nomenklatura.schema.data_types import DataException # noqa
 
 
-DEFAULT_SCHEMA = os.path.join(os.path.dirname(__file__), 'schema.yaml')
+DEFAULT_SCHEMA = os.path.join(FIXTURES, 'schema.yaml')
 
 
 def generate_qualified():

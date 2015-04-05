@@ -1,3 +1,4 @@
+import os
 import logging
 
 from archivekit import open_archive
@@ -18,6 +19,8 @@ logging.basicConfig(level=logging.DEBUG)
 logging.getLogger('passlib').setLevel(logging.WARNING)
 logging.getLogger('requests').setLevel(logging.WARNING)
 logging.getLogger('amqp').setLevel(logging.WARNING)
+
+FIXTURES = os.path.join(os.path.dirname(__file__), 'fixtures')
 
 app = Flask(__name__)
 app.config.from_object(default_settings)
