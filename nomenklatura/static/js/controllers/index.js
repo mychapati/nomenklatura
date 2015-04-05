@@ -1,18 +1,3 @@
-var loadEntities = ['$route', '$http', '$q', 'Session', function($route, $http, $q, Session) {
-  var dfd = $q.defer();
-      
-  Session.get(function(s) {
-    if (!s.permissions['read']) {
-      return dfd.resolve({});
-    }
-    var params = {params: {_uid: s.cbq}};
-    $http.get('/api/2/entities', params).then(function(res) {
-      dfd.resolve(res.data);
-    });
-  });
-  return dfd.promise;
-}];
-
 
 nomenklatura.controller('IndexCtrl', ['$scope', '$location', '$http', '$modal', 'Flash', 'Meta', 'entities',
   function ($scope, $location, $http, $modal, Flash, Meta, entities) {

@@ -1,0 +1,102 @@
+<ul class="breadcrumb hidden-xs">
+  <li>
+    Manage
+  </li>
+</ul>
+
+
+<h3 class="page-header">Open Refine Reconciliation</h3>
+
+<div class="row">
+  <div class="col-sm-3">
+    <img ng-src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/76/Google-refine-logo.svg/2000px-Google-refine-logo.svg.png" style="width: 70px; float: right;">
+  </div>
+  <div class="col-sm-9">
+    <p>
+      <a href="http://openrefine.org" target="_blank">OpenRefine</a> is a powerful data cleaning tool that can be connected to {{config.APP_NAME}} to match raw data to the entities in this project.
+    </p>
+    <p>
+      Use the this endpoint in Refine's <a target="_blank" href="https://github.com/OpenRefine/OpenRefine/wiki/Reconciliation">Reconciliation</a> to match data against this project.
+    </p>
+    <input class="form-control" readonly
+      value="[TODO]/api/2/reconcile">
+  </div>
+</div>
+
+
+
+
+<h3 class="page-header">Bulk data imports</h3>
+
+<div class="row">
+  <div class="col-sm-3">
+    <p>Bla blah help text.</p>
+    <div class="btn-group">
+      <a nk-authz op="manage" class="btn btn-default" ng-click="upload()">
+        <i class="fa fa-cloud-upload"></i> Upload</a>
+    </div>
+  </div>
+  <div class="col-sm-9">
+    <table class="table">
+      <tr>
+        <th>File name</th>
+        <th>Publisher</th>
+        <th>Last changed</th>
+      </tr>
+      <tr ng-repeat="ctx in imports.results">
+        <td>
+          <a ng-href="/imports/{{ctx.id}}">{{ctx.resource_name.split('/')[1]}}</a>
+        </td>
+        <td>
+          <a ng-show="ctx.publisher_url" target="_new" ng-href="{{ctx.publisher_url}}"> 
+            <i class="fa fa-external-link"></i> {{ctx.publisher || '-'}}
+          </a>
+          <span ng-hide="ctx.publisher_url"> 
+            {{ctx.publisher || '-'}}
+          </span>
+        </td>
+        <td am-time-ago="ctx.updated_at"></td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+
+<h3 class="page-header">User access permissions</h3>
+
+<div class="row">
+  <div class="col-sm-3">
+    <p>Bla blah help text.</p>
+  </div>
+  <div class="col-sm-9">
+    <table class="table table-condensed">
+      <tr>
+        <th>Users who have access</th>
+        <th>Read</th>
+        <th>Write</th>
+        <th>Admin</th>
+        <th>No&nbsp;access</th>
+      </tr>
+      <tr ng-repeat="user in users.results">
+        <td>{{user.display_name}}</td>
+        <td>
+          <input type="radio" name="role.{{user.id}}" ng-model="user.system_role" value="read"
+            ng-change="roleChange(user)" ng-hide="readonlyRole(user)">
+        </td>
+        <td>
+          <input type="radio" name="role.{{user.id}}" ng-model="user.system_role" value="edit"
+            ng-change="roleChange(user)" ng-hide="readonlyRole(user)">
+        </td>
+        <td>
+          <input type="radio" name="role.{{user.id}}" ng-model="user.system_role" value="manage"
+            ng-change="roleChange(user)" ng-hide="readonlyRole(user)">
+        </td>
+        <td>
+          <input type="radio" name="role.{{user.id}}" ng-model="user.system_role" value="none"
+            ng-change="roleChange(user)" ng-hide="readonlyRole(user)">
+        </td>
+      </tr>
+    </table>
+  </div>
+</div>
+

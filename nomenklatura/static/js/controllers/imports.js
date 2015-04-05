@@ -1,17 +1,4 @@
 
-var loadImports = ['$route', '$http', '$q', 'Session', function($route, $http, $q, Session) {
-  var dfd = $q.defer();
-      
-  Session.get(function(s) {
-    var params = {params: {_uid: s.cbq, imports: true}};
-    $http.get('/api/2/contexts', params).then(function(res) {
-      dfd.resolve(res.data);
-    });
-  });
-  return dfd.promise;
-}];
-
-
 nomenklatura.controller('ImportsIndexCtrl', ['$scope', '$routeParams', '$modal', '$location', '$http', '$sce', 'imports',
   function ($scope, $routeParams, $modal, $location, $http, $sce, imports) {
   $scope.imports = imports;
