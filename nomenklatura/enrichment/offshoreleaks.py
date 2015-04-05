@@ -1,12 +1,12 @@
 # OffshoreLeaks (http://www.icij.org/offshore)
 #
-from lxml import html
 from urlparse import urljoin
-from urllib import quote
+
+from lxml import html
 import requests
 
 from nomenklatura.schema import types
-from nomenklatura.enrichment.util import Spider
+from nomenklatura.enrichment.util import Spider, ContextException
 
 QUERY_URL = 'http://offshoreleaks.icij.org/search'
 
@@ -54,46 +54,56 @@ class OffshoreLeaksSpider(Spider):
                         edge.get('target') == node_id:
                     yield node, edge
 
-    def lookup_company(self, node, label):
-        for data in scrape(label, 'ent', 'results-type-entity'):
-            ctx = self.scored_context(node, data.get('title'), data.get('url'))
-            if ctx is None:
+    def lookup_company(self, root, entity):
+        for data in scrape(entity.label, 'ent', 'results-type-entity'):
+            try:
+                ctx = self.scored_context(root, entity, data.get('title'),
+                                          data.get('url'))
+            except ContextException:
                 continue
 
-            if data.get('node').get('taxJurisdiction'):
-                node.add(P.jurisdiction, data.get('jurisdiction'), ctx)
+            corp = self.create_entity(ctx, types.Company,
+                                      label=data.get('title'),
+                                      same_as=entity,
+                                      links=data.get('url'))
+            # TODO: reconcile: data.get('node').get('taxJurisdiction')
 
             for n, e in self.parse_graph(data):
-                off = self.graph.node(context=ctx)
-                off.add(P.label, n.get('label'))
-                off.add(P.is_a, TYPES.get(n.get('subtype')))
                 url = urljoin(data.get('url'), str(n.get('id')))
-                off.add(P.url, url)
-                off.add(P.identity, url)
-                link = self.graph.link(ctx, off, P.officer_of, node)
-                lurl = url + '#' + quote(str(data.get('id')))
-                link.add(P.identity, lurl)
-                link.add(P.position, e.get('label'))
+                off = self.create_entity(ctx, TYPES.get(n.get('subtype')),
+                                         label=n.get('label'),
+                                         links=url)
+                self.create_entity(ctx, types.Post,
+                                   holder=off,
+                                   organization=corp,
+                                   role=e.get('label'),
+                                   links=(url, data.get('url')))
 
-    def lookup_officer(self, node, label):
-        for data in scrape(label, 'ppl', 'results-type-officer'):
-            ctx = self.scored_context(node, data.get('title'), data.get('url'))
-            if ctx is None:
+    def lookup_officer(self, root, entity):
+        for data in scrape(entity.label, 'ppl', 'results-type-officer'):
+            try:
+                ctx = self.scored_context(root, entity, data.get('title'),
+                                          data.get('url'))
+            except ContextException:
                 continue
 
-            for n, e in self.parse_graph(data):
-                corp = self.graph.node(context=ctx)
-                corp.add(P.label, n.get('label'))
-                corp.add(P.is_a, TYPES.get(n.get('subtype')))
-                url = urljoin(data.get('url'), str(n.get('id')))
-                corp.add(P.url, url)
-                corp.add(P.identity, url)
-                link = self.graph.link(ctx, node, P.officer_of, corp)
-                lurl = data.get('url') + '#' + quote(str(n.get('id')))
-                link.add(P.identity, lurl)
-                link.add(P.position, e.get('label'))
+            off = self.create_entity(ctx, types.Actor,
+                                     label=data.get('title'),
+                                     same_as=entity,
+                                     links=data.get('url'))
 
-    def lookup(self, node, label):
-        if node.is_a(T.Company):
-            self.lookup_company(node, label)
-        self.lookup_officer(node, label)
+            for n, e in self.parse_graph(data):
+                url = urljoin(data.get('url'), str(n.get('id')))
+                corp = self.create_entity(ctx, TYPES.get(n.get('subtype')),
+                                          label=n.get('label'),
+                                          links=url)
+                self.create_entity(ctx, types.Post,
+                                   holder=off,
+                                   organization=corp,
+                                   role=e.get('label'),
+                                   links=(url, data.get('url')))
+
+    def lookup(self, root, entity):
+        if types.Company.matches(entity.type):
+            self.lookup_company(root, entity)
+        self.lookup_officer(root, entity)
