@@ -2,6 +2,7 @@
 #
 # http://api.opencorporates.com/documentation/API-Reference
 #
+import logging
 from urlparse import urljoin
 from itertools import count
 
@@ -11,6 +12,7 @@ from nomenklatura.core import app
 from nomenklatura.enrichment.util import Spider
 
 
+log = logging.getLogger(__name__)
 API_HOST = 'https://api.opencorporates.com/'
 CORP_ID = 'https://opencorporates.com/companies/'
 API_TOKEN = app.config.get('OPENCORPORATES_TOKEN')

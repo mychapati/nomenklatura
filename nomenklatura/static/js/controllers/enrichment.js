@@ -58,11 +58,17 @@ nomenklatura.controller('EnrichmentReviewCtrl', ['$scope', '$routeParams', '$loc
       statements.push(s);
     });
     statements.sort(function(a, b) {
-      if (a.attr.name == 'same_as') return -1;
-      if (b.attr.name == 'same_as') return 1;
-      if (!a.value_entity && b.value_entity) return 1;
-      if (a.value_entity && !b.value_entity) return -1;
-      if (!a.value_entity && b.value_entity) return 1;
+      if (a.subject == b.subject) {
+        if (a.attr.name == 'same_as') return -1;
+        if (b.attr.name == 'same_as') return 1;
+        if (!a.value_entity && b.value_entity) return 1;
+        if (a.value_entity && !b.value_entity) return -1;
+        if (!a.value_entity && b.value_entity) return 1;
+      } else {
+        if (a.value == $scope.candidate.context.enrich_root) return -1;
+        if (b.value == $scope.candidate.context.enrich_root) return 1;
+        return a.subject.localeCompare(b.subject);
+      }
       return 0;
     });
     return statements;
