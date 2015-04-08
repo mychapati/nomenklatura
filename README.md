@@ -70,6 +70,12 @@ cp settings.py.tmpl settings.py
 export NOMENKLATURA_SETTINGS =`pwd`/settings.py
 ```
 
+You will also need to create a database in Postgres with the encoding set to UTF-8. To enable data reconciliation, please execute the folloing SQL command with superuser privileges:
+
+```sql
+CREATE EXTENSION IF NOT EXISTS fuzzystrmatch;
+```
+
 To download all JavaScript dependencies, fixture country data and to create a new database, run the following command:
 
 ```bash
