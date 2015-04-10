@@ -83,7 +83,7 @@ def reconcile_op(query):
         results.append({
             'id': entity.get('id'),
             'name': entity.get('label'),
-            'score': entity.get('score'),
+            'score': min(99, int(entity.get('score') or 0)),
             'type': [type_],
             'uri': entity_ui(entity.get('id')),
             'match': False
