@@ -1,7 +1,7 @@
 import copy
 
-from nomenklatura.model.common import is_list
 from nomenklatura.schema import qualified
+from nomenklatura.schema.util import is_list
 from nomenklatura.query.util import parse_name, OP_SIM
 
 

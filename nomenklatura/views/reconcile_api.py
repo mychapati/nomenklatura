@@ -8,6 +8,7 @@ from werkzeug.exceptions import BadRequest
 from nomenklatura.core import url_for, app_title
 from nomenklatura.views import authz
 from nomenklatura.schema import qualified, types
+from nomenklatura.schema.util import is_list
 from nomenklatura.query import execute_query
 
 
@@ -77,7 +78,7 @@ def reconcile_op(query):
     results = []
     for entity in execute_query([q]).get('result'):
         type_ = entity.get('type')
-        type_ = type_ if isinstance(type_, (list, set, tuple)) else type_
+        type_ = type_[0] if is_list(type_) else type_
         type_ = types[type_].to_freebase_type()
         results.append({
             'id': entity.get('id'),
