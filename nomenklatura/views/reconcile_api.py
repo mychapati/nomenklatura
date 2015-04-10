@@ -70,10 +70,10 @@ def reconcile_op(query):
         'label%=': query.get('query', ''),
         'type': query_types([query.get('type')]),
         'limit': get_limit(default=5),
-        'same_as': {'optional': 'forbidden'}
+        # 'same_as': {'optional': 'forbidden'}
     }
-    for p in query.get('properties', []):
-        q[p.get('pid')] = p.get('v')
+    # for p in query.get('properties', []):
+    #    q[p.get('pid')] = p.get('v')
 
     results = []
     for entity in execute_query([q]).get('result'):
