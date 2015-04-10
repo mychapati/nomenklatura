@@ -98,6 +98,7 @@ def reconcile():
     Reconciliation API, emulates Google Refine API. See:
     http://code.google.com/p/google-refine/wiki/ReconciliationServiceApi
     """
+    print request.form, authz.system_read()
     authz.require(authz.system_read())
     data = request.args.copy()
     data.update(request.form.copy())
