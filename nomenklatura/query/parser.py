@@ -28,6 +28,10 @@ class QueryNode(object):
                 self.limit = 1
             self.offset = value.pop('offset', 0)
 
+        if value is not None and \
+                not isinstance(value, (dict, list, tuple, set)):
+            value = unicode(value)
+
         self.value = value
 
     @property
