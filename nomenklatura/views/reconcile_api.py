@@ -28,7 +28,7 @@ def query_types(types_):
         if '/' in type_name:
             _, type_name = type_name.rsplit('/', 1)
         queried.add(type_name)
-    return queried if len(queried) else None
+    return list(queried) if len(queried) else None
 
 
 def reconcile_index():
@@ -76,7 +76,9 @@ def reconcile_op(query):
 
     results = []
     for entity in execute_query([q]).get('result'):
-        type_ = types[entity.get('type')].to_freebase_type()
+        type_ = entity.get('type')
+        type_ = type_ if isinstance(type_, (list, set, tuple)) else type_
+        type_ = types[type_].to_freebase_type()
         results.append({
             'id': entity.get('id'),
             'name': entity.get('label'),
@@ -86,6 +88,8 @@ def reconcile_op(query):
             'match': False
         })
 
+    best = results[0] if len(results) else None
+    log.info("Returning %s candidates, best: %r", len(results), best)
     return {
         'result': results,
         'num': len(results)
@@ -98,7 +102,6 @@ def reconcile():
     Reconciliation API, emulates Google Refine API. See:
     http://code.google.com/p/google-refine/wiki/ReconciliationServiceApi
     """
-    print request.form, authz.system_read()
     authz.require(authz.system_read())
     data = request.args.copy()
     data.update(request.form.copy())
