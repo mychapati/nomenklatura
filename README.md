@@ -7,7 +7,7 @@ Nomenklatura is an entity database for information about companies, people and t
 * A full investigative data toolkit with a focus on modelling corporate structures, 
   connections between people, organizations and companies.
 * A comprehensive graph query API inspired by [Freebase MQL](https://developers.google.com/freebase/mql/index).
-* Interactive data enrichment via structured data spiders, with automatic queries to [OpenCorporates](https://opencorporates.com/) and a variety of other public databases.
+* Interactive data enrichment via structured data spiders, with automatic queries to [OpenCorporates](https://opencorporates.com/) and a variety of other public databases. See [the wiki for details](https://github.com/pudo/nomenklatura/wiki/Data-enrichment).
 * Each fact is associated with full source information, and material from specific sources
   can be revoked and re-introduced at will.
 * Bulk data import from CSV and Excel with an interactive data model builder.
