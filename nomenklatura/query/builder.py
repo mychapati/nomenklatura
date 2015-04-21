@@ -68,10 +68,10 @@ class QueryBuilder(object):
                                 func.length(filter_stmt.normalized))
             distance = func.levenshtein(field, value)
             score = ((rel - distance) / rel) * 100.0
+            q = q.filter(score > 1)
             score = func.max(score).label('score')
 
             q = q.add_column(score)
-            q = q.having(score >= 1)
             q = q.order_by(score.desc())
         return q
 
