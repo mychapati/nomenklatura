@@ -17,16 +17,21 @@
 
 <table class="table">
   <tr>
-    <th>Publisher</th>
     <th>File name</th>
+    <th>Publisher</th>
     <th>Last changed</th>
   </tr>
   <tr ng-repeat="ctx in imports.results">
     <td>
-      {{ctx.publisher || '-'}}
+      <a ng-href="/imports/{{ctx.id}}">{{ctx.resource_name.split('/')[1]}}</a>
     </td>
     <td>
-      <a ng-href="/imports/{{ctx.id}}">{{ctx.resource_name.split('/')[1]}}</a>
+      <a ng-show="ctx.publisher_url" target="_new" ng-href="{{ctx.publisher_url}}"> 
+        <i class="fa fa-external-link"></i> {{ctx.publisher || '-'}}
+      </a>
+      <span ng-hide="ctx.publisher_url"> 
+        {{ctx.publisher || '-'}}
+      </span>
     </td>
     <td am-time-ago="ctx.updated_at"></td>
   </tr>

@@ -1,6 +1,7 @@
 from nomenklatura.core import db, url_for
 from nomenklatura.schema import types, qualified, Attribute
-from nomenklatura.model.common import make_key, is_list
+from nomenklatura.schema.util import is_list
+from nomenklatura.model.common import make_key
 from nomenklatura.model.statement import Statement
 
 

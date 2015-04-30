@@ -1,7 +1,7 @@
 import copy
 
-from nomenklatura.model.common import is_list
 from nomenklatura.schema import qualified
+from nomenklatura.schema.util import is_list
 from nomenklatura.query.util import parse_name, OP_SIM
 
 
@@ -27,6 +27,10 @@ class QueryNode(object):
             if not self.many:
                 self.limit = 1
             self.offset = value.pop('offset', 0)
+
+        if value is not None and \
+                not isinstance(value, (dict, list, tuple, set)):
+            value = unicode(value)
 
         self.value = value
 

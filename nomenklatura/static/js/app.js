@@ -36,7 +36,16 @@ nomenklatura.config(['$routeProvider', '$locationProvider', '$sceProvider', 'cfp
     templateUrl: '/static/templates/settings.html',
     controller: 'SettingsCtrl',
     resolve: {
-      'users': loadRoleUsers
+      'users': loadUsers
+    }
+  });
+
+  $routeProvider.when('/manage', {
+    templateUrl: '/static/templates/tools/manage.html',
+    controller: 'ManageCtrl',
+    resolve: {
+      'users': loadUsers,
+      'imports': loadImports
     }
   });
 

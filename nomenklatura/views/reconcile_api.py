@@ -8,6 +8,7 @@ from werkzeug.exceptions import BadRequest
 from nomenklatura.core import url_for, app_title
 from nomenklatura.views import authz
 from nomenklatura.schema import qualified, types
+from nomenklatura.schema.util import is_list
 from nomenklatura.query import execute_query
 
 
@@ -28,7 +29,7 @@ def query_types(types_):
         if '/' in type_name:
             _, type_name = type_name.rsplit('/', 1)
         queried.add(type_name)
-    return queried if len(queried) else None
+    return list(queried) if len(queried) else None
 
 
 def reconcile_index():
@@ -69,23 +70,27 @@ def reconcile_op(query):
         'label%=': query.get('query', ''),
         'type': query_types([query.get('type')]),
         'limit': get_limit(default=5),
-        'same_as': {'optional': 'forbidden'}
+        # 'same_as': {'optional': 'forbidden'}
     }
-    for p in query.get('properties', []):
-        q[p.get('pid')] = p.get('v')
+    # for p in query.get('properties', []):
+    #    q[p.get('pid')] = p.get('v')
 
     results = []
     for entity in execute_query([q]).get('result'):
-        type_ = types[entity.get('type')].to_freebase_type()
+        type_ = entity.get('type')
+        type_ = type_[0] if is_list(type_) else type_
+        type_ = types[type_].to_freebase_type()
         results.append({
             'id': entity.get('id'),
             'name': entity.get('label'),
-            'score': entity.get('score'),
+            'score': min(99, int(entity.get('score') or 0)),
             'type': [type_],
             'uri': entity_ui(entity.get('id')),
             'match': False
         })
 
+    best = results[0] if len(results) else None
+    log.info("Returning %s candidates, best: %r", len(results), best)
     return {
         'result': results,
         'num': len(results)

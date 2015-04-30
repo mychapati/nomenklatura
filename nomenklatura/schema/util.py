@@ -9,6 +9,10 @@ def date_parse(text):
         return None
 
 
+def is_list(obj):
+    return isinstance(obj, (list, tuple, set))
+
+
 class SchemaObject(object):
 
     def __init__(self, name, label, abstract=False):

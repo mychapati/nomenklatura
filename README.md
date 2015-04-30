@@ -7,7 +7,7 @@ Nomenklatura is an entity database for information about companies, people and t
 * A full investigative data toolkit with a focus on modelling corporate structures, 
   connections between people, organizations and companies.
 * A comprehensive graph query API inspired by [Freebase MQL](https://developers.google.com/freebase/mql/index).
-* Interactive data enrichment via structured data spiders, with automatic queries to [OpenCorporates](https://opencorporates.com/) and a variety of other public databases.
+* Interactive data enrichment via structured data spiders, with automatic queries to [OpenCorporates](https://opencorporates.com/) and a variety of other public databases. See [the wiki for details](https://github.com/pudo/nomenklatura/wiki/Data-enrichment).
 * Each fact is associated with full source information, and material from specific sources
   can be revoked and re-introduced at will.
 * Bulk data import from CSV and Excel with an interactive data model builder.
@@ -68,6 +68,12 @@ Next, you need to customize the configuration file. Copy the template configurat
 cp settings.py.tmpl settings.py
 # edit settings.py
 export NOMENKLATURA_SETTINGS =`pwd`/settings.py
+```
+
+You will also need to create a database in Postgres with the encoding set to UTF-8. To enable data reconciliation, please execute the folloing SQL command with superuser privileges:
+
+```sql
+CREATE EXTENSION IF NOT EXISTS fuzzystrmatch;
 ```
 
 To download all JavaScript dependencies, fixture country data and to create a new database, run the following command:

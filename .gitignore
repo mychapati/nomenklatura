@@ -2,7 +2,7 @@
 *.DS_Store
 *.sqlite3
 *.egg-info
-_store/*
+backups/*
 .env
 env/*
 settings.py

@@ -19,6 +19,7 @@ deps_assets = Bundle(
 
 app_assets = Bundle(
     'js/app.js',
+    'js/loaders.js',
     'js/services/meta.js',
     'js/services/session.js',
     'js/services/validation.js',
@@ -28,6 +29,7 @@ app_assets = Bundle(
     'js/directives/entity_mapping.js',
     'js/directives/authz.js',
     'js/controllers/app.js',
+    'js/controllers/manage.js',
     'js/controllers/imports.js',
     'js/controllers/index.js',
     'js/controllers/docs.js',

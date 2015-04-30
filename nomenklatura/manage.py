@@ -17,8 +17,6 @@ manager.add_command('db', MigrateCommand)
 @manager.command
 def sync():
     """ Sync or create the database. """
-    db.engine.execute("CREATE EXTENSION IF NOT EXISTS hstore;")
-    db.engine.execute("CREATE EXTENSION IF NOT EXISTS fuzzystrmatch;")
     upgrade()
     # db.create_all()
 
