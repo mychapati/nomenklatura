@@ -12,12 +12,12 @@
 </h2>
 
 <div ng-show="entity.same_as" class="alert alert-info">
-    <span>{{entity.label}}</span> is an alias name for 
+    <span>{{entity.label}}</span> is an alias name for
     <a ng-href="/entities/{{entity.same_as.id}}">{{entity.same_as.label}}</a>.
 </div>
 
 <div class="row">
-  <div class="col-xs-12 col-md-6">
+  <div ng-show="!editing" class="col-xs-12 col-md-6">
     <table class="table table-condensed">
       <tr>
         <th colspan="2">Attributes <span class="explainer">additional data</span></th>
@@ -28,6 +28,28 @@
       </tr>
     </table>
   </div>
+  <div ng-show="editing" class="col-xs-12 col-md-6">
+
+    <table class="table table-condensed">
+      <tr>
+        <th colspan="2">Attributes <span class="explainer">additional data</span></th>
+      </tr>
+      <tr ng-repeat="(key, value) in editedEntity" ng-show="value">
+        <th>{{schema.attributes[key].label || key}}</th>
+        <td><input ng-model="editedEntity[key]" value={{value}} /></td>
+      </tr>
+    </table>
+  </div>
   <div class="col-xs-12 col-md-6">
   </div>
+  <button type="button" class="btn btn-primary" ng-show="!editing" ng-click="beginEdit()">edit</button>
+  <button type="button" class="btn btn-primary" ng-show="editing" ng-click="saveEdit()">save</button>
+  <button type="button" class="btn btn-primary" ng-show="editing" ng-click="cancelEdit()">cancel</button>
+  <!--
+        saving spinner or so
+        actually save the data to server
+
+        test
+        rewrite html/css
+  -->
 </div>
