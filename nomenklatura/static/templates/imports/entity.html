@@ -12,13 +12,13 @@
 
     <div class="form-group" ng-repeat="(attribute, map) in getMapped()">
       <label class="col-sm-2 control-label">
-        {{schema.attributes[attribute].label}}
+        {{getAttribute(attribute).label}}
       </label>
-      <div class="col-sm-9" ng-show="schema.attributes[attribute].data_type == 'entity'">
+      <div class="col-sm-9" ng-show="getAttribute(attribute).data_type == 'entity'">
         <entity-mapping schema="schema" mapping="map" fields="fields">
         </entity-mapping>
       </div>
-      <div class="col-sm-7" ng-show="schema.attributes[attribute].data_type != 'entity'">
+      <div class="col-sm-7" ng-show="getAttribute(attribute).data_type != 'entity'">
         <select name="type" class="form-control"
           ng-model="map.field"
           ng-options="f.name as f.title for f in getFields()"></select>
@@ -26,7 +26,7 @@
           Examples: <span ng-repeat="s in getSamples(fields[map.field])"><code>{{s}}</code>, </span>...
         </p>
       </div>
-      <div class="col-sm-2" ng-show="schema.attributes[attribute].data_type != 'entity'">
+      <div class="col-sm-2" ng-show="getAttribute(attribute).data_type != 'entity'">
         <div class="checkbox">
           <label>
             <input type="checkbox" ng-model="map.key">

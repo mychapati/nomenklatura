@@ -1,18 +1,18 @@
 
-nomenklatura.directive('entityMapping', ['RecursionHelper', function (RecursionHelper) {
+nomenklatura.directive('entityMapping', ['RecursionHelper', 'Meta', function (RecursionHelper, Meta) {
     return {
         restrict: 'E',
         scope: {
-          'schema': '=',
           'mapping': '=',
           'fields': '='
         },
         templateUrl: '/static/templates/imports/entity.html',
         compile: function(element) {
           return RecursionHelper.compile(element, function(scope, iElement, iAttrs, controller, transcludeFn){
+
             scope.getTypes = function() {
               var types = [];
-              angular.forEach(scope.schema.types, function(t) {
+              angular.forEach(Meta.schema.types, function(t) {
                 if (!t.abstract) {
                   types.push(t);  
                 }
@@ -24,7 +24,7 @@ nomenklatura.directive('entityMapping', ['RecursionHelper', function (RecursionH
               if (!scope.mapping.type) {
                 return [];
               }
-              var type = scope.schema.types[scope.mapping.type],
+              var type = Meta.schema.types[scope.mapping.type],
                   attributes = [];
               angular.forEach(type.attributes, function(a) {
                 if (!angular.isDefined(scope.mapping[a.name])) {
@@ -54,9 +54,14 @@ nomenklatura.directive('entityMapping', ['RecursionHelper', function (RecursionH
               return samples;
             };
 
+            scope.getAttribute = function(attr) {
+              var type = Meta.schema.types[scope.mapping.type];
+              return type.attributes[attr];
+            };
+
             scope.getMapped = function() {
               var mapped = {};
-              var type = scope.schema.types[scope.mapping.type];
+              var type = Meta.schema.types[scope.mapping.type];
               angular.forEach(scope.mapping, function(spec, attr) {
                 if (attr != 'type' && type.attributes[attr]) {
                   mapped[attr] = spec;
