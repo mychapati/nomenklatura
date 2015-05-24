@@ -4,11 +4,10 @@ import logging
 from flask import Blueprint, request
 from apikit import jsonify, get_limit
 from werkzeug.exceptions import BadRequest
+from typesystem.util import is_list
 
-from nomenklatura.core import url_for, app_title
+from nomenklatura.core import url_for, app_title, types
 from nomenklatura.views import authz
-from nomenklatura.schema import qualified, types
-from nomenklatura.schema.util import is_list
 from nomenklatura.query import execute_query
 
 
@@ -173,7 +172,7 @@ def suggest_property():
     authz.require(authz.system_read())
     prefix = request.args.get('prefix', '')
     matches = []
-    for qname, attribute in qualified.items():
+    for qname, attribute in types.qualified.items():
         if attribute.match_prefix(prefix):
             matches.append({
                 'name': attribute.label,

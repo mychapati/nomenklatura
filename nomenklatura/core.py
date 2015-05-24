@@ -1,6 +1,7 @@
 import os
 import logging
 
+import typesystem
 from archivekit import open_archive
 from normality import slugify
 from flask import Flask
@@ -28,6 +29,14 @@ app.config.from_envvar('NOMENKLATURA_SETTINGS', silent=True)
 
 app_title = app.config.get('APP_TITLE', 'Nomenklatura')
 app_name = app.config.get('APP_NAME', slugify(app_title, sep='_'))
+
+
+def load_entity(id):
+    from nomenklatura.query.entity import EntityQuery
+    return EntityQuery.by_id(id)
+
+types = typesystem.load_yaml(os.path.join(FIXTURES, 'schema.yaml'),
+                             entity_loader=load_entity)
 
 db = SQLAlchemy(app)
 migrate = Migrate(app, db, directory=app.config.get('ALEMBIC_DIR'))

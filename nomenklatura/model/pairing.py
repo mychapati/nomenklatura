@@ -1,8 +1,7 @@
 from datetime import datetime
 from sqlalchemy import or_, and_
 
-from nomenklatura.core import db
-from nomenklatura.schema import types
+from nomenklatura.core import db, types
 from nomenklatura.model.common import CommonMixIn, KEY_LENGTH
 from nomenklatura.model.forms import PairingForm
 from nomenklatura.model.statement import Statement

@@ -4,8 +4,7 @@ import random
 
 import dedupe
 
-from nomenklatura.core import db, celery
-from nomenklatura.schema import qualified
+from nomenklatura.core import db, celery, types
 from nomenklatura.model import Pairing, Lock
 from nomenklatura.query import EntityQuery, execute_query
 from nomenklatura.query import same_as
@@ -18,7 +17,7 @@ log = logging.getLogger(__name__)
 
 def make_fields():
     fields = []
-    for qname, attr in qualified.items():
+    for qname, attr in types.qualified.items():
         if attr.data_type in ['string', 'text']:
             fields.append({
                 'field': attr.name,

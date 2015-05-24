@@ -4,8 +4,7 @@ from normality import normalize
 from sqlalchemy import exists, or_, func
 from sqlalchemy.orm import aliased
 
-from nomenklatura.core import db, url_for
-from nomenklatura.schema import types, qualified
+from nomenklatura.core import db, url_for, types
 from nomenklatura.model.statement import Statement
 from nomenklatura.model.context import Context
 from nomenklatura.query.util import OP_EQ, OP_LIKE, OP_IN, OP_NOT, \
@@ -177,7 +176,7 @@ class QueryBuilder(object):
             if not child.node.nested:
                 attrs.update(child.node.attributes)
         if not len(attrs):
-            attrs.update(qualified.keys())
+            attrs.update(types.qualified.keys())
         return list(attrs)
 
     def base_object(self, data):
@@ -241,7 +240,7 @@ class QueryBuilder(object):
                 results[id] = self.base_object(data)
 
             value = data.get('value')
-            attr = qualified[data.get('attribute')]
+            attr = types.qualified[data.get('attribute')]
             if attr.data_type not in ['type', 'entity']:
                 conv = attr.converter(attr)
                 value = conv.deserialize_safe(value)

@@ -1,9 +1,9 @@
 from datetime import datetime
 import logging
 
-from nomenklatura.core import db
-from nomenklatura.schema import types
-from nomenklatura.schema.util import date_parse
+from typesystem.util import date_parse
+
+from nomenklatura.core import db, types
 from nomenklatura.model import Statement
 
 log = logging.getLogger(__name__)

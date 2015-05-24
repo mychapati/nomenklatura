@@ -3,8 +3,7 @@ import os
 from apikit.jsonify import JSONEncoder
 from flask import render_template
 
-from nomenklatura.core import app, app_name, app_title
-from nomenklatura.schema import types
+from nomenklatura.core import app, app_name, app_title, types
 
 
 def angular_templates():

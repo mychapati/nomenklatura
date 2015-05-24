@@ -52,3 +52,4 @@ css_assets = Bundle(
 assets.register('deps', deps_assets)
 assets.register('app', app_assets)
 assets.register('css', css_assets)
+

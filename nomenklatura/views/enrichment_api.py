@@ -3,9 +3,8 @@ from flask.ext.login import current_user
 from apikit import jsonify, request_data, obj_or_404
 
 from nomenklatura.views import authz
-from nomenklatura.core import db
+from nomenklatura.core import db, types
 from nomenklatura.model import Context
-from nomenklatura.schema import qualified
 from nomenklatura.model.constants import PENDING, ACCEPTED
 from nomenklatura.query import execute_query
 from nomenklatura.enrichment import get_spiders, enrich_entity
@@ -67,7 +66,7 @@ def view(root, id):
     entities = set()
     for stmt in context.statements:
         entities.add(stmt.subject)
-        if qualified[stmt.attribute].data_type == 'entity':
+        if types.qualified[stmt.attribute].data_type == 'entity':
             entities.add(stmt._value)
         statements.append(stmt.to_dict(raw=True))
     q = [{

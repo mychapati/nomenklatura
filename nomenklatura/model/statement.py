@@ -1,8 +1,7 @@
 from normality import normalize
 from sqlalchemy.ext.hybrid import hybrid_property
 
-from nomenklatura.core import db
-from nomenklatura.schema import qualified
+from nomenklatura.core import db, types
 from nomenklatura.model.common import CommonMixIn, KEY_LENGTH
 
 
@@ -34,15 +33,13 @@ class Statement(db.Model, CommonMixIn):
 
     @hybrid_property
     def value(self):
-        attr = qualified[self.attribute]
-        conv = attr.converter(attr)
-        return conv.deserialize_safe(self._value)
+        attr = types.qualified[self.attribute]
+        return attr.converter.deserialize_safe(self._value)
 
     @value.setter
     def value(self, value):
-        attr = qualified[self.attribute]
-        conv = attr.converter(attr)
-        self._value = conv.serialize_safe(value)
+        attr = types.qualified[self.attribute]
+        self._value = attr.converter.serialize_safe(value)
         self.normalized = normalize(self._value)
 
     @property

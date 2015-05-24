@@ -1,7 +1,7 @@
 import copy
 
-from nomenklatura.schema import qualified
-from nomenklatura.schema.util import is_list
+from typesystem.util import is_list
+from nomenklatura.core import types
 from nomenklatura.query.util import parse_name, OP_SIM
 
 
@@ -47,9 +47,9 @@ class QueryNode(object):
     @property
     def attributes(self):
         if self.name == '*':
-            return qualified.keys()
+            return types.qualified.keys()
         attributes = []
-        for qname, attr in qualified.items():
+        for qname, attr in types.qualified.items():
             if attr.name == self.name:
                 attributes.append(qname)
         return attributes

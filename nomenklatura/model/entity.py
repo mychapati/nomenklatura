@@ -1,6 +1,7 @@
-from nomenklatura.core import db, url_for
-from nomenklatura.schema import types, qualified, Attribute
-from nomenklatura.schema.util import is_list
+from typesystem import Attribute
+from typesystem.util import is_list
+
+from nomenklatura.core import db, url_for, types
 from nomenklatura.model.common import make_key
 from nomenklatura.model.statement import Statement
 
@@ -21,8 +22,8 @@ class Entity(object):
     def attributes(self):
         attrs = set()
         for stmt in self.statements:
-            if stmt.active and stmt.attribute in qualified:
-                attrs.add(qualified[stmt.attribute])
+            if stmt.active and stmt.attribute in types.qualified:
+                attrs.add(types.qualified[stmt.attribute])
         return attrs
 
     def has(self, attribute):

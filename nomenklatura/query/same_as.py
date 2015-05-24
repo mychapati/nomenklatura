@@ -1,8 +1,7 @@
 from sqlalchemy import and_, or_
 from sqlalchemy.orm import aliased
 
-from nomenklatura.core import db
-from nomenklatura.schema import types
+from nomenklatura.core import db, types
 from nomenklatura.model import Statement, Context
 
 

@@ -2,9 +2,9 @@ import logging
 from flask import request
 from colander import Invalid
 from apikit import jsonify
+from typesystem import TypeException
 
 from nomenklatura.core import login_manager
-from nomenklatura.schema import DataException
 from nomenklatura.model import User
 from nomenklatura.views.ui import app
 from nomenklatura.views.users_api import blueprint as users_api
@@ -54,19 +54,19 @@ def handle_invalid(exc):
     return jsonify(body, status=400)
 
 
-@app.errorhandler(DataException)
-def handle_data_exception(exc):
-    log.exception(exc)
-    body = {
-        'status': 400,
-        'name': exc.message,
-        'errors': {
-            exc.data_type.attribute.name: exc.message
-        },
-        'data_type': unicode(exc.data_type),
-        'value': exc.value
-    }
-    return jsonify(body, status=400)
+# @app.errorhandler(TypeException)
+# def handle_data_exception(exc):
+#     log.exception(exc)
+#     body = {
+#         'status': 400,
+#         'name': exc.message,
+#         'errors': {
+#             exc.type: exc.message
+#         },
+#         'data_type': unicode(exc.data_type),
+#         'value': exc.value
+#     }
+#     return jsonify(body, status=400)
 
 
 app.register_blueprint(users_api, url_prefix='/api/2')

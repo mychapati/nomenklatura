@@ -4,9 +4,8 @@ from flask import Blueprint, request, url_for, redirect
 from flask.ext.login import current_user
 from apikit import jsonify, Pager, request_data, obj_or_404
 
-from nomenklatura.core import db
+from nomenklatura.core import db, types
 from nomenklatura.views import authz
-from nomenklatura.schema import types
 from nomenklatura.model import Entity, Context
 from nomenklatura.query import execute_query, EntityQuery
 

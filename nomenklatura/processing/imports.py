@@ -4,9 +4,9 @@ import yaml
 from loadkit import logger
 from loadkit.types.table import Table
 from loadkit.operators.table import TableExtractOperator
+from typesystem import TypeException
 
-from nomenklatura.core import db, archive, celery
-from nomenklatura.schema import types, DataException
+from nomenklatura.core import db, archive, celery, types
 from nomenklatura.model import Context, Entity
 from nomenklatura.query import EntityQuery
 
@@ -112,9 +112,9 @@ def load_upload(context_id):
         for record in table.records():
             try:
                 load_entity(context, context.resource_mapping, record)
-            except DataException, de:
-                log.error("Cannot convert '%s' to %s for attribute '%s': %s",
-                          de.value, de.data_type, de.attribute, de.message)
+            except TypeException, de:
+                log.error("Cannot convert '%s' to %r for attribute '%s': %s",
+                          de.value, de.type, de.attribute, de.message)
             except Exception, e:
                 log.exception(e)
 
