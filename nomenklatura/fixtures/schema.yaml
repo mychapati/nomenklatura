@@ -5,26 +5,26 @@ types:
         attributes:
             type:
                 label: "Type"
-                data_type: type
+                type: type
                 phrase: "is a"
             links:
                 label: "Links"
                 many: true
-                data_type: string
+                type: string
                 phrase: "is explained at"
             alias:
                 label: "Alias"
                 many: true
-                data_type: string
+                type: string
                 phrase: "also known as"
             same_as:
                 label: "Same as"
                 many: false
-                data_type: entity
+                type: Object
                 phrase: "is the same as"
             label:
                 label: "Label"
-                data_type: string
+                type: string
                 phrase: "is called"
 
     Node:
@@ -41,12 +41,12 @@ types:
             start_date:
                 label: "Start date"
                 many: false
-                data_type: date
+                type: date
                 phrase: 'started on'
             end_date:
                 label: "End date"
                 many: false
-                data_type: date
+                type: date
                 phrase: 'ended on'
 
     Actor:
@@ -57,7 +57,7 @@ types:
             posts_held:
                 label: "Posts held"
                 many: true
-                data_type: entity
+                type: Post
 
     Organization:
         label: "Organization"
@@ -66,11 +66,11 @@ types:
             has_posts:
                 label: "Posts"
                 many: true
-                data_type: entity
+                type: Actor
             jurisdiction:
                 label: "Jurisdiction"
                 many: false
-                data_type: entity
+                type: Country
 
     Company:
         label: "Company"
@@ -80,27 +80,27 @@ types:
                 label: "SEC Central Index Key"
                 many: false
                 phrase: 'identified by CIK'
-                data_type: 'string'
+                type: 'string'
             opencorporates_url:
                 label: "OpenCorporates URL"
                 many: false
                 phrase: "at OpenCorporates URL"
-                data_type: 'string'
+                type: 'string'
             company_type:
                 label: "Company type"
                 many: false
                 phrase: "of type"
-                data_type: 'string'
+                type: 'string'
             company_number:
                 label: "Company number"
                 many: false
                 phrase: "with registration number"
-                data_type: 'string'
+                type: 'string'
             current_status:
                 label: "Current status"
                 many: false
                 phrase: "with status"
-                data_type: 'string'
+                type: 'string'
 
     Person:
         label: "Person"
@@ -109,19 +109,19 @@ types:
             email:
                 label: "E-Mail"
                 many: false
-                data_type: string
+                type: string
             gender:
                 label: "Gender"
                 many: false
-                data_type: string
+                type: string
             birth_date:
                 label: "Birth date"
                 many: false
-                data_type: date
+                type: date
             death_date:
                 label: "Death date"
                 many: false
-                data_type: date
+                type: date
 
     Post:
         label: "Post"
@@ -130,17 +130,17 @@ types:
             role:
                 label: "Role"
                 many: false
-                data_type: string
+                type: string
                 phrase: 'with the role'
             holder:
                 label: "Post holder"
                 many: false
-                data_type: entity
+                type: Actor
                 phrase: 'held by'
             organization:
                 label: "Organization"
                 many: false
-                data_type: entity
+                type: Organization
                 phrase: 'at'
 
     Country:
@@ -150,10 +150,10 @@ types:
             iso2:
                 label: "ISO3166 Alpha-2"
                 many: false
-                data_type: string
+                type: string
                 phrase: "has two-digit country code"
             iso3:
                 label: "ISO3166 Alpha-3"
                 many: false
-                data_type: string
+                type: string
                 phrase: "has three-digit country code"

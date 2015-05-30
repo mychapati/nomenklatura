@@ -78,7 +78,7 @@ def reconcile_op(query):
     for entity in execute_query([q]).get('result'):
         type_ = entity.get('type')
         type_ = type_[0] if is_list(type_) else type_
-        type_ = types[type_].to_freebase_type()
+        type_ = type_.to_freebase_type()
         results.append({
             'id': entity.get('id'),
             'name': entity.get('label'),

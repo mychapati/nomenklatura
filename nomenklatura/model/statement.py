@@ -34,12 +34,12 @@ class Statement(db.Model, CommonMixIn):
     @hybrid_property
     def value(self):
         attr = types.qualified[self.attribute]
-        return attr.converter.deserialize_safe(self._value)
+        return attr.type.deserialize_safe(self._value)
 
     @value.setter
     def value(self, value):
         attr = types.qualified[self.attribute]
-        self._value = attr.converter.serialize_safe(value)
+        self._value = attr.type.serialize_safe(value)
         self.normalized = normalize(self._value)
 
     @property

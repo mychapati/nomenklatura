@@ -241,9 +241,7 @@ class QueryBuilder(object):
 
             value = data.get('value')
             attr = types.qualified[data.get('attribute')]
-            if attr.data_type not in ['type', 'entity']:
-                conv = attr.converter(attr)
-                value = conv.deserialize_safe(value)
+            value = attr.type.deserialize_safe(value)
 
             node = self.get_node(attr.name)
             if attr.many if node is None else node.many:

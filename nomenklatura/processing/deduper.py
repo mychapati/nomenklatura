@@ -18,13 +18,13 @@ log = logging.getLogger(__name__)
 def make_fields():
     fields = []
     for qname, attr in types.qualified.items():
-        if attr.data_type in ['string', 'text']:
+        if attr.type == types.string:
             fields.append({
                 'field': attr.name,
                 'type': 'Set' if attr.many else 'String',
                 'has missing': True
             })
-        if attr.data_type in ['type']:
+        if attr.type == types.type:
             fields.append({
                 'field': attr.name,
                 'type': 'Exact'

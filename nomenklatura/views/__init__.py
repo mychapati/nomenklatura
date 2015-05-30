@@ -54,19 +54,19 @@ def handle_invalid(exc):
     return jsonify(body, status=400)
 
 
-# @app.errorhandler(TypeException)
-# def handle_data_exception(exc):
-#     log.exception(exc)
-#     body = {
-#         'status': 400,
-#         'name': exc.message,
-#         'errors': {
-#             exc.type: exc.message
-#         },
-#         'data_type': unicode(exc.data_type),
-#         'value': exc.value
-#     }
-#     return jsonify(body, status=400)
+@app.errorhandler(TypeException)
+def handle_data_exception(exc):
+    log.exception(exc)
+    body = {
+        'status': 400,
+        'name': exc.message,
+        'errors': {
+            exc.type: exc.message
+        },
+        'data': unicode(exc.type),
+        'value': exc.value
+    }
+    return jsonify(body, status=400)
 
 
 app.register_blueprint(users_api, url_prefix='/api/2')

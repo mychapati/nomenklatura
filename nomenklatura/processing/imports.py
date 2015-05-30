@@ -142,7 +142,7 @@ def load_entity(context, mapping, record):
         if attr.name not in mapping or attr == types.Object.attributes.type:
             continue
         attr_map = mapping[attr.name]
-        if attr.data_type == 'entity':
+        if attr.type.is_entity:
             value = load_entity(context, attr_map, record)
         else:
             value = record.get(attr_map.get('field'))
